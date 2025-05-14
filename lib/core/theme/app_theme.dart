@@ -1,4 +1,4 @@
-import 'package:exodus/core/constants/app_colors.dart';
+import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/theme/text_style.dart';
 // import 'package:exodus/core/theme/text_style.dart';
 import 'package:flutter/material.dart';

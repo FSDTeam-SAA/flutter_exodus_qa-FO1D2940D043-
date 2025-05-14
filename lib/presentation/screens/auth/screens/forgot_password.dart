@@ -1,5 +1,5 @@
-import 'package:exodus/core/constants/app_gap.dart';
-import 'package:exodus/core/constants/app_padding.dart';
+import 'package:exodus/core/constants/app/app_gap.dart';
+import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';

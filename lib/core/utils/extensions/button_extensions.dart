@@ -1,5 +1,5 @@
-import 'package:exodus/core/constants/app_colors.dart';
-import 'package:exodus/core/constants/app_sizes.dart';
+import 'package:exodus/core/constants/app/app_colors.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/presentation/widgets/gradient_primary_button.dart';
 import 'package:exodus/presentation/widgets/gradient_secondary_button.dart';

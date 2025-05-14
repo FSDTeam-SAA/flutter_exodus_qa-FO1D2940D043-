@@ -1,4 +1,4 @@
-import 'package:exodus/core/constants/app_sizes.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class GradientButtonPrimary extends StatelessWidget {
