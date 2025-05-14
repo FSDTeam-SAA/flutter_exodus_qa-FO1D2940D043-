@@ -1,3 +1,4 @@
+import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/routes/route_generator.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
@@ -8,6 +9,8 @@ import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  setupServiceLocator();
   runApp(const MyApp());
 }
 

@@ -1,4 +1,8 @@
 class ApiEndpoints {
+  // BaseURL
+  // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
+  static const String baseUrl = 'https://localhost:5000/api/v1';
+
   // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
