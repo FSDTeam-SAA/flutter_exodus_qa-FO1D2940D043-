@@ -4,7 +4,7 @@ import 'package:exodus/data/models/user_models.dart';
 class AuthResponse {
   final String accessToken;
   final User user;
-  final List<Ticket> tickets;
+  final List<Ticket>? tickets;
 
   AuthResponse({
     required this.accessToken,

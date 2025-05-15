@@ -54,6 +54,8 @@ class ApiClient {
         onReceiveProgress: onReceiveProgress,
       );
 
+      dPrint(response);
+
       final base = BaseResponse<T>.fromJson(response.data, fromJsonT);
 
       return mapBaseResponse(base);
@@ -84,13 +86,16 @@ class ApiClient {
         onReceiveProgress: onReceiveProgress,
       );
 
-      final base = BaseResponse<T>.fromJson(response.data, fromJsonT);
+      dPrint(" Base Api Response -> ${response.data}");
+      final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
+      // dPrint(" Base Api Response -> $baseResponse");
 
-      return mapBaseResponse(base);
+      return mapBaseResponse<T>(baseResponse);
     } on DioException catch (error) {
       final message = dioErrorToUserMessage(error);
       return ApiError(message);
     } catch (e) {
+      dPrint("Unexpected Error: $e");
       return ApiError("Unexpected error occurred.");
     }
   }

@@ -1,3 +1,5 @@
+import 'package:exodus/core/utils/debug_logger.dart';
+
 class BaseResponse<T> {
   final bool success;
   final String message;
@@ -9,6 +11,7 @@ class BaseResponse<T> {
     Map<String, dynamic> json,
     T Function(dynamic) fromJsonT,
   ) {
+    dPrint("Base Response -> ${json['message']}");
     return BaseResponse<T>(
       success: json['success'] ?? false,
       message: json['message'] ?? '',

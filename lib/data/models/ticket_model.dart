@@ -3,17 +3,16 @@ class Ticket {
   final String scheduleId;
   final String userId;
   final int price;
-  final String busNumber;
+  final String busNumber; // Assuming it's a stringified ObjectId
   final String seatNumber;
   final String source;
   final String destination;
   final DateTime date;
   final String time;
   final String status;
-  final String ride;
   final String key;
   final String qrCode;
-  final List<String>? availableSeats;
+  final List<String> availableSeats;
 
   Ticket({
     required this.id,
@@ -27,29 +26,28 @@ class Ticket {
     required this.date,
     required this.time,
     required this.status,
-    required this.ride,
     required this.key,
     required this.qrCode,
-    this.availableSeats,
+    required this.availableSeats,
   });
 
   factory Ticket.fromJson(Map<String, dynamic> json) => Ticket(
-        id: json['_id'],
-        scheduleId: json['schedule'],
-        userId: json['userId'],
-        price: json['price'],
-        busNumber: json['busNumber'],
-        seatNumber: json['seatNumber'],
-        source: json['source'],
-        destination: json['destination'],
-        date: DateTime.parse(json['date']),
-        time: json['time'],
-        status: json['status'],
-        ride: json['ride'],
-        key: json['key'],
+        id: json['_id'] ?? '',
+        scheduleId: json['schedule'] ?? '',
+        userId: json['userId'] ?? '',
+        price: json['price'] ?? 0,
+        busNumber: json['busNumber'] ?? '',
+        seatNumber: json['seatNumber'] ?? '',
+        source: json['source'] ?? '',
+        destination: json['destination'] ?? '',
+        date: DateTime.tryParse(json['date'] ?? '') ?? DateTime.now(),
+        time: json['time'] ?? '',
+        status: json['status'] ?? 'pending',
+        key: json['key'] ?? '',
         qrCode: json['qrCode'] ?? '',
-        availableSeats: json['avaiableSeat'] != null 
-            ? List<String>.from(json['avaiableSeat'])
-            : null,
+        availableSeats: (json['avaiableSeat'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
       );
 }

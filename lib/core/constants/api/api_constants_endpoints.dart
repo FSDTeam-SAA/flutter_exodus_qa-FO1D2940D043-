@@ -1,7 +1,8 @@
 class ApiEndpoints {
   // BaseURL
-  // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
-  static const String baseUrl = 'https://localhost:5000/api/v1';
+  static const String baseUrl =
+      'https://exodus-backend-ke7n.onrender.com/api/v1';
+  // static const String baseUrl = 'https://localhost:5000/api/v1';
 
   // Auth
   static const String login = '/auth/login';
@@ -21,7 +22,8 @@ class ApiEndpoints {
 
   // Ticket
   static const String createTicket = '/ticket/create-ticket';
-  static const String acceptStanding = '/ticket/accept-standing/'; // + {ticketId}
+  static const String acceptStanding =
+      '/ticket/accept-standing/'; // + {ticketId}
   static const String getAllTickets = '/ticket/all-ticket';
   static const String getAdminAllTickets = '/ticket/admin-all-ticket';
   static const String cancelTicket = '/ticket/cancle-ticket/'; // + {ticketId}

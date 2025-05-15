@@ -3,7 +3,7 @@ import 'package:exodus/data/models/auth_response.dart';
 import 'package:exodus/data/models/user_models.dart';
 
 abstract class AuthRepository {
-  Future<ApiResult<User>> login(String email, String password);
+  Future<ApiResult<AuthResponse>> login(String email, String password);
   // Future<AuthResponse> register({
   //   required String name,
   //   required String email,
