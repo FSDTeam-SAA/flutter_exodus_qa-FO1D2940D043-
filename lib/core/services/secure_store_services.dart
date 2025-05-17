@@ -1,3 +1,4 @@
+import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStoreServices {
@@ -14,6 +15,7 @@ class SecureStoreServices {
 
   /// [Method to store data securely]
   Future<void> storeData(String key, String value) async {
+    dPrint("Successfully store the data");
     await _storage.write(key: key, value: value);
   }
 

@@ -1,9 +1,9 @@
 class ApiEndpoints {
   // BaseURL
-  static const String baseUrl =
-      'https://exodus-backend-ke7n.onrender.com/api/v1';
-  // static const String baseUrl = 'https://localhost:5000/api/v1';
+  // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
+  static const String baseUrl = 'http://192.168.40.213:5000/api/v1';
 
+  static const String refreshToken = '/auth/refresh-token';
   // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
@@ -11,6 +11,7 @@ class ApiEndpoints {
   static const String forgetPassword = '/auth/forget';
   static const String resetPassword = '/auth/reset-password';
   static const String changePassword = '/auth/change-password';
+  static const String getUserData = '/auth/user-data';
 
   // Bus
   static const String createBus = '/bus/';

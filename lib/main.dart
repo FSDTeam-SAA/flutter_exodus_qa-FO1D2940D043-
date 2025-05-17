@@ -1,6 +1,7 @@
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/routes/route_generator.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
 import 'package:exodus/core/theme/app_theme.dart';
@@ -8,9 +9,12 @@ import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupServiceLocator();
+
+  // final repositoryProvider = RepositoryProvider();
+  // await repositoryProvider.initialize();
   runApp(const MyApp());
 }
 
@@ -25,7 +29,8 @@ class MyApp extends StatelessWidget {
       title: 'Exodus',
       theme: AppTheme.light,
       // home: CheckThemeScreen(),
-      initialRoute: AppRoutes.login,
+      navigatorKey: NavigationService().navigatorKey,
+      initialRoute: AppRoutes.splash,
       onGenerateRoute: RouteGenerator.generateRoute,
       navigatorObservers: [RouteObserver<PageRoute>()],
     );

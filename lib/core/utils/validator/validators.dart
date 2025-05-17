@@ -13,10 +13,11 @@ class Validators {
 
   static String? password(String? value) {
     if (value == null || value.isEmpty) return 'Password is required';
+
     /// [Todo: Uncommant this]
-    // if (value.length < 8) return 'Must be at least 8 characters';
-    // if (!RegExp(r'[A-Z]').hasMatch(value)) return 'One uppercase required';
-    // if (!RegExp(r'\d').hasMatch(value)) return 'One number required';
+    if (value.length < 8) return 'Must be at least 8 characters';
+    if (!RegExp(r'[A-Z]').hasMatch(value)) return 'One uppercase required';
+    if (!RegExp(r'\d').hasMatch(value)) return 'One number required';
     return null;
   }
 

@@ -3,7 +3,6 @@ import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
-import 'package:exodus/core/network/api_client.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
@@ -50,10 +49,13 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
       await _controller.login(_emailController.text, _passwordController.text);
-      // Navigator.pushNamed(context, AppRoutes.home);
+    } catch (e) {
+      print(e);
     }
   }
 

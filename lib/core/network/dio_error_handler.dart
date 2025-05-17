@@ -11,7 +11,7 @@ String dioErrorToUserMessage(DioException error) {
     case DioExceptionType.badCertificate:
       return "Invalid server certificate.";
     case DioExceptionType.badResponse:
-      return error.response?.data['message'] ?? "Server error occurred.";
+      return "Server error occurred.";
     case DioExceptionType.cancel:
       return "Request was cancelled.";
     case DioExceptionType.connectionError:

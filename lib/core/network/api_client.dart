@@ -13,6 +13,9 @@ class ApiClient {
   // Singleton instance
   static ApiClient? _instance;
 
+  bool _isRefreshingToken = false;
+  final SecureStoreServices _secureStoreServices = SecureStoreServices();
+
   factory ApiClient() {
     _instance ??= ApiClient._internal();
     _instance!._initialize();
@@ -22,6 +25,7 @@ class ApiClient {
   ApiClient._internal();
 
   Future<void> _initialize() async {
+    dPrint("Api Initialized");
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -29,8 +33,89 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json'},
+        // Don't throw for 4xx errors - we'll handle them manually
+        validateStatus: (status) => status! < 500,
       ),
     );
+
+    // Add interceptors
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (error, handle) async {
+          if (error.response?.statusCode == 401 ||
+              error.response?.statusCode == 403) {
+            // Handle token refresh
+            if (!_isRefreshingToken) {
+              _isRefreshingToken = true;
+
+              try {
+                await _refreshToken();
+
+                // Retry the original request
+                final response = await _retryRequest(error.requestOptions);
+                handle.resolve(response);
+              } catch (e) {
+                handle.reject(error);
+              } finally {
+                _isRefreshingToken = false;
+              }
+            }
+          } else {
+            handle.next(error);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) async {
+    final option = Options(
+      method: requestOptions.method,
+      headers: await _addAuthHeader(null).then((opts) => opts.headers),
+    );
+
+    return _dio.request<dynamic>(
+      requestOptions.path,
+      data: requestOptions.data,
+      queryParameters: requestOptions.queryParameters,
+      options: option,
+    );
+  }
+
+  Future<void> _refreshToken() async {
+    try {
+      final refreshToken = await _secureStoreServices.retrieveData(
+        KeyConstants.refreshToken,
+      );
+
+      if (refreshToken == null) throw Exception("No refresh token available");
+
+      // Call refresh token
+      final response = await _dio.post(
+        ApiEndpoints.refreshToken,
+        data: {'refreshToken': refreshToken},
+      );
+
+      dPrint("Refresh the Tokens -> ${response.data}");
+
+      // Save New token
+      final newAccessToken = response.data['accessToken'];
+      final newRefreshToken = response.data['refreshToken'];
+
+      await _secureStoreServices.storeData(
+        KeyConstants.accessToken,
+        newAccessToken,
+      );
+      await _secureStoreServices.storeData(
+        KeyConstants.refreshToken,
+        newRefreshToken,
+      );
+    } catch (e) {
+      // Clear token if refresh fails
+      await _secureStoreServices.deleteData(KeyConstants.accessToken);
+      await _secureStoreServices.deleteData(KeyConstants.refreshToken);
+      throw Exception("Token refresh failed");
+    }
   }
 
   /// [Api Methods] ------------------------------------------------------------------
@@ -56,9 +141,11 @@ class ApiClient {
 
       dPrint(response);
 
-      final base = BaseResponse<T>.fromJson(response.data, fromJsonT);
+      final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
 
-      return mapBaseResponse(base);
+      dPrint(baseResponse);
+
+      return mapBaseResponse<T>(baseResponse);
     } on DioException catch (error) {
       final message = dioErrorToUserMessage(error);
       return ApiError(message);
@@ -86,13 +173,14 @@ class ApiClient {
         onReceiveProgress: onReceiveProgress,
       );
 
-      dPrint(" Base Api Response -> ${response.data}");
+      dPrint(" Base Api Response -> ${response}");
       final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
       // dPrint(" Base Api Response -> $baseResponse");
 
       return mapBaseResponse<T>(baseResponse);
     } on DioException catch (error) {
       final message = dioErrorToUserMessage(error);
+      dPrint("Post Error message -> $error");
       return ApiError(message);
     } catch (e) {
       dPrint("Unexpected Error: $e");
@@ -105,13 +193,13 @@ class ApiClient {
   Future<Options> _addAuthHeader(Options? options) async {
     options ??= Options();
 
-    final accessToken = await SecureStoreServices().retrieveData(
+    final accessToken = await _secureStoreServices.retrieveData(
       KeyConstants.accessToken,
     );
 
     if (accessToken != null) {
       options.headers ??= {};
-      options.headers!['Authorization'] = accessToken;
+      options.headers!['Authorization'] = 'Bearer $accessToken';;
     }
     dPrint("Authorization header : ${options.headers}");
     return options;

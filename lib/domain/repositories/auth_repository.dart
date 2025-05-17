@@ -1,17 +1,13 @@
 import 'package:exodus/core/network/api_result.dart';
-import 'package:exodus/data/models/auth_response.dart';
-import 'package:exodus/data/models/user_models.dart';
+import 'package:exodus/data/models/auth/login_response.dart';
+import 'package:exodus/data/models/auth/register_response.dart';
+import 'package:exodus/data/models/auth/user_data_response.dart';
+import 'package:exodus/presentation/screens/auth/model/register_request.dart';
 
+// auth_repository.dart
 abstract class AuthRepository {
-  Future<ApiResult<AuthResponse>> login(String email, String password);
-  // Future<AuthResponse> register({
-  //   required String name,
-  //   required String email,
-  //   required String password,
-  //   required String phone,
-  // });
-  // Future<void> verifyOtp(String email, String otp);
-  // Future<void> forgetPassword(String email);
-  // Future<void> resetPassword(String email, String otp, String password);
-  // Future<void> changePassword(String email, String oldPassword, String newPassword);
+  Future<ApiResult<LoginResponse>> login(String email, String password);
+  Future<ApiResult<User>> register(RegisterRequest params);
+  Future<ApiResult<UserData>> getUserData();
+  // Future<ApiResult<void>> refreshToken();
 }

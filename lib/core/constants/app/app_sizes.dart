@@ -84,11 +84,13 @@ class AppSizes {
   // Edge insets helpers
   static EdgeInsets get paddingAllTiny => const EdgeInsets.all(paddingTiny);
   static EdgeInsets get paddingAllSmall => const EdgeInsets.all(paddingSmall);
+  static EdgeInsets get paddingAllMedium => const EdgeInsets.all(paddingMedium);
   static EdgeInsets get paddingAllRegular => const EdgeInsets.all(paddingRegular);
   static EdgeInsets get paddingAllLarge => const EdgeInsets.all(paddingLarge);
 
   static EdgeInsets get paddingHorizontalTiny =>  const EdgeInsets.symmetric(horizontal: paddingTiny);
   static EdgeInsets get paddingHorizontalSmall =>  const EdgeInsets.symmetric(horizontal: paddingSmall);
+  static EdgeInsets get paddingHorizontalMedium =>  const EdgeInsets.symmetric(horizontal: paddingMedium);
   static EdgeInsets get paddingHorizontalRegular =>  const EdgeInsets.symmetric(horizontal: paddingRegular);
   static EdgeInsets get paddingHorizontalLarge =>  const EdgeInsets.symmetric(horizontal: paddingLarge);
 
@@ -101,5 +103,5 @@ class AppSizes {
   static BorderRadius get borderRadiusSmall =>  BorderRadius.circular(radiusSmall);
   static BorderRadius get borderRadiusMedium =>  BorderRadius.circular(radiusMedium);
   static BorderRadius get borderRadiusRegular =>  BorderRadius.circular(radiusRegular);
-  static BorderRadius get borderRadiusLarge =>  BorderRadius.circular(radiusLarge);
+  static BorderRadius get radiusMediumborderRadiusLarge =>  BorderRadius.circular(radiusLarge);
 }

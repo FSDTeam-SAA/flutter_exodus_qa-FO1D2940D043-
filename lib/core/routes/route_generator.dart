@@ -1,4 +1,6 @@
+import 'package:exodus/core/routes/transitions/fade_route.dart';
 import 'package:exodus/core/routes/transitions/slide_left.dart';
+import 'package:exodus/core/routes/transitions/slide_up.dart';
 import 'package:exodus/presentation/screens/auth/screens/create_new_password.dart';
 import 'package:exodus/presentation/screens/auth/screens/forgot_password.dart';
 import 'package:exodus/presentation/screens/auth/screens/login_screen.dart';
@@ -26,7 +28,7 @@ class RouteGenerator {
         return SlideLeftTransition(page: CreateNewPasswordScreen());
 
       case AppRoutes.home:
-        return SlideLeftTransition(page: HomeScreen());
+        return FadeRoute(page: HomeScreen());
       
       default:
         return _errorRoute();
