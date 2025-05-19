@@ -12,6 +12,7 @@ import 'package:exodus/presentation/screens/auth/constants/auth_constant.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
+import 'package:exodus/presentation/widgets/form_error_message.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,6 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
 
+  // final ValueNotifier<String?> errorMessage = ValueNotifier(null);
+
   final _controller = sl<LoginController>();
 
   @override
@@ -48,6 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
+
+  // Future<void> errorMessage() async {
+  //   errorMessage = _controller.errorMessage;
+  // }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -88,6 +95,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             AppLogo(height: 117, width: 160),
 
                             Gap.h32,
+
+                            /// [Api Error messages]
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return FormErrorMessage(
+                                  message: _controller.errorMessage,
+                                );
+                              },
+                            ),
 
                             /// [Title]
                             Text(AuthConstants.title.login, style: AppText.h1),

@@ -47,16 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
           return ListView(
             children: [
               _buildHeader(value.user),
+
               Gap.h16,
               _buildRideLeftRewardPoints(),
 
               Gap.h40,
+              _buildTitle("Your Next Ride"),
+
+              Gap.h16,
               _buildNextRideCard(value.ticket),
+
               Gap.h22,
-              Padding(
-                padding: AppSizes.paddingHorizontalMedium,
-                child: Text("Your All Ride", style: AppText.bodySemiBold),
-              ),
+              _buildTitle("Your All Ride"),
+
               Gap.h16,
               _buildAllRidesList(),
             ],
@@ -123,9 +126,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildTitle(String title) {
+    return Padding(
+      padding: AppSizes.paddingHorizontalMedium,
+      child: Text(title, style: AppText.bodySemiBold),
+    );
+  }
+
   Widget _buildStatsCard(String title, String value) {
     return Container(
-      padding: AppSizes.paddingAllMedium,
+      padding: AppSizes.paddingAllRegular,
       decoration: BoxDecoration(
         color: AppColors.secondary,
         borderRadius: AppSizes.borderRadiusMedium,
@@ -147,13 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (nextTicket == null) {
       return Padding(
-        padding: AppSizes.paddingAllMedium,
+        padding: AppSizes.paddingAllRegular,
         child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF1C1C1E),
             borderRadius: AppSizes.borderRadiusMedium,
           ),
-          padding: AppSizes.paddingAllMedium,
+          padding: AppSizes.paddingAllRegular,
           child: const Center(
             child: Text(
               "No upcoming rides",
@@ -165,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(13.0),
+      padding: AppSizes.paddingHorizontalMedium,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.background,
@@ -174,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
           boxShadow: [
             BoxShadow(
               color: AppColors.secondary.withValues(alpha: 0.1),
-              blurRadius: 8,
+              blurRadius: 12,
               offset: Offset(0, 4),
             ),
           ],
@@ -182,9 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gap.h16,
             Container(
-              padding: AppSizes.paddingAllMedium,
+              padding: AppSizes.paddingAllRegular,
               decoration: const BoxDecoration(
                 color: AppColors.secondary,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -323,25 +332,27 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: AppSizes.paddingHorizontalMedium,
       child: Container(
         decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: AppSizes.borderRadiusMedium,
           boxShadow: [
             BoxShadow(
               color: AppColors.secondary.withValues(alpha: 0.1),
-              blurRadius: 8,
+              blurRadius: 12,
               offset: Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           children:
-              rides.map((ride) {
+              rides.asMap().entries.map((entry) {
+                final index = entry.key;
+                final ride = entry.value;
+                final isLastItem = index == rides.length - 1;
+
                 return Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1C1C1E),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    Padding(
+                      padding: AppSizes.paddingAllMedium,
                       child: Row(
                         children: [
                           Expanded(
@@ -351,25 +362,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   ride['route']!,
                                   style: const TextStyle(
-                                    color: Colors.amberAccent,
+                                    color: AppColors.secondary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
                                   ride['time']!,
-                                  style: const TextStyle(color: Colors.white70),
+                                  style: const TextStyle(
+                                    color: AppColors.secondary,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           Text(
                             ride['seats']!,
-                            style: const TextStyle(color: Colors.amberAccent),
+                            style: const TextStyle(color: AppColors.secondary),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    if (!isLastItem) // Only add divider if not the last item
+                      Divider(
+                        color: AppColors.secondary,
+                        height: 16, // Adjust height as needed
+                        thickness: 1,
+                      ),
                   ],
                 );
               }).toList(),

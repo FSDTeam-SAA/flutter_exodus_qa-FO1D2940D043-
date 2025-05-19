@@ -85,23 +85,45 @@ class AppSizes {
   static EdgeInsets get paddingAllTiny => const EdgeInsets.all(paddingTiny);
   static EdgeInsets get paddingAllSmall => const EdgeInsets.all(paddingSmall);
   static EdgeInsets get paddingAllMedium => const EdgeInsets.all(paddingMedium);
-  static EdgeInsets get paddingAllRegular => const EdgeInsets.all(paddingRegular);
+  static EdgeInsets get paddingAllRegular =>
+      const EdgeInsets.all(paddingRegular);
   static EdgeInsets get paddingAllLarge => const EdgeInsets.all(paddingLarge);
 
-  static EdgeInsets get paddingHorizontalTiny =>  const EdgeInsets.symmetric(horizontal: paddingTiny);
-  static EdgeInsets get paddingHorizontalSmall =>  const EdgeInsets.symmetric(horizontal: paddingSmall);
-  static EdgeInsets get paddingHorizontalMedium =>  const EdgeInsets.symmetric(horizontal: paddingMedium);
-  static EdgeInsets get paddingHorizontalRegular =>  const EdgeInsets.symmetric(horizontal: paddingRegular);
-  static EdgeInsets get paddingHorizontalLarge =>  const EdgeInsets.symmetric(horizontal: paddingLarge);
+  static EdgeInsets get paddingHorizontalTiny =>
+      const EdgeInsets.symmetric(horizontal: paddingTiny);
+  static EdgeInsets get paddingHorizontalSmall =>
+      const EdgeInsets.symmetric(horizontal: paddingSmall);
+  static EdgeInsets get paddingHorizontalMedium =>
+      const EdgeInsets.symmetric(horizontal: paddingMedium);
+  static EdgeInsets get paddingHorizontalRegular =>
+      const EdgeInsets.symmetric(horizontal: paddingRegular);
+  static EdgeInsets get paddingHorizontalLarge =>
+      const EdgeInsets.symmetric(horizontal: paddingLarge);
 
-  static EdgeInsets get paddingVerticalTiny =>  const EdgeInsets.symmetric(vertical: paddingTiny);
-  static EdgeInsets get paddingVerticalSmall =>  const EdgeInsets.symmetric(vertical: paddingSmall);
-  static EdgeInsets get paddingVerticalRegular =>  const EdgeInsets.symmetric(vertical: paddingRegular);
-  static EdgeInsets get paddingVerticalLarge =>  const EdgeInsets.symmetric(vertical: paddingLarge);
+  static EdgeInsets get paddingVerticalTiny =>
+      const EdgeInsets.symmetric(vertical: paddingTiny);
+  static EdgeInsets get paddingVerticalSmall =>
+      const EdgeInsets.symmetric(vertical: paddingSmall);
+  static EdgeInsets get paddingVerticalRegular =>
+      const EdgeInsets.symmetric(vertical: paddingRegular);
+  static EdgeInsets get paddingVerticalLarge =>
+      const EdgeInsets.symmetric(vertical: paddingLarge);
 
   // Border radius helpers
-  static BorderRadius get borderRadiusSmall =>  BorderRadius.circular(radiusSmall);
-  static BorderRadius get borderRadiusMedium =>  BorderRadius.circular(radiusMedium);
-  static BorderRadius get borderRadiusRegular =>  BorderRadius.circular(radiusRegular);
-  static BorderRadius get radiusMediumborderRadiusLarge =>  BorderRadius.circular(radiusLarge);
+  static BorderRadius get borderRadiusSmall =>
+      BorderRadius.circular(radiusSmall);
+  static BorderRadius get borderRadiusMedium =>
+      BorderRadius.circular(radiusMedium);
+  static BorderRadius get borderRadiusRegular =>
+      BorderRadius.circular(radiusRegular);
+  static BorderRadius get radiusMediumborderRadiusLarge =>
+      BorderRadius.circular(radiusLarge);
+
+  // Padding only helpers
+  static EdgeInsets paddingOnly({
+    double left = 0.0,
+    double top = 0.0,
+    double right = 0.0,
+    double bottom = 0.0,
+  }) => EdgeInsets.only(left: left, top: top, right: right, bottom: bottom);
 }
