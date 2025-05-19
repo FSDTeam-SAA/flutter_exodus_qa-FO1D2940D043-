@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final isAuthenticate = await sl<CheckAuthStatusUsecase>().call();
 
     if(mounted) {
-      NavigationService().freshStartTo( isAuthenticate? AppRoutes.home : AppRoutes.login);
+      NavigationService().freshStartTo( isAuthenticate? AppRoutes.bottomNavbar : AppRoutes.login);
     }
   }
 

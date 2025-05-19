@@ -9,6 +9,7 @@ import 'package:exodus/data/models/auth/register_response.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
+import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:exodus/presentation/widgets/custom_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -89,28 +90,32 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ValueListenableBuilder<UserData?>(
         valueListenable: _controller.userDataNotifier,
         builder: (context, userData, _) {
-          return Padding(
-            padding: AppSizes.paddingHorizontalExtraMedium,
-            child: AppBar(
-              leading: CustomCachedImage.avatarSmall(
-                userData?.user.avatar.url ?? '',
-              ),
-              title: Text(
-                userData?.user.name ?? 'Home',
-                style: AppText.bodySemiBold.copyWith(
-                  color: AppColors.secondary,
-                ),
-              ),
-              actions: [
-                InkWell(
-                  child: Icon(
-                    Icons.notifications_none_outlined,
-                    color: AppColors.secondary,
+          return AppBar(
+            leadingWidth: 60.0,
+            leading: Row(
+              children: [
+                SizedBox(width: 18.0),
+                SizedBox(
+                  child: CustomCachedImage.avatarSmall(
+                    userData?.user.avatar.url ?? '',
                   ),
-                  onTap: () {},
                 ),
               ],
             ),
+            title: Text(
+              userData?.user.name ?? 'Home',
+              style: AppText.bodySemiBold.copyWith(color: AppColors.secondary),
+            ),
+            actions: [
+              InkWell(
+                child: Icon(
+                  Icons.notifications_none_outlined,
+                  color: AppColors.secondary,
+                ),
+                onTap: () {},
+              ),
+              SizedBox(width: 18.0),
+            ],
           );
         },
       ),
@@ -217,18 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Padding(
         padding: AppSizes.paddingHorizontalExtraMedium,
         child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: AppSizes.borderRadiusMedium,
-
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.secondary.withValues(alpha: 0.1),
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: AppDecorations.card,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -376,17 +370,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: AppSizes.paddingHorizontalExtraMedium,
       child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: AppSizes.borderRadiusMedium,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.secondary.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
+        decoration: AppDecorations.card,
+
         child: Column(
           children:
               rides.asMap().entries.map((entry) {

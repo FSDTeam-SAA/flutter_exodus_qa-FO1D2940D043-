@@ -1,3 +1,5 @@
+import 'package:exodus/core/constants/app/app_colors.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -18,7 +20,7 @@ class CustomCachedImage extends StatelessWidget {
     return CustomCachedImage._(
       imageUrl: imageUrl,
       size: 40,
-      borderRadius: 20, // Half of size for full circle
+      borderRadius: 40, // Half of size for full circle
       key: key,
     );
   }
@@ -47,24 +49,44 @@ class CustomCachedImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          width: size,
-          height: size,
-          color: Colors.grey.shade300,
-          child: const Center(child: CircularProgressIndicator(strokeWidth: 1.5)),
-        ),
-        errorWidget: (context, url, error) => Container(
-          width: size,
-          height: size,
-          color: Colors.grey.shade300,
-          child: const Icon(Icons.error, color: Colors.red),
-        ),
-      ),
+      child:
+          imageUrl.isNotEmpty
+              ? CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                placeholder:
+                    (context, url) => Container(
+                      width: size,
+                      height: size,
+                      color: AppColors.primaryDark,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 1.5),
+                      ),
+                    ),
+                errorWidget:
+                    (context, url, error) => Container(
+                      width: size,
+                      height: size,
+                      color: AppColors.secondary,
+                      child: const Icon(
+                        Icons.person,
+                        size: AppSizes.iconSizeRegular,
+                        color: AppColors.background,
+                      ),
+                    ),
+              )
+              : Container(
+                width: size,
+                height: size,
+                color: AppColors.secondary,
+                child: const Icon(
+                  Icons.person,
+                  size: AppSizes.iconSizeRegular,
+                  color: AppColors.background,
+                ),
+              ),
     );
   }
 }

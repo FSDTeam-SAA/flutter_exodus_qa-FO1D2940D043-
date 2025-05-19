@@ -33,17 +33,14 @@ extension ButtonStyleExtensions on BuildContext {
 
   Widget secondaryButton({
     required VoidCallback onPressed,
-    required String text,
+    required Widget widget,
     double? width,
   }) {
     return GradientButtonSecondary(
       onPressed: onPressed,
       isPrimary: true,
       gradient: AppColors.primaryGradient,
-      child: Text(
-        text,
-        // style: AppText.bodyMed ium.copyWith(color: AppColors.background),
-      ),
+      child: widget,
       // const LinearGradient(
       //   colors: [
       //     AppColors.primary,
