@@ -14,6 +14,12 @@ class AppTheme {
       primaryContainer: AppColors.primary,
     ),
 
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.background,
+      titleTextStyle: AppText.h2,
+      iconTheme: IconThemeData(color: AppColors.secondary),
+    ),
+
     // elevatedButtonTheme: ElevatedButtonThemeData(
     //   style: AppButtonStyles.primary,
     // ),

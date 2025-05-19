@@ -2,14 +2,13 @@ import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
-import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/data/models/auth/register_response.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
-import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:exodus/presentation/widgets/custom_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _buildAppBar(),
       body: ValueListenableBuilder<UserData?>(
         valueListenable: _controller.userDataNotifier,
 
@@ -46,8 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (value == null) return Center(child: CircularProgressIndicator());
           return ListView(
             children: [
-              _buildHeader(value.user),
-
+              // _buildHeader(value.user),
               Gap.h16,
               _buildRideLeftRewardPoints(),
 
@@ -84,9 +83,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  PreferredSizeWidget _buildAppBar() {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: ValueListenableBuilder<UserData?>(
+        valueListenable: _controller.userDataNotifier,
+        builder: (context, userData, _) {
+          return Padding(
+            padding: AppSizes.paddingHorizontalExtraMedium,
+            child: AppBar(
+              leading: CustomCachedImage.avatarSmall(
+                userData?.user.avatar.url ?? '',
+              ),
+              title: Text(
+                userData?.user.name ?? 'Home',
+                style: AppText.bodySemiBold.copyWith(
+                  color: AppColors.secondary,
+                ),
+              ),
+              actions: [
+                InkWell(
+                  child: Icon(
+                    Icons.notifications_none_outlined,
+                    color: AppColors.secondary,
+                  ),
+                  onTap: () {},
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildRideLeftRewardPoints() {
     return Padding(
-      padding: AppSizes.paddingHorizontalMedium,
+      padding: AppSizes.paddingHorizontalExtraMedium,
       child: Row(
         children: [
           Expanded(child: _buildStatsCard("Ride Left", "4")),
@@ -97,38 +130,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeader(User user) {
-    dPrint("user Image -> ${user.avatar.url}");
-    return Padding(
-      padding: AppSizes.paddingHorizontalMedium,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // CustomCachedImage.avatarSmall(user.avatar.url),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Hello, ${user.name}"),
-                SizedBox(height: 4),
-                Text("@${user.username}", style: TextStyle()),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.notifications_none_outlined,
-            color: AppColors.secondary,
-            size: 28,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildHeader(User user) {
+  //   dPrint("user Image -> ${user.avatar.url}");
+  //   return Padding(
+  //     padding: AppSizes.paddingHorizontalExtraMedium,
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         // CustomCachedImage.avatarSmall(user.avatar.url),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text("Hello, ${user.name}"),
+  //               SizedBox(height: 4),
+  //               Text("@${user.username}", style: TextStyle()),
+  //             ],
+  //           ),
+  //         ),
+  //         Icon(
+  //           Icons.notifications_none_outlined,
+  //           color: AppColors.secondary,
+  //           size: 28,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildTitle(String title) {
     return Padding(
-      padding: AppSizes.paddingHorizontalMedium,
+      padding: AppSizes.paddingHorizontalExtraMedium,
       child: Text(title, style: AppText.bodySemiBold),
     );
   }
@@ -160,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: AppSizes.paddingAllRegular,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E),
+            color: AppColors.background,
             borderRadius: AppSizes.borderRadiusMedium,
           ),
           padding: AppSizes.paddingAllRegular,
@@ -174,114 +207,126 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return Padding(
-      padding: AppSizes.paddingHorizontalMedium,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: AppSizes.borderRadiusMedium,
+    return GestureDetector(
+      onTap:
+          () => Navigator.pushNamed(
+            context,
+            AppRoutes.rideDetails,
+            arguments: {'Tickets': tickets},
+          ),
+      child: Padding(
+        padding: AppSizes.paddingHorizontalExtraMedium,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: AppSizes.borderRadiusMedium,
 
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.secondary.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: AppSizes.paddingAllRegular,
-              decoration: const BoxDecoration(
-                color: AppColors.secondary,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.secondary.withValues(alpha: 0.1),
+                blurRadius: 12,
+                offset: Offset(0, 4),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// [Soure] to [Destination] Ticket
-                  Row(
-                    children: [
-                      Text(
-                        nextTicket.source,
-                        style: AppText.h3.copyWith(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Gap.w4,
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        color: AppColors.background,
-                        size: 20,
-                      ),
-                      Gap.w4,
-                      Text(
-                        nextTicket.destination,
-                        style: AppText.h3.copyWith(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  /// [Date]
-                  Text(
-                    DateFormat(
-                      'EEE, MMM d',
-                    ).format(DateTime.parse(nextTicket.date)),
-                    style: AppText.bodySemiBold.copyWith(
-                      color: AppColors.background,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: AppSizes.paddingAllRegular,
-              child: Column(
-                children: [
-                  // Gap.h12,
-                  _rideInfoRow(
-                    Icons.directions_bus,
-                    "Bus",
-                    nextTicket.busNumber,
-                  ),
-                  Gap.h16,
-                  _rideInfoRow(Icons.event_seat, "Seat", nextTicket.seatNumber),
-                  Gap.h16,
-                  _rideInfoRow(Icons.access_time, "Time", nextTicket.time),
-                  // if (nextTicket.qrCode.isNotEmpty) ...[
-                  //   const SizedBox(height: 12),
-                  //   Center(
-                  //     child: Image.network(nextTicket.qrCode, height: 100, width: 100),
-                  //   ),
-                  // ],
-                  Gap.h24,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _goldButton(nextTicket.status),
-                      Row(
-                        children: [
-                          Text("View Details", style: AppText.smallRegular),
-                          SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: AppColors.secondary,
-                            size: 16,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: AppSizes.paddingAllRegular,
+                decoration: const BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// [Soure] to [Destination] Ticket
+                    Row(
+                      children: [
+                        Text(
+                          nextTicket.source,
+                          style: AppText.h3.copyWith(
+                            color: AppColors.background,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
+                        Gap.w4,
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          color: AppColors.background,
+                          size: 20,
+                        ),
+                        Gap.w4,
+                        Text(
+                          nextTicket.destination,
+                          style: AppText.h3.copyWith(
+                            color: AppColors.background,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    /// [Date]
+                    Text(
+                      DateFormat(
+                        'EEE, MMM d',
+                      ).format(DateTime.parse(nextTicket.date)),
+                      style: AppText.bodySemiBold.copyWith(
+                        color: AppColors.background,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: AppSizes.paddingAllRegular,
+                child: Column(
+                  children: [
+                    // Gap.h12,
+                    _rideInfoRow(
+                      Icons.directions_bus,
+                      "Bus",
+                      nextTicket.busNumber,
+                    ),
+                    Gap.h16,
+                    _rideInfoRow(
+                      Icons.event_seat,
+                      "Seat",
+                      nextTicket.seatNumber,
+                    ),
+                    Gap.h16,
+                    _rideInfoRow(Icons.access_time, "Time", nextTicket.time),
+                    // if (nextTicket.qrCode.isNotEmpty) ...[
+                    //   const SizedBox(height: 12),
+                    //   Center(
+                    //     child: Image.network(nextTicket.qrCode, height: 100, width: 100),
+                    //   ),
+                    // ],
+                    Gap.h24,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _goldButton(nextTicket.status),
+                        Row(
+                          children: [
+                            Text("View Details", style: AppText.smallRegular),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.secondary,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -329,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return Padding(
-      padding: AppSizes.paddingHorizontalMedium,
+      padding: AppSizes.paddingHorizontalExtraMedium,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.background,
