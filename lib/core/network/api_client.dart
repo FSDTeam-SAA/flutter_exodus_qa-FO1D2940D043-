@@ -5,6 +5,7 @@ import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/network/api_result_mapper.dart';
 import 'package:exodus/core/network/base_response.dart';
 import 'package:exodus/core/network/dio_error_handler.dart';
+import 'package:exodus/core/network/interceptor/custom_cache_interceptor.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 
@@ -37,6 +38,9 @@ class ApiClient {
         validateStatus: (status) => status! < 500,
       ),
     );
+
+    // Add interceptors - CACHE INTERCEPTOR FIRST
+    _dio.interceptors.add(CustomCacheInterceptor());
 
     // Add interceptors
     _dio.interceptors.add(
@@ -199,7 +203,8 @@ class ApiClient {
 
     if (accessToken != null) {
       options.headers ??= {};
-      options.headers!['Authorization'] = 'Bearer $accessToken';;
+      options.headers!['Authorization'] = 'Bearer $accessToken';
+      ;
     }
     dPrint("Authorization header : ${options.headers}");
     return options;

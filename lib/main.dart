@@ -1,4 +1,6 @@
+import 'package:exodus/core/constants/api/cache_constants.dart';
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/network/models/hive_cache_model.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/routes/route_generator.dart';
 import 'package:exodus/core/services/navigation_service.dart';
@@ -8,13 +10,22 @@ import 'package:exodus/core/theme/app_theme.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Hive adapter (you'll need to generate this)
+  Hive.registerAdapter(HiveCacheModelAdapter());
+  
   setupServiceLocator();
 
-  // final repositoryProvider = RepositoryProvider();
-  // await repositoryProvider.initialize();
+  // Open Hive boxes with the correct type
+  await Hive.openBox<HiveCacheModel>(ApiCacheConstants.userCacheKey);
+
   runApp(const MyApp());
 }
 
