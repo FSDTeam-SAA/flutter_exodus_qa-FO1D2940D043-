@@ -55,49 +55,49 @@ class UserProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                children: [
-                  _buildMenuItem(
-                    iconPath: "assets/icons/history.png",
-                    title: "Ride History",
-                    onTap: () {},
-                  ),
-                  _buildMenuItem(
-                    iconPath: "assets/icons/password.png",
-                    title: "Change Password",
-                    onTap: () {},
-                  ),
-                  _buildMenuItem(
-                    iconPath: "assets/icons/about.png",
-                    title: "About App",
-                    onTap: () {},
-                  ),
-                  _buildMenuItem(
-                    iconPath: "assets/icons/privacy.png",
-                    title: "Privacy Policy",
-                    onTap: () {},
-                  ),
-                  _buildMenuItem(
-                    iconPath: "assets/icons/terms.png",
-                    title: "Term & Condition",
-                    onTap: () {},
-                  ),
-                  _buildMenuItem(
-                    iconPath: "assets/icons/logout.png",
-                    title: "Log Out",
-                    onTap: () {
-                      // Add logout logic here
-                      profileController.logout();
-                    },
-                    isLogout: true,
-                  ),
-                ],
-              ),
-            ),
           ],
+
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              children: [
+                _buildMenuItem(
+                  iconPath: "assets/icons/history.png",
+                  title: "Ride History",
+                  onTap: () {},
+                ),
+                _buildMenuItem(
+                  iconPath: "assets/icons/password.png",
+                  title: "Change Password",
+                  onTap: () {},
+                ),
+                _buildMenuItem(
+                  iconPath: "assets/icons/about.png",
+                  title: "About App",
+                  onTap: () {},
+                ),
+                _buildMenuItem(
+                  iconPath: "assets/icons/privacy.png",
+                  title: "Privacy Policy",
+                  onTap: () {},
+                ),
+                _buildMenuItem(
+                  iconPath: "assets/icons/terms.png",
+                  title: "Term & Condition",
+                  onTap: () {},
+                ),
+                _buildMenuItem(
+                  iconPath: "assets/icons/logout.png",
+                  title: "Log Out",
+                  onTap: () {
+                    // Add logout logic here
+                    profileController.logout();
+                  },
+                  isLogout: true,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       // bottomNavigationBar: _buildBottomNavigationBar(),

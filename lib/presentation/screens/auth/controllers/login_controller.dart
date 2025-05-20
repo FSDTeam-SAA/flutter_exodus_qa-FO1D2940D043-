@@ -38,7 +38,7 @@ class LoginController extends BaseController {
           KeyConstants.refreshToken,
           data.refreshToken,
         );
-        NavigationService().freshStartTo(AppRoutes.home);
+        NavigationService().freshStartTo(AppRoutes.bottomNavbar);
         // Navigator.pushNamedAndRemoveUntil(context, newRouteName, predicate)
         dPrint("Navigation complete");
       } else {
