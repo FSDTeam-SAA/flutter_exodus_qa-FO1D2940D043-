@@ -20,4 +20,6 @@ class Gap {
   static const SizedBox w24 = SizedBox(width: 24);
   static const SizedBox w32 = SizedBox(width: 32);
   static const SizedBox w40 = SizedBox(width: 40);
+
+  static const SizedBox bottomAppBarGap = SizedBox(height: 56);
 }

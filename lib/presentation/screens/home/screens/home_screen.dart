@@ -4,8 +4,6 @@ import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
-import 'package:exodus/core/utils/debug_logger.dart';
-import 'package:exodus/data/models/auth/register_response.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
@@ -40,45 +38,46 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: ValueListenableBuilder<UserData?>(
-        valueListenable: _controller.userDataNotifier,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Get screen dimensions
+          final screenWidth = constraints.maxWidth;
+          final isMobile = screenWidth < 600;
+          
+          return ValueListenableBuilder<UserData?>(
+            valueListenable: _controller.userDataNotifier,
 
-        builder: (context, value, _) {
-          if (value == null) return Center(child: CircularProgressIndicator());
-          return ListView(
-            children: [
-              // _buildHeader(value.user),
-              Gap.h16,
-              _buildRideLeftRewardPoints(),
+            builder: (context, value, _) {
+              if (value == null) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 0 : screenWidth * 0.1,
+                  vertical: 16.0,
+                ),
+                children: [
+                  // _buildHeader(value.user),
+                  Gap.h16,
+                  _buildRideLeftRewardPoints(),
 
-              Gap.h40,
-              _buildTitle("Your Next Ride"),
+                  Gap.h40,
+                  _buildTitle("Your Next Ride"),
 
-              Gap.h16,
-              _buildNextRideCard(value.ticket),
+                  Gap.h16,
+                  _buildNextRideCard(value.ticket),
 
-              Gap.h22,
-              _buildTitle("Your All Ride"),
+                  Gap.h22,
+                  _buildTitle("Your All Ride"),
 
-              Gap.h16,
-              _buildAllRidesList(),
-            ],
+                  Gap.h16,
+                  _buildAllRidesList(),
+
+                  Gap.bottomAppBarGap,
+                ],
+              );
+            },
           );
-          // Center(
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Text("Home ${value.user.email}"),
-          //       Gap.h12,
-          //       context.primaryButton(
-          //         onPressed: () async {
-          //           await _controller.getUserData();
-          //         },
-          //         text: "Get Data",
-          //       ),
-          //     ],
-          //   ),
-          // );
         },
       ),
     );
