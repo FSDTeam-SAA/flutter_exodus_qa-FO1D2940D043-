@@ -4,9 +4,11 @@ import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
+import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
+import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:exodus/presentation/widgets/custom_cached_image.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _controller = sl<LoginController>();
+  final _controller = sl<HomeController>();
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _controller.dispose(); // Close the stream when widget is disposed
+    _controller.dispose();
     super.dispose();
   }
 
@@ -43,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Get screen dimensions
           final screenWidth = constraints.maxWidth;
           final isMobile = screenWidth < 600;
-          
+
           return ValueListenableBuilder<UserData?>(
             valueListenable: _controller.userDataNotifier,
 
@@ -101,9 +103,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            title: Text(
-              userData?.user.name ?? 'Home',
-              style: AppText.bodySemiBold.copyWith(color: AppColors.secondary),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userData?.user.name.capitalizeFirstOfEach ?? 'User Name',
+                  style: AppText.bodySemiBold.copyWith(
+                    color: AppColors.secondary,
+                  ),
+                ),
+                Text(
+                  userData?.user.username.startsWithAt ?? "@username",
+                  style: AppText.smallRegular,
+                ),
+              ],
             ),
             actions: [
               InkWell(
@@ -350,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
         gradient: AppColors.primaryGradient,
       ),
       child: Text(
-        text[0].toUpperCase() + text.substring(1),
+        text.capitalizeFirstLetter(),
         style: AppText.tinyRegular.copyWith(color: AppColors.background),
       ),
     );

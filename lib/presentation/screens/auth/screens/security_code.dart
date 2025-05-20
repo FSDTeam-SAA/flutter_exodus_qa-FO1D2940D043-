@@ -82,7 +82,7 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      body: LayoutBuilder(
         builder: (context, constraints) {
           final double maxFormWidth =
               constraints.maxWidth > 600 ? 600 : constraints.maxWidth;

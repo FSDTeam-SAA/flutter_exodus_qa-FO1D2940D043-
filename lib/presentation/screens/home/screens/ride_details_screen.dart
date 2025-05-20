@@ -163,7 +163,11 @@ class RideDetailsScreen extends StatelessWidget {
                     nextTicket.time,
                   ),
                   Gap.h16,
-                  _rideInfoRow(Icons.check_circle, "Status", nextTicket.status),
+                  _rideInfoRow(
+                    Icons.edit_location_alt_rounded,
+                    "Status",
+                    nextTicket.status,
+                  ),
                 ],
               ),
             ),

@@ -41,7 +41,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)
           final double maxFormWidth =
@@ -87,7 +87,9 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                               ),
                               onPressed: () {
                                 setState(
-                                  () => _obscureNewPassword = !_obscureNewPassword,
+                                  () =>
+                                      _obscureNewPassword =
+                                          !_obscureNewPassword,
                                 );
                               },
                             ),

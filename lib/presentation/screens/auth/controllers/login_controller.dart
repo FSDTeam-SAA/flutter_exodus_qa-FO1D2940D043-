@@ -4,25 +4,21 @@ import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
-import 'package:exodus/domain/usecases/auth/get_home_data.dart';
 import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
-import 'package:exodus/data/models/auth/user_data_response.dart';
-import 'package:flutter/material.dart';
+
 
 class LoginController extends BaseController {
   final LoginUsecase _loginUsecase;
-  final GetHomeDataUsecase _getHomeDataUsecase;
   final SecureStoreServices _secureStoreServices;
 
   LoginController(
     this._loginUsecase,
-    this._getHomeDataUsecase,
     this._secureStoreServices,
   );
 
-  final ValueNotifier<UserData?> userDataNotifier = ValueNotifier(null);
+
 
   Future<void> login(String email, String password) async {
     setLoading(true);
@@ -30,7 +26,6 @@ class LoginController extends BaseController {
 
     try {
       final result = await _loginUsecase.call(email, password);
-      // final result = ApiClient().post(ApiEndpoints.baseUrl + ApiEndpoints.login, fromJsonT: (json) => LoginResponse.fromJson(json));
 
       if (result is ApiSuccess<LoginResponse>) {
         dPrint("Success}");
@@ -49,7 +44,7 @@ class LoginController extends BaseController {
       } else {
         final message = (result as ApiError).message;
         setError(message);
-        dPrint(" Controller login message print ${message}");
+        dPrint(" Controller login message print $message");
         notifyListeners();
       }
     } catch (e) {
@@ -57,20 +52,6 @@ class LoginController extends BaseController {
       throw Exception(e.toString());
     } finally {
       setLoading(false);
-    }
-  }
-
-  Future<void> getUserData() async {
-    try {
-      final result = await _getHomeDataUsecase.call();
-
-      if (result is ApiSuccess<UserData>) {
-        final data = result.data;
-        userDataNotifier.value = result.data;
-        dPrint("User Data Print -> ${data.user.email}");
-      }
-    } catch (e) {
-      dPrint(e);
     }
   }
 }

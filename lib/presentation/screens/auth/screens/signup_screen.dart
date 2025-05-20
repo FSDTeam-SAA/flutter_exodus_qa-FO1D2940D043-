@@ -59,14 +59,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     print("Widget build ${count++}");
 
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardVisible = bottomInset > 0;
 
     return AppScaffold(
-      child: LayoutBuilder(
+      body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)
           final double maxFormWidth =
@@ -239,8 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               Gap.h16,
                               // Already have an Account
                               TextButton(
-                                onPressed:
-                                    () => Navigator.pop(context),
+                                onPressed: () => Navigator.pop(context),
                                 child: Text(
                                   AuthConstants.label.haveAccount,
                                   style: TextStyle(
@@ -266,8 +264,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   bottom: 20,
                   child: Center(
                     child: TextButton(
-                      onPressed:
-                          () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
                       child: Text(
                         AuthConstants.label.haveAccount,
                         style: TextStyle(

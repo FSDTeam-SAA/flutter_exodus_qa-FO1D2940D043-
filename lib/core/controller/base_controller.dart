@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BaseController extends ChangeNotifier {
+class BaseController with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
 
