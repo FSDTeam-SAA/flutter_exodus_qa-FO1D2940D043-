@@ -5,7 +5,8 @@ import 'package:exodus/presentation/screens/auth/screens/forgot_password.dart';
 import 'package:exodus/presentation/screens/auth/screens/login_screen.dart';
 import 'package:exodus/presentation/screens/auth/screens/security_code.dart';
 import 'package:exodus/presentation/screens/auth/screens/signup_screen.dart';
-import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride.dart';
+import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride_screen.dart';
+import 'package:exodus/presentation/screens/book_a_ride/screens/reserve_bus_screen.dart';
 import 'package:exodus/presentation/screens/bot/screens/bottom_navbar.dart';
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
@@ -52,6 +53,8 @@ class RouteGenerator {
       /// [Book a Ride]
       case AppRoutes.bookARide:
         return FadeRoute(page: BookARideScreen());
+      case AppRoutes.reserveBus:
+        return SlideLeftTransition(page: ReserveBusScreen());
 
       /// [Subscriptions]
       case AppRoutes.subscription:

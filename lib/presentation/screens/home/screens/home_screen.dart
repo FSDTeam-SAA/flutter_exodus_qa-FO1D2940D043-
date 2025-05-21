@@ -214,14 +214,10 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             color: AppColors.background,
             borderRadius: AppSizes.borderRadiusMedium,
+            border: Border.all(color: AppColors.secondary),
           ),
           padding: AppSizes.paddingAllRegular,
-          child: const Center(
-            child: Text(
-              "No upcoming rides",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
+          child: const Center(child: Text("No upcoming rides")),
         ),
       );
     }
@@ -284,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       DateFormat(
                         'EEE, MMM d',
-                      ).format(DateTime.parse(nextTicket.date)),
+                      ).format(nextTicket.date),
                       style: AppText.bodySemiBold.copyWith(
                         color: AppColors.background,
                       ),

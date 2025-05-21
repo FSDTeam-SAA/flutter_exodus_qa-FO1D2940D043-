@@ -3,7 +3,7 @@ import 'package:exodus/core/network/api_client.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
-import 'package:exodus/data/models/auth/register_response.dart';
+import 'package:exodus/data/models/auth/user_response.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/domain/repositories/auth_repository.dart';
 import 'package:exodus/presentation/screens/auth/model/register_request.dart';

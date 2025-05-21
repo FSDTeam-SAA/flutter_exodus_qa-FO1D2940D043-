@@ -25,6 +25,7 @@ class RideDetailsScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: Text("Ride Details")),
             body: ListView(
+              physics: const BouncingScrollPhysics(),
               children: [
                 _buildNextRideCard(tickets),
 
@@ -134,9 +135,7 @@ class RideDetailsScreen extends StatelessWidget {
 
                   /// [Date]
                   Text(
-                    DateFormat(
-                      'EEE, MMM d',
-                    ).format(DateTime.parse(nextTicket.date)),
+                    DateFormat('EEE, MMM d').format(nextTicket.date),
                     style: AppText.bodySemiBold.copyWith(
                       color: AppColors.background,
                     ),
@@ -233,7 +232,7 @@ class RideDetailsScreen extends StatelessWidget {
 
   Widget _buildQRcode(List<Ticket> tickets) {
     // Extract base64 data by removing the prefix
-    final String base64String = tickets.first.qrCode.split(',').last;
+    final String base64String = tickets.first.qrCode!.split(',').last;
     final Uint8List bytes = base64Decode(base64String);
 
     return Padding(

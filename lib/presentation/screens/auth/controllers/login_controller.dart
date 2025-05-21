@@ -8,17 +8,11 @@ import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
 
-
 class LoginController extends BaseController {
   final LoginUsecase _loginUsecase;
   final SecureStoreServices _secureStoreServices;
 
-  LoginController(
-    this._loginUsecase,
-    this._secureStoreServices,
-  );
-
-
+  LoginController(this._loginUsecase, this._secureStoreServices);
 
   Future<void> login(String email, String password) async {
     setLoading(true);
@@ -38,7 +32,10 @@ class LoginController extends BaseController {
           KeyConstants.refreshToken,
           data.refreshToken,
         );
-        NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+        if (data.isUser) {
+          NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+        }
+        dPrint("User role: ${data.role}");
         // Navigator.pushNamedAndRemoveUntil(context, newRouteName, predicate)
         dPrint("Navigation complete");
       } else {

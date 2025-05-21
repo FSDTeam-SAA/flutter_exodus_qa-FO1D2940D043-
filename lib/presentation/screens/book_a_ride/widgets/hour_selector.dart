@@ -1,0 +1,171 @@
+import 'package:exodus/core/constants/app/app_gap.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
+import 'package:exodus/core/utils/extensions/button_extensions.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/constants/app/app_colors.dart';
+import '../../../../core/theme/text_style.dart';
+import '../controllers/hour_selector_controller.dart';
+
+class HourSelector extends StatelessWidget {
+  final HourSelectorController controller;
+
+  const HourSelector({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                padding: AppSizes.paddingAllSmall,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: AppSizes.borderRadiusMedium,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _iconButton(Icons.remove, controller.decrease),
+
+                    Gap.w8,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: AppSizes.borderRadiusSmall,
+                      ),
+                      child: Text(
+                        "${controller.hours.toStringAsFixed(1)}hr",
+                        style: AppText.bodyMedium.copyWith(
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                    ),
+
+                    Gap.w8,
+                    _iconButton(Icons.add, controller.increase),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                "Amount: \$${controller.subtotal.toStringAsFixed(0)}",
+                style: AppText.h2.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: AppSizes.paddingHorizontalLarge,
+              child: Center(
+                child: Text(
+                  "You need to pay \$75.00 dollars per additional 1.0hr",
+                  style: AppText.bodyRegular.copyWith(
+                    color: AppColors.secondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Gap.h16,
+            _priceRow("Subtotal", controller.subtotal),
+
+            Gap.h16,
+            _priceRow("Tax", controller.tax),
+
+            Gap.h16,
+            Divider(thickness: 0.8, color: AppColors.secondary),
+
+            Gap.h16,
+            _priceRow("Total", controller.total),
+
+            Gap.h40,
+            _subscriptionToggle(),
+            
+            Gap.h16,
+            _bookButton(context),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _iconButton(IconData icon, VoidCallback onPressed) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: AppSizes.borderRadiusSmall,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.background),
+          borderRadius: AppSizes.borderRadiusSmall,
+        ),
+        child: Icon(icon, size: 16, color: AppColors.background),
+      ),
+    );
+  }
+
+  Widget _priceRow(String label, double value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: AppText.bodyRegular),
+        Text("\$${value.toStringAsFixed(2)}", style: AppText.bodyRegular),
+      ],
+    );
+  }
+
+  Widget _subscriptionToggle() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.secondary),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.radio_button_unchecked,
+            color: AppColors.secondary,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text("With Subscription", style: AppText.smallRegular),
+        ],
+      ),
+    );
+  }
+
+  Widget _bookButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: context.primaryButton(
+        onPressed: () {
+          // Handle booking action here
+        },
+        text: "Book Request",
+      ),
+
+      // ElevatedButton(
+      //   onPressed: () {
+      //     // Handle booking action here
+      //   },
+      //   style: ElevatedButton.styleFrom(
+      //     backgroundColor: AppColors.secondary,
+      //     foregroundColor: Colors.black,
+      //     padding: const EdgeInsets.symmetric(vertical: 16),
+      //   ),
+      //   child: const Text("Book Request"),
+      // ),
+    );
+  }
+}

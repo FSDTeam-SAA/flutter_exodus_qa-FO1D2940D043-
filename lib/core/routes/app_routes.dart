@@ -18,6 +18,7 @@ abstract class AppRoutes {
 
   /// [Book a Ride]
   static const bookARide = 'book-a-ride';
+  static const reserveBus = 'reserve-bus';
 
   /// [Subscriptions]
   static const subscription = 'subscription';

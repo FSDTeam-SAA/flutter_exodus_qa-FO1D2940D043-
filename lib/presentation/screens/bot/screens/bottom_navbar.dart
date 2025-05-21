@@ -1,5 +1,5 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
-import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride.dart';
+import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride_screen.dart';
 import 'package:exodus/presentation/screens/bot/widgets/top_indicator.dart';
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.dart';
