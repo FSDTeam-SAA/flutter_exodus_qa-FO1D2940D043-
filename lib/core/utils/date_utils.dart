@@ -4,23 +4,33 @@ class DateUtilsForThirtyDays {
   /// Gets the current date
   static DateTime get now => DateTime.now();
 
-  /// Formats a date as 'EEE d' (e.g., 'Mon 28')
-  static String formatDayMonth(DateTime date) {
-    return DateFormat('EEE d').format(date);
+  /// Formats a date into day and date components
+  static Map<String, String> formatDayMonth(DateTime date) {
+    return {
+      'day': DateFormat('EEE').format(date), // e.g. "Mon"
+      'date': DateFormat('d').format(date), // e.g. "28"
+    };
   }
 
   /// Gets the next [daysCount] days starting from [startDate]
   /// If [startDate] is not provided, uses current date
   static List<DateTime> getNextDays({int daysCount = 30, DateTime? startDate}) {
     final start = startDate ?? now;
-    return List.generate(daysCount, (index) => start.add(Duration(days: index)));
+    return List.generate(
+      daysCount,
+      (index) => start.add(Duration(days: index)),
+    );
   }
 
   /// Gets formatted next days as strings (e.g., ['Mon 28', 'Tue 29', ...])
-  static List<String> getFormattedNextDays({int daysCount = 30, DateTime? startDate}) {
-    return getNextDays(daysCount: daysCount, startDate: startDate)
-        .map(formatDayMonth)
-        .toList();
+  static List<Map<String, String>> getFormattedNextDays({
+    int daysCount = 30,
+    DateTime? startDate,
+  }) {
+    return getNextDays(
+      daysCount: daysCount,
+      startDate: startDate,
+    ).map(formatDayMonth).toList();
   }
 
   /// Checks if two dates are the same day (ignores time)

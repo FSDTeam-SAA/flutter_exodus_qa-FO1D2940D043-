@@ -7,9 +7,10 @@ import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
-import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
+import 'package:exodus/presentation/widgets/arrow_icon_widget.dart';
+import 'package:exodus/presentation/widgets/build_title.dart';
 import 'package:exodus/presentation/widgets/custom_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -54,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Center(child: CircularProgressIndicator());
               }
               return ListView(
+                physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobile ? 0 : screenWidth * 0.1,
                   vertical: 16.0,
@@ -64,13 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildRideLeftRewardPoints(),
 
                   Gap.h40,
-                  _buildTitle("Your Next Ride"),
+                  TitleTextWidget(title: "Your Next Ride"),
 
                   Gap.h16,
                   _buildNextRideCard(value.ticket),
 
                   Gap.h22,
-                  _buildTitle("Your All Ride"),
+                  TitleTextWidget(title: "Your All Ride"),
 
                   Gap.h16,
                   _buildAllRidesList(),
@@ -176,12 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
   //   );
   // }
 
-  Widget _buildTitle(String title) {
-    return Padding(
-      padding: AppSizes.paddingHorizontalExtraMedium,
-      child: Text(title, style: AppText.bodySemiBold),
-    );
-  }
+  // Widget _buildTitle(String title) {
+  //   return Padding(
+  //     padding: AppSizes.paddingHorizontalExtraMedium,
+  //     child: Text(title, style: AppText.bodySemiBold),
+  //   );
+  // }
 
   Widget _buildStatsCard(String title, String value) {
     return Container(
@@ -250,26 +252,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     /// [Soure] to [Destination] Ticket
                     Row(
                       children: [
-                        Text(
-                          nextTicket.source,
-                          style: AppText.h3.copyWith(
-                            color: AppColors.background,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Gap.w4,
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: AppColors.background,
-                          size: 20,
-                        ),
-                        Gap.w4,
-                        Text(
-                          nextTicket.destination,
-                          style: AppText.h3.copyWith(
-                            color: AppColors.background,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              nextTicket.source,
+                              style: AppText.h3.copyWith(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Gap.w4,
+
+                            /// [Arrow] Icon
+                            ArrowIcon(color: AppColors.background),
+
+                            Gap.w4,
+                            Text(
+                              nextTicket.destination,
+                              style: AppText.h3.copyWith(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -408,18 +414,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  ride['time']!,
-                                  style: const TextStyle(
-                                    color: AppColors.secondary,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      ride['time']!,
+                                      style: const TextStyle(
+                                        color: AppColors.secondary,
+                                      ),
+                                    ),
+                                    Text(
+                                      ride['seats']!,
+                                      style: const TextStyle(
+                                        color: AppColors.secondary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                          Text(
-                            ride['seats']!,
-                            style: const TextStyle(color: AppColors.secondary),
                           ),
                         ],
                       ),

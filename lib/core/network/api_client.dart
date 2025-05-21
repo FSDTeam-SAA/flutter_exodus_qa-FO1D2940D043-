@@ -9,12 +9,15 @@ import 'package:exodus/core/network/interceptor/custom_cache_interceptor.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 
+import 'package:synchronized/synchronized.dart';
+
 class ApiClient {
   late final Dio _dio;
   // Singleton instance
   static ApiClient? _instance;
 
   bool _isRefreshingToken = false;
+  final _refreshLock = Lock();
   final SecureStoreServices _secureStoreServices = SecureStoreServices();
 
   factory ApiClient() {
@@ -48,21 +51,54 @@ class ApiClient {
         onError: (error, handle) async {
           if (error.response?.statusCode == 401 ||
               error.response?.statusCode == 403) {
-            // Handle token refresh
-            if (!_isRefreshingToken) {
-              _isRefreshingToken = true;
+            try {
+              await _refreshLock.synchronized(() async {
+                // Handle token refresh
+                if (!_isRefreshingToken) {
+                  _isRefreshingToken = true;
 
-              try {
-                await _refreshToken();
+                  try {
+                    await _refreshToken();
 
-                // Retry the original request
-                final response = await _retryRequest(error.requestOptions);
-                handle.resolve(response);
-              } catch (e) {
-                handle.reject(error);
-              } finally {
-                _isRefreshingToken = false;
-              }
+                    // Retry the original request
+                    final response = await _retryRequest(error.requestOptions);
+                    handle.resolve(response);
+                  } catch (e) {
+                    handle.reject(error);
+                  } finally {
+                    _isRefreshingToken = false;
+                  }
+                }
+              });
+
+              // update the request with new token
+              final newToken = await _secureStoreServices.retrieveData(
+                KeyConstants.accessToken,
+              );
+
+              error.requestOptions.headers['Authorization'] =
+                  'Bearer $newToken';
+
+              // Create a new request with updated headers
+              final opts = Options(
+                method: error.requestOptions.method,
+                headers: error.requestOptions.headers,
+              );
+
+              // Retry the request
+              final response = await _dio.request(
+                error.requestOptions.path,
+                data: error.requestOptions.data,
+                queryParameters: error.requestOptions.queryParameters,
+                options: opts,
+              );
+
+              handle.resolve(response);
+            } catch (e) {
+              // If refresh fails, clear tokens and reject
+              await _secureStoreServices.deleteData(KeyConstants.accessToken);
+              await _secureStoreServices.deleteData(KeyConstants.refreshToken);
+              handle.reject(error);
             }
           } else {
             handle.next(error);
@@ -92,33 +128,54 @@ class ApiClient {
         KeyConstants.refreshToken,
       );
 
-      if (refreshToken == null) throw Exception("No refresh token available");
+      if (refreshToken == null || refreshToken.isEmpty) {
+        throw Exception("No refresh token available");
+      }
 
-      // Call refresh token
-      final response = await _dio.post(
+      // Create a temporary Dio instance without interceptors
+      final tempDio = Dio(
+        BaseOptions(
+          baseUrl: ApiEndpoints.baseUrl,
+          headers: {'Content-Type': 'application/json'},
+          validateStatus: (status) => true, // Accept all status codes
+        ),
+      );
+
+      final response = await tempDio.post(
         ApiEndpoints.refreshToken,
         data: {'refreshToken': refreshToken},
       );
 
-      dPrint("Refresh the Tokens -> ${response.data}");
+      dPrint("Refresh Token Response: ${response.data}");
 
-      // Save New token
-      final newAccessToken = response.data['accessToken'];
-      final newRefreshToken = response.data['refreshToken'];
+      if (response.statusCode != 200) {
+        throw Exception("Refresh failed with status ${response.statusCode}");
+      }
 
-      await _secureStoreServices.storeData(
-        KeyConstants.accessToken,
-        newAccessToken,
-      );
-      await _secureStoreServices.storeData(
-        KeyConstants.refreshToken,
-        newRefreshToken,
-      );
+      // Validate response structure
+      if (response.data['accessToken'] == null ||
+          response.data['refreshToken'] == null) {
+        throw Exception("Invalid token response format");
+      }
+
+      // Save new tokens
+      await Future.wait([
+        _secureStoreServices.storeData(
+          KeyConstants.accessToken,
+          response.data['accessToken'],
+        ),
+        _secureStoreServices.storeData(
+          KeyConstants.refreshToken,
+          response.data['refreshToken'],
+        ),
+      ]);
+
+      dPrint("Tokens refreshed successfully");
     } catch (e) {
-      // Clear token if refresh fails
+      dPrint("Token refresh error: $e");
       await _secureStoreServices.deleteData(KeyConstants.accessToken);
       await _secureStoreServices.deleteData(KeyConstants.refreshToken);
-      throw Exception("Token refresh failed");
+      throw Exception("Token refresh failed: ${e.toString()}");
     }
   }
 

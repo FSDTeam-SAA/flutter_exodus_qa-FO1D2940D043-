@@ -7,7 +7,7 @@ class AppColors {
 
   static const Color containerPolicyColoer = Color(0xff2A2A2A);
 
-  static const Color primary = Color(0xFFF3E898);
+  static const Color primary = Color(0xFFF3E898);  
   static const Color primaryDark = Color(0xFF946329);
 
   static const Color secondary = Color(0xFFC0A05C);
