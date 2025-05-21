@@ -1,5 +1,4 @@
 import 'package:exodus/data/models/ticket/ticket_model.dart';
-import 'package:exodus/data/models/ticket_model.dart';
 
 abstract class TicketRepository {
   Future<Ticket> createTicket({

@@ -40,7 +40,7 @@ class DateUtilsForThirtyDays {
 
   /// Formats time as 'h:mma' (e.g., '8:30am')
   static String formatTime(DateTime time) {
-    return DateFormat('h:mma').format(time).toLowerCase();
+    return DateFormat('h:mm a').format(time).toLowerCase();
   }
 
   /// Formats time range (e.g., '8:30am - 9:15am')

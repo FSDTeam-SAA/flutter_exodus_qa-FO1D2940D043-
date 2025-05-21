@@ -10,6 +10,7 @@ import 'package:exodus/presentation/screens/book_a_ride/screens/reserve_bus_scre
 import 'package:exodus/presentation/screens/bot/screens/bottom_navbar.dart';
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
+import 'package:exodus/presentation/screens/notification/screens/notification_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.dart';
 import 'package:exodus/presentation/screens/splash/screens/splash_screen.dart';
 import 'package:exodus/presentation/screens/subscriptions/screens/subscriptions.dart';
@@ -49,6 +50,9 @@ class RouteGenerator {
                 args != null ? (args as Map<String, dynamic>)['Tickets'] : null,
           ),
         );
+
+      case AppRoutes.notification:
+        return SlideLeftTransition(page: NotificationScreen());
 
       /// [Book a Ride]
       case AppRoutes.bookARide:

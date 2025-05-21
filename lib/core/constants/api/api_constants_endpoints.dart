@@ -13,6 +13,10 @@ class ApiEndpoints {
   static const String changePassword = '/auth/change-password';
   static const String getUserData = '/auth/user-data';
 
+  // User
+  static const String getAllNotification = '/users/get-notfication';
+  static const String makeAsAllRead = '/users/mark-as-read';
+
   // Bus
   static const String createBus = '/bus/';
   static const String updateBus = '/bus/'; // + {busId}

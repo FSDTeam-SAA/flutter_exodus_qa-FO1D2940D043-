@@ -15,6 +15,7 @@ abstract class AppRoutes {
   /// [Home screens routes]
   static const home = '/home';
   static const rideDetails = '/ride-details';
+  static const notification = '/notification';
 
   /// [Book a Ride]
   static const bookARide = 'book-a-ride';

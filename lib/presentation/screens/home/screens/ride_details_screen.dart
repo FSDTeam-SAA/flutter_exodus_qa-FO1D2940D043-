@@ -270,7 +270,7 @@ class RideDetailsScreen extends StatelessWidget {
       padding: AppSizes.paddingAllExtraMedium,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.containerPolicyColoer,
+          color: AppColors.containerPolicyColor,
           borderRadius: AppSizes.borderRadiusMedium,
         ),
         child: Padding(

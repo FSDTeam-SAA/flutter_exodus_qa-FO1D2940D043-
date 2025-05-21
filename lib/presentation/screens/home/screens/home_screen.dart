@@ -3,6 +3,7 @@ import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
@@ -126,7 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icons.notifications_none_outlined,
                   color: AppColors.secondary,
                 ),
-                onTap: () {},
+                onTap: () {
+                  NavigationService().sailTo(AppRoutes.notification);
+                },
               ),
               SizedBox(width: 18.0),
             ],

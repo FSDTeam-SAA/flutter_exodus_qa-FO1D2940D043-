@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 class AppColors {
   static const Color background = Color(0xFF1F2022);
 
-  static const Color containerPolicyColoer = Color(0xff2A2A2A);
+  static const Color containerPolicyColor = Color(0xff2A2A2A);
 
-  static const Color primary = Color(0xFFF3E898);  
+  static const Color primary = Color(0xFFF3E898);
   static const Color primaryDark = Color(0xFF946329);
 
   static const Color secondary = Color(0xFFC0A05C);
@@ -33,7 +33,7 @@ class AppColors {
   static const Color inputHint = textSecondary; // Use your textSecondary
   static const Color inputLabel = textPrimary; // Use your textPrimary
   static const Color inputIcon = Color(0xFF70603F);
-  
+
   static const Color inputDisabledFill = Color(
     0xFFF5F5F5,
   ); // Light gray for disabled
