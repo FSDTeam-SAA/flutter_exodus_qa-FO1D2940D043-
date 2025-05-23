@@ -3,6 +3,7 @@ import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/date_utils.dart';
+import 'package:exodus/data/models/user_profile_models/notification.dart';
 import 'package:exodus/presentation/screens/notification/controllers/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,24 +37,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
-      body: FutureBuilder<void>(
-        future: _loadNotifications,
+      body: StreamBuilder<List<NotificationModel>>(
+        stream: _notificationController.notificationsStream,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (_notificationController.notifications.isEmpty) {
+          final notifications = snapshot.data ?? [];
+
+          if (notifications.isEmpty) {
             return const Center(child: Text('No notifications yet!'));
           }
 
           return ListView.builder(
             physics: const BouncingScrollPhysics(),
-            itemCount: _notificationController.notifications.length,
+            itemCount: notifications.length,
             itemBuilder: (context, index) {
-              final notification = _notificationController.notifications[index];
-              final isLastItem =
-                  index == _notificationController.notifications.length - 1;
+              final notification = notifications[index];
+              final isLastItem = index == notifications.length - 1;
               return Column(
                 children: [
                   ListTile(

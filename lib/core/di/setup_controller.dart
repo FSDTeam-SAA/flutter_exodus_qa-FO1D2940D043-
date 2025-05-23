@@ -11,9 +11,11 @@ import 'package:exodus/presentation/screens/notification/controllers/notificatio
 import 'package:exodus/presentation/screens/profile/controllers/profile_controller.dart';
 import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 
+import '../services/socket_services.dart';
+
 void setupController() {
   sl.registerFactory(
-    () => LoginController(sl<LoginUsecase>(), sl<SecureStoreServices>()),
+    () => LoginController(sl<LoginUsecase>(), sl<SecureStoreServices>(), sl<SocketService>()),
   );
 
   sl.registerFactory(
@@ -22,7 +24,7 @@ void setupController() {
 
   sl.registerFactory(() => ProfileController(sl<SecureStoreServices>()));
 
-  sl.registerFactory(() => NotificationController(sl<NotificationDataUsecase>()));
+  sl.registerFactory(() => NotificationController(sl<NotificationDataUsecase>(), sl<SocketService>()));
 
   sl.registerFactory(() => RideHistoryController(sl<RideHistoryUsecase>()));
   

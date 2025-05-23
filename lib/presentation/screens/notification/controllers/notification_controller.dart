@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/user_profile_models/notification.dart';
 import 'package:exodus/domain/usecases/home/notification_data_usecase.dart';
@@ -7,20 +10,39 @@ import 'package:exodus/domain/usecases/home/notification_data_usecase.dart';
 class NotificationController extends BaseController {
   // Add NotificationUsecase to the constructor
   final NotificationDataUsecase _notificationDataUsecase;
+  final SocketService _socketService;
+  final _notificationsStreamController = StreamController<List<NotificationModel>>.broadcast();
 
-  NotificationController(this._notificationDataUsecase);
+  NotificationController(this._notificationDataUsecase, this._socketService) {
+    _setupSocketListeners();
+  }
 
   // Notification List
-  List<NotificationModel> notifications = [];
+  List<NotificationModel> _currentNotifications = [];
+  Stream<List<NotificationModel>> get notificationsStream => _notificationsStreamController.stream;
+
+
+  void _setupSocketListeners() {
+    _socketService.on('now_notification', (data) {
+      try {
+        final newNotification = NotificationModel.fromJson(data);
+        _currentNotifications = [newNotification, ..._currentNotifications];
+        _notificationsStreamController.add(_currentNotifications);
+      } catch (e) {
+        dPrint("Error parsing notification data: $e");
+      }
+    });
+  }
 
   Future<void> getAllNotifications() async {
     try {
       final result = await _notificationDataUsecase.call();
 
       if (result is ApiSuccess<List<NotificationModel>>) {
-        final notifications = result.data;
-        this.notifications = notifications;
-        dPrint("Notification -> ${notifications.length}");
+        _currentNotifications = result.data;
+        _notificationsStreamController.add(_currentNotifications);
+        // this.notifications = notifications;
+        dPrint("Notification -> ${_currentNotifications.length}");
       } else if (result is ApiError) {
         // Handle error case
         final message = (result as ApiError).message;
@@ -31,5 +53,11 @@ class NotificationController extends BaseController {
     } catch (e) {
       // Handle any unexpected errors
     }
+  }
+
+  @override
+  void dispose() {
+    _notificationsStreamController.close();
+    super.dispose();
   }
 }

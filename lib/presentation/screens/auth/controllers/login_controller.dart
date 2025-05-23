@@ -4,6 +4,7 @@ import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
+import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
@@ -11,8 +12,13 @@ import 'package:exodus/data/models/auth/login_response.dart';
 class LoginController extends BaseController {
   final LoginUsecase _loginUsecase;
   final SecureStoreServices _secureStoreServices;
+  final SocketService _socketService;
 
-  LoginController(this._loginUsecase, this._secureStoreServices);
+  LoginController(
+    this._loginUsecase,
+    this._secureStoreServices,
+    this._socketService,
+  );
 
   Future<void> login(String email, String password) async {
     setLoading(true);
@@ -32,6 +38,14 @@ class LoginController extends BaseController {
           KeyConstants.refreshToken,
           data.refreshToken,
         );
+
+        try {
+          // Initialize socket connection with the access token
+          _socketService.initializeSocket(authToken: data.accessToken);
+        } catch (e) {
+          dPrint("Socket initialization error: $e");
+        }
+
         if (data.isUser) {
           NavigationService().freshStartTo(AppRoutes.bottomNavbar);
         }
