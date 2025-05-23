@@ -1,7 +1,9 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/app_state_service.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/presentation/screens/profile/controllers/profile_controller.dart';
@@ -64,7 +66,9 @@ class UserProfileScreen extends StatelessWidget {
                 _buildMenuItem(
                   iconPath: "assets/icons/history.png",
                   title: "Ride History",
-                  onTap: () {},
+                  onTap: () {
+                    NavigationService().sailTo(AppRoutes.rideHistory);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/password.png",

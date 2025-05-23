@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:exodus/core/constants/api/cache_constants.dart';
 import 'package:exodus/core/network/models/hive_cache_model.dart';
+import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class CustomCacheInterceptor extends Interceptor {
@@ -12,6 +13,8 @@ class CustomCacheInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    dPrint("Cache Is coming in ...");
+
     // Only cache GET requests
     if (options.method.toUpperCase() != 'GET') {
       return handler.next(options);

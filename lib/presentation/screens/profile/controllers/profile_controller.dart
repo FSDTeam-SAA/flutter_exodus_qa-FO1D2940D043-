@@ -18,4 +18,6 @@ class ProfileController extends BaseController {
     sl<AppStateService>().clearUser();
     NavigationService().freshStartTo(AppRoutes.login);
   }
+
+  
 }

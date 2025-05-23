@@ -11,6 +11,7 @@ import 'package:exodus/presentation/screens/bot/screens/bottom_navbar.dart';
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
 import 'package:exodus/presentation/screens/notification/screens/notification_screen.dart';
+import 'package:exodus/presentation/screens/profile/screens/ride_history_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.dart';
 import 'package:exodus/presentation/screens/splash/screens/splash_screen.dart';
 import 'package:exodus/presentation/screens/subscriptions/screens/subscriptions.dart';
@@ -67,6 +68,8 @@ class RouteGenerator {
       /// [User Profile]
       case AppRoutes.userProfile:
         return FadeRoute(page: UserProfileScreen());
+      case AppRoutes.rideHistory:
+        return SlideLeftTransition(page: RideHistoryScreen());
 
       default:
         return _errorRoute();

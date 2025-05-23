@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNextRideCard(List<Ticket> tickets) {
+  Widget _buildNextRideCard(List<TicketModel> tickets) {
     // Find the next upcoming ticket (you might want to add proper logic here)
     final nextTicket = tickets.isNotEmpty ? tickets.first : null;
 

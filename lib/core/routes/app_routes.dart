@@ -26,4 +26,5 @@ abstract class AppRoutes {
 
   /// [User Profile]
   static const userProfile = 'user-profile';
+  static const rideHistory = 'ride-history';
 }

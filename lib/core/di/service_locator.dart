@@ -4,6 +4,7 @@ import 'package:exodus/core/di/setup_repository.dart';
 import 'package:exodus/core/di/setup_use_case.dart';
 import 'package:get_it/get_it.dart';
 
+
 import '../network/interceptor/custom_cache_interceptor.dart';
 
 final sl = GetIt.instance;
@@ -17,10 +18,11 @@ void setupServiceLocator() {
       ), // Adjust cache duration as needed
     ),
   );
-  
+
+
+
   // Core Service
   setupCore();
-
 
   // Usecase
   setupUseCase();

@@ -1,5 +1,4 @@
-
-class Ticket {
+class TicketModel {
   final String id;
   final String scheduleId;
   final String userId;
@@ -15,10 +14,8 @@ class Ticket {
   final List<String>? availableSeat;
   final String status;
   final String key;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
-  Ticket({
+  TicketModel({
     required this.id,
     required this.scheduleId,
     required this.userId,
@@ -34,31 +31,37 @@ class Ticket {
     this.availableSeat,
     required this.status,
     required this.key,
-    required this.createdAt,
-    required this.updatedAt,
   });
-
-  factory Ticket.fromJson(Map<String, dynamic> json) {
-    return Ticket(
+  factory TicketModel.fromJson(Map<String, dynamic> json) {
+    return TicketModel(
       id: json['_id'] ?? '',
-      scheduleId: json['schedule'] ?? '',
-      userId: json['userId'] ?? '',
+      scheduleId:
+          json['schedule'] is Map<String, dynamic>
+              ? json['schedule']['_id'] ?? ''
+              : json['schedule'] ?? '',
+      userId:
+          json['userId'] is Map<String, dynamic>
+              ? json['userId']['_id'] ?? ''
+              : json['userId'] ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      busNumber: json['busNumber'] ?? '',
+      busNumber:
+          json['busNumber'] is Map<String, dynamic>
+              ? json['busNumber']['_id'] ?? ''
+              : json['busNumber'] ?? '',
       seatNumber: json['seatNumber'] ?? '',
       source: json['source'] ?? '',
       destination: json['destination'] ?? '',
-      date: DateTime.parse(json['date']),
+      date:
+          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
       time: json['time'] ?? '',
       qrCode: json['qrCode'],
       ticketSecret: json['ticket_secret'],
-      availableSeat: json['avaiableSeat'] != null 
-          ? List<String>.from(json['avaiableSeat']) 
-          : null,
+      availableSeat:
+          json['avaiableSeat'] != null
+              ? List<String>.from(json['avaiableSeat'])
+              : null,
       status: json['status'] ?? 'pending',
       key: json['key'] ?? '',
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
@@ -79,48 +82,6 @@ class Ticket {
       'avaiableSeat': availableSeat,
       'status': status,
       'key': key,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
     };
-  }
-
-  Ticket copyWith({
-    String? id,
-    String? scheduleId,
-    String? userId,
-    double? price,
-    String? busNumber,
-    String? seatNumber,
-    String? source,
-    String? destination,
-    DateTime? date,
-    String? time,
-    String? qrCode,
-    String? ticketSecret,
-    List<String>? availableSeat,
-    String? status,
-    String? key,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return Ticket(
-      id: id ?? this.id,
-      scheduleId: scheduleId ?? this.scheduleId,
-      userId: userId ?? this.userId,
-      price: price ?? this.price,
-      busNumber: busNumber ?? this.busNumber,
-      seatNumber: seatNumber ?? this.seatNumber,
-      source: source ?? this.source,
-      destination: destination ?? this.destination,
-      date: date ?? this.date,
-      time: time ?? this.time,
-      qrCode: qrCode ?? this.qrCode,
-      ticketSecret: ticketSecret ?? this.ticketSecret,
-      availableSeat: availableSeat ?? this.availableSeat,
-      status: status ?? this.status,
-      key: key ?? this.key,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
   }
 }

@@ -13,7 +13,7 @@ import '../../../../core/constants/app/app_sizes.dart';
 import '../../../../core/theme/text_style.dart';
 
 class RideDetailsScreen extends StatelessWidget {
-  final List<Ticket> tickets;
+  final List<TicketModel> tickets;
   const RideDetailsScreen({super.key, required this.tickets});
 
   @override
@@ -67,7 +67,7 @@ class RideDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNextRideCard(List<Ticket> tickets) {
+  Widget _buildNextRideCard(List<TicketModel> tickets) {
     // Find the next upcoming ticket (you might want to add proper logic here)
     final nextTicket = tickets.isNotEmpty ? tickets.first : null;
 
@@ -230,7 +230,7 @@ class RideDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQRcode(List<Ticket> tickets) {
+  Widget _buildQRcode(List<TicketModel> tickets) {
     // Extract base64 data by removing the prefix
     final String base64String = tickets.first.qrCode!.split(',').last;
     final Uint8List bytes = base64Decode(base64String);
@@ -265,7 +265,7 @@ class RideDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _cancellationPolicy(BuildContext context, List<Ticket> tickets) {
+  Widget _cancellationPolicy(BuildContext context, List<TicketModel> tickets) {
     return Padding(
       padding: AppSizes.paddingAllExtraMedium,
       child: Container(

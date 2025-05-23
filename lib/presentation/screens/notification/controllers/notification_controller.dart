@@ -5,7 +5,6 @@ import 'package:exodus/data/models/user_profile_models/notification.dart';
 import 'package:exodus/domain/usecases/home/notification_data_usecase.dart';
 
 class NotificationController extends BaseController {
-
   // Add NotificationUsecase to the constructor
   final NotificationDataUsecase _notificationDataUsecase;
 
@@ -33,6 +32,4 @@ class NotificationController extends BaseController {
       // Handle any unexpected errors
     }
   }
-
-
 }
