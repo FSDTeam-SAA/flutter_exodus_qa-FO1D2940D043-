@@ -5,6 +5,7 @@ import 'package:exodus/core/services/secure_store_services.dart';
 
 import '../network/interceptor/token_refresh_interceptor.dart';
 import '../services/app_state_service.dart';
+import '../services/socket_services.dart';
 
 void setupCore() {
   sl.registerLazySingleton(() => ApiClient());
@@ -17,4 +18,9 @@ void setupCore() {
 
   /// [Global User Data Store]
   sl.registerLazySingleton(() => AppStateService());
+
+  // Register SocketService as a LazySingleton (global instance)
+  sl.registerLazySingleton<SocketService>(
+    () => SocketService(), // Initialize without token here
+  );
 }
