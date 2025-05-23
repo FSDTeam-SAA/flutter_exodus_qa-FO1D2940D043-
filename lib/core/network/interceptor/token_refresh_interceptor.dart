@@ -1,55 +1,52 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:exodus/core/utils/debug_logger.dart';
+
+import '../../constants/app/key_constants.dart';
+import '../../services/secure_store_services.dart';
+import '../api_client.dart';
 
 class TokenRefreshInterceptor extends Interceptor {
-  final Future<String?> Function() refreshToken;
-  final Future<void> Function(String newToken) saveToken;
-  final Future<void> Function() logout;
+  final ApiClient _apiClient;
+  final SecureStoreServices _secureStoreServices;
 
-  TokenRefreshInterceptor({
-    required this.refreshToken,
-    required this.saveToken,
-    required this.logout,
-  });
+  TokenRefreshInterceptor(this._apiClient, this._secureStoreServices);
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Check for specific 403 "Invalid token" error
-    if (_isTokenInvalidError(err)) {
-      debugPrint('Detected invalid token, attempting refresh...');
-      
-      final newToken = await refreshToken();
-      if (newToken != null) {
-        debugPrint('Token refresh successful');
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    dPrint("Refresh Token Interceptor ...");
+
+    if (err.response?.statusCode == 401) {
+      // Check if it's an invalid token error
+      final responseData = err.response?.data;
+      if (responseData is Map && responseData['message'] == 'Invalid token') {
+        // Attempt to refresh the token
+        final isRefreshed = await _apiClient.refreshToken();
         
-        // Update the request with new token
-        err.requestOptions.headers['Authorization'] = newToken;
-        
-        // Create a new Dio instance to avoid circular interceptor calls
-        final dio = Dio();
-        
-        // Repeat the request with new token
-        try {
-          final response = await dio.fetch(err.requestOptions);
-          return handler.resolve(response);
-        } catch (retryError) {
-          debugPrint('Retry failed: $retryError');
-          return handler.next(err);
+        if (isRefreshed) {
+          // Retry the original request with the new token
+          final options = err.requestOptions;
+          
+          // Get the new access token
+          final accessToken = await _secureStoreServices.retrieveData(
+            KeyConstants.accessToken,
+          );
+          
+          // Update the header
+          options.headers['Authorization'] = 'Bearer $accessToken';
+          
+          // Create a new request with the updated options
+          final newRequest = await _apiClient.dio.fetch(options);
+          return handler.resolve(newRequest);
+        } else {
+          // If refresh fails, you might want to logout the user
+          // _logoutUser();
+          return handler.reject(err);
         }
-      } else {
-        debugPrint('Token refresh failed - logging out');
-        await logout();
-        return handler.next(err);
       }
     }
-    
-    // For all other errors, just pass them through
     return handler.next(err);
-  }
-
-  bool _isTokenInvalidError(DioException err) {
-    return err.response?.statusCode == 403 &&
-           err.response?.data != null &&
-           err.response?.data['message'] == 'Invalid token';
   }
 }
