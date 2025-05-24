@@ -9,6 +9,7 @@ import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
+import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:exodus/presentation/widgets/arrow_icon_widget.dart';
 import 'package:exodus/presentation/widgets/build_title.dart';
@@ -25,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = sl<HomeController>();
+  final _rideHistoryController = sl<RideHistoryController>();
 
   @override
   void initState() {

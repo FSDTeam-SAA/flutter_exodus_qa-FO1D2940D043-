@@ -12,7 +12,6 @@ import 'package:exodus/core/network/interceptor/token_refresh_interceptor.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 
-
 class ApiClient {
   late final Dio _dio;
 
@@ -40,8 +39,8 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json'},
-        // Don't throw for 4xx errors - we'll handle them manually
-        // validateStatus: (status) => status! < 500,
+        // // Don't throw for 4xx errors - we'll handle them manually
+        // validateStatus: (status) => status != 400,
       ),
     );
 
@@ -171,6 +170,8 @@ class ApiClient {
     final accessToken = await _secureStoreServices.retrieveData(
       KeyConstants.accessToken,
     );
+
+    dPrint("Current Access Token: $accessToken");
 
     if (accessToken != null) {
       options.headers ??= {};

@@ -12,7 +12,7 @@ class RideHistoryImpl implements RideHistoryRepository {
   @override
   Future<ApiResult<List<TicketModel>>> getAllRideHistory() async {
     return _apiClient.get<List<TicketModel>>(
-      ApiEndpoints.getAllNotification,
+      ApiEndpoints.getRideHistory,
       fromJsonT:
           (json) =>
               (json as List).map((item) => TicketModel.fromJson(item)).toList(),
