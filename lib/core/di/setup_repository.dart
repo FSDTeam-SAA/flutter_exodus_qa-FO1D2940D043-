@@ -1,8 +1,12 @@
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/data/repositories/auth_repository_impl.dart';
+import 'package:exodus/data/repositories/list_of_available_suttles_impl.dart';
+import 'package:exodus/data/repositories/list_of_routes_impl.dart';
 import 'package:exodus/data/repositories/notification_repository_impl.dart';
 import 'package:exodus/data/repositories/ride_history_impl.dart';
 import 'package:exodus/domain/repositories/auth_repository.dart';
+import 'package:exodus/domain/repositories/list_of_available_suttles_repository.dart';
+import 'package:exodus/domain/repositories/list_of_routes_repository.dart';
 import 'package:exodus/domain/repositories/notification_repository.dart';
 import 'package:exodus/domain/repositories/ride_history_repository.dart';
 
@@ -16,4 +20,7 @@ void setupRepository() {
   // Profile Repository
   sl.registerCachedFactory<RideHistoryRepository>(() => RideHistoryImpl(apiClient: sl()));
 
+  // Book A Ride Repository
+  sl.registerCachedFactory<ListOfRoutesRepository>(() => ListOfRoutesImpl(apiClient: sl()));
+  sl.registerCachedFactory<ListOfAvailableShuttlesRepository>(() => ListOfAvailableSuttlesImpl(apiClient: sl()));
 }

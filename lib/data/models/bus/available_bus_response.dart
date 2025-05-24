@@ -1,41 +1,57 @@
-class ScheduleItem {
+class Stop {
+  final String name;
+  final String id;
+  final double? latitude;
+  final double? longitude;
+  final double? price;
+
+  Stop({
+    required this.name,
+    required this.id,
+    this.latitude,
+    this.longitude,
+    this.price,
+  });
+
+  factory Stop.fromJson(Map<String, dynamic> json) => Stop(
+    name: json['name'],
+    id: json['_id'],
+    latitude: json['latitude']?.toDouble(),
+    longitude: json['longitude']?.toDouble(),
+    price: json['price']?.toDouble(),
+  );
+}
+
+class Schedule {
   final String day;
   final String arrivalTime;
   final String departureTime;
-  final String id;
 
-  ScheduleItem({
+  Schedule({
     required this.day,
     required this.arrivalTime,
     required this.departureTime,
-    required this.id,
   });
 
-  factory ScheduleItem.fromJson(Map<String, dynamic> json) {
-    return ScheduleItem(
-      day: json['day'] as String,
-      arrivalTime: json['arrivalTime'] as String,
-      departureTime: json['departureTime'] as String,
-      id: json['_id'] as String,
-    );
-  }
+  factory Schedule.fromJson(Map<String, dynamic> json) => Schedule(
+    day: json['day'],
+    arrivalTime: json['arrivalTime'],
+    departureTime: json['departureTime'],
+  );
 }
 
-class BusId {
+class Bus {
   final String id;
   final String name;
   final String busNumber;
   final int seat;
   final int standing;
   final String source;
-  final List<Map<String, String>> stops;
+  final List<Stop> stops;
   final String lastStop;
   final int price;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int v;
 
-  BusId({
+  Bus({
     required this.id,
     required this.name,
     required this.busNumber,
@@ -45,79 +61,41 @@ class BusId {
     required this.stops,
     required this.lastStop,
     required this.price,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
   });
 
-  factory BusId.fromJson(Map<String, dynamic> json) {
-    return BusId(
-      id: json['_id'] as String,
-      name: json['name'] as String,
-      busNumber: json['bus_number'] as String,
-      seat: json['seat'] as int,
-      standing: json['standing'] as int,
-      source: json['source'] as String,
-      stops: List<Map<String, String>>.from(
-          (json['stops'] as List).map((stop) => {
-                'name': (stop as Map<String, dynamic>)['name'] as String,
-                '_id': (stop)['_id'] as String,
-              })),
-      lastStop: json['lastStop'] as String,
-      price: json['price'] as int,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      v: json['__v'] as int,
-    );
-  }
+  factory Bus.fromJson(Map<String, dynamic> json) => Bus(
+    id: json['_id'],
+    name: json['name'],
+    busNumber: json['bus_number'],
+    seat: json['seat'],
+    standing: json['standing'],
+    source: json['source'],
+    stops: List<Stop>.from(json['stops']?.map((x) => Stop.fromJson(x)) ?? []),
+    lastStop: json['lastStop'],
+    price: json['price'],
+  );
 }
 
-class AvailableBus {
+class AvailableShuttle {
   final String id;
-  final List<ScheduleItem> schedules;
+  final List<Schedule> schedules;
   final String driverId;
-  final BusId busId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int v;
+  final Bus bus;
+  final bool isActive;
 
-  AvailableBus({
+  AvailableShuttle({
     required this.id,
     required this.schedules,
     required this.driverId,
-    required this.busId,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+    required this.bus,
+    this.isActive = true,
   });
 
-  factory AvailableBus.fromJson(Map<String, dynamic> json) {
-    return AvailableBus(
-      id: json['_id'] as String,
-      schedules: (json['schedules'] as List)
-          .map((e) => ScheduleItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      driverId: json['driverId'] as String,
-      busId: BusId.fromJson(json['busId'] as Map<String, dynamic>),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      v: json['__v'] as int,
-    );
-  }
-}
-
-class AvailableBusData {
-  final List<AvailableBus> data;
-
-  AvailableBusData({
-    required this.data,
-  });
-
-  factory AvailableBusData.fromJson(Map<String, dynamic> json) {
-    return AvailableBusData(
-      data: (json['data'] as List)
-          .map((e) => AvailableBus.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+  factory AvailableShuttle.fromJson(Map<String, dynamic> json) => AvailableShuttle(
+    id: json['_id'],
+    schedules: List<Schedule>.from(json['schedules']?.map((x) => Schedule.fromJson(x)) ?? []),
+    driverId: json['driverId'],
+    bus: Bus.fromJson(json['busId']),
+    isActive: json['isActive'] ?? true,
+  );
 }

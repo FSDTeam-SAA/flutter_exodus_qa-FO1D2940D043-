@@ -8,6 +8,7 @@ import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
+import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
 import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
@@ -32,11 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _controller.getUserData();
+    _rideHistoryController.getAllRideHistory();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _rideHistoryController.dispose();
     super.dispose();
   }
 
@@ -283,9 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     /// [Date]
                     Text(
-                      DateFormat(
-                        'EEE, MMM d',
-                      ).format(nextTicket.date),
+                      DateFormat('EEE, MMM d').format(nextTicket.date),
                       style: AppText.bodySemiBold.copyWith(
                         color: AppColors.background,
                       ),
@@ -377,78 +378,130 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAllRidesList() {
-    final rides = List.generate(
-      4,
-      (index) => {
-        'route': 'West Bay to Al Wakra',
-        'time': '08:30am - 09:15am',
-        'seats': '7 seats left',
-      },
-    );
-
     return Padding(
       padding: AppSizes.paddingHorizontalExtraMedium,
-      child: Container(
-        decoration: AppDecorations.card,
+      child: StreamBuilder<List<TicketModel>>(
+        stream: AppDataStore().rideHistoryStream,
+        builder: (context, snapshot) {
+          // Show loading indicator while waiting for data
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        child: Column(
-          children:
-              rides.asMap().entries.map((entry) {
-                final index = entry.key;
-                final ride = entry.value;
-                final isLastItem = index == rides.length - 1;
+          // Show error message if something went wrong
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Failed to load rides: ${snapshot.error}",
+                style: TextStyle(color: AppColors.error),
+              ),
+            );
+          }
 
-                return Column(
-                  children: [
-                    Padding(
-                      padding: AppSizes.paddingAllMedium,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ride['route']!,
-                                  style: const TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      ride['time']!,
-                                      style: const TextStyle(
-                                        color: AppColors.secondary,
-                                      ),
-                                    ),
-                                    Text(
-                                      ride['seats']!,
-                                      style: const TextStyle(
-                                        color: AppColors.secondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!isLastItem) // Only add divider if not the last item
-                      Divider(
-                        color: AppColors.secondary,
-                        height: 16, // Adjust height as needed
-                        thickness: 1,
-                      ),
-                  ],
-                );
-              }).toList(),
-        ),
+          // Get all rides without filtering
+          final rides = snapshot.data ?? [];
+
+          // Show empty state if no rides
+          if (rides.isEmpty) {
+            return Center(
+              child: Text("No rides found", style: AppText.bodyMedium),
+            );
+          }
+
+          // return SizedBox(child: Text("Data -> ${rides.first.busNumber}"));
+
+          // Display all rides
+          return _buildRideList(rides);
+        },
+      ),
+    );
+  }
+
+  Widget _buildRideList(List<TicketModel> rides) {
+    return ListView.builder(
+      key: ValueKey(rides.length),
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: rides.length,
+      itemBuilder: (context, index) {
+        final ride = rides[index];
+        return Padding(
+          padding: AppSizes.paddingHorizontalExtraMedium,
+          child: _buildRideCard(ride, index == rides.length - 1),
+        );
+      },
+    );
+  }
+
+  Widget _buildRideCard(TicketModel ride, bool isLastItem) {
+    // Color statusColor;
+    // IconData statusIcon;
+
+    // switch (ride.status.toLowerCase()) {
+    //   case 'completed':
+    //     statusColor = AppColors.success;
+    //     statusIcon = Icons.check_circle;
+    //     break;
+    //   case 'canceled':
+    //     statusColor = AppColors.error;
+    //     statusIcon = Icons.cancel;
+    //     break;
+    //   default:
+    //     statusColor = Colors.blue;
+    //     statusIcon = Icons.access_time;
+    // }
+
+    return Container(
+      // padding: const EdgeInsets.all(12),
+      // margin: const EdgeInsets.only(bottom: 10),
+      decoration: AppDecorations.card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              /// [Soure] to [Destination] Ticket
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 4, // Equivalent to Gap.w4
+                runSpacing: 4, // Optional vertical spacing between lines
+                children: [
+                  Text(ride.source, style: AppText.h3),
+                  ArrowIcon(),
+                  Text(ride.destination, style: AppText.h3),
+                ],
+              ),
+              // Text(
+              //   '${ride.source} to ${ride.destination}',
+              //   style: const TextStyle(
+              //     color: AppColors.secondary,
+              //     fontWeight: FontWeight.bold,
+              //     fontSize: 16,
+              //   ),
+              // ),
+              // const Spacer(),
+              // Row(
+              //   children: [
+              //     Icon(statusIcon, color: statusColor, size: 14),
+              //     const SizedBox(width: 4),
+              //     Text(ride.status, style: TextStyle(color: statusColor)),
+              //   ],
+              // ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(ride.time, style: const TextStyle(color: AppColors.secondary)),
+          const SizedBox(height: 4),
+          Gap.h12,
+
+          /// [Bus Name] Shuttle
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text("Appple Red Bus", style: AppText.smallRegular)],
+          ),
+          if (!isLastItem)
+            const Divider(height: 16, color: AppColors.secondary),
+        ],
       ),
     );
   }

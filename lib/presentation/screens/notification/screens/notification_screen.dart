@@ -4,6 +4,7 @@ import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/date_utils.dart';
 import 'package:exodus/data/models/user_profile_models/notification.dart';
+import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/screens/notification/controllers/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +26,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     _loadNotifications = _notificationController.getAllNotifications();
   }
 
+    @override
+  void dispose() {
+    AppDataStore().notificationClose();
+    super.dispose();
+  }
+
   String _formatFullDateTime(DateTime date) {
     final datePart = DateFormat(
       'MMM d, yyyy',
@@ -38,7 +45,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
       body: StreamBuilder<List<NotificationModel>>(
-        stream: _notificationController.notificationsStream,
+        stream: AppDataStore().notificationsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {

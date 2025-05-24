@@ -46,9 +46,9 @@ class BusInfo {
 class AdminSchedule {
   final bool isActive;
   final String id;
-  final List<ScheduleItem> schedules;
+  final List<Schedule> schedules;
   final Driver driverId;
-  final BusId busId;
+  final Bus busId;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
@@ -69,10 +69,10 @@ class AdminSchedule {
       isActive: json['isActive'] as bool,
       id: json['_id'] as String,
       schedules: (json['schedules'] as List)
-          .map((e) => ScheduleItem.fromJson(e as Map<String, dynamic>))
+          .map((e) => Schedule.fromJson(e as Map<String, dynamic>))
           .toList(),
       driverId: Driver.fromJson(json['driverId'] as Map<String, dynamic>),
-      busId: BusId.fromJson(json['busId'] as Map<String, dynamic>),
+      busId: Bus.fromJson(json['busId'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       v: json['__v'] as int,
