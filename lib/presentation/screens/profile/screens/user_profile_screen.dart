@@ -78,17 +78,23 @@ class UserProfileScreen extends StatelessWidget {
                 _buildMenuItem(
                   iconPath: "assets/icons/about.png",
                   title: "About App",
-                  onTap: () {},
+                  onTap: () {
+                    NavigationService().sailTo(AppRoutes.aboutApp);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/privacy.png",
                   title: "Privacy Policy",
-                  onTap: () {},
+                  onTap: () {
+                    NavigationService().sailTo(AppRoutes.privacyPolicy);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/terms.png",
                   title: "Term & Condition",
-                  onTap: () {},
+                  onTap: () {
+                    NavigationService().sailTo(AppRoutes.termsAndCondition);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/logout.png",

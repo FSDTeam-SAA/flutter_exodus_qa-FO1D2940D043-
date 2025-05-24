@@ -1,5 +1,8 @@
 import 'package:exodus/core/routes/transitions/fade_route.dart';
 import 'package:exodus/core/routes/transitions/slide_left.dart';
+import 'package:exodus/presentation/screens/app/about_app.dart';
+import 'package:exodus/presentation/screens/app/privacy_policy.dart';
+import 'package:exodus/presentation/screens/app/terms_condition.dart';
 import 'package:exodus/presentation/screens/auth/screens/create_new_password.dart';
 import 'package:exodus/presentation/screens/auth/screens/forgot_password.dart';
 import 'package:exodus/presentation/screens/auth/screens/login_screen.dart';
@@ -70,6 +73,14 @@ class RouteGenerator {
         return FadeRoute(page: UserProfileScreen());
       case AppRoutes.rideHistory:
         return SlideLeftTransition(page: RideHistoryScreen());
+
+      // About, Privacy, Terms
+      case AppRoutes.aboutApp:
+        return SlideLeftTransition(page: AboutApp());
+      case AppRoutes.privacyPolicy:
+        return SlideLeftTransition(page: PrivacyPolicy());
+      case AppRoutes.termsAndCondition:
+        return SlideLeftTransition(page: TermsCondition());
 
       default:
         return _errorRoute();

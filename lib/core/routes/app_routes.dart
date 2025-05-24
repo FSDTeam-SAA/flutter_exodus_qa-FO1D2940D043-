@@ -27,4 +27,8 @@ abstract class AppRoutes {
   /// [User Profile]
   static const userProfile = 'user-profile';
   static const rideHistory = 'ride-history';
+  static const aboutApp = 'about-app';
+  static const privacyPolicy = 'privacy-policy';
+  static const termsAndCondition = 'terms-and-condition';
+  static const changePassword = 'change-password';
 }
