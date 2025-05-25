@@ -1,5 +1,8 @@
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/check_auth_status_usecase.dart';
+import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
+import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_available_suttles_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_routes_usecase.dart';
 import 'package:exodus/domain/usecases/home/get_home_data.dart';
@@ -12,6 +15,11 @@ void setupUseCase() {
   sl.registerLazySingleton(() => LoginUsecase(sl()));
   sl.registerLazySingleton(() => GetHomeDataUsecase(sl()));
   sl.registerLazySingleton(() => NotificationDataUsecase(sl()));
+
+  // Password Usecases
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
 
   // Profile Usecases
   sl.registerLazySingleton(() => RideHistoryUsecase(sl()));

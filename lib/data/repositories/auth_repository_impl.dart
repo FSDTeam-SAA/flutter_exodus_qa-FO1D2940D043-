@@ -38,4 +38,44 @@ class AuthRepositoryImpl implements AuthRepository {
       fromJsonT: (json) => UserData.fromJson(json),
     );
   }
+
+  @override
+  Future<ApiResult<void>> forgatePassword(String email) {
+    return _apiClient.post(
+      ApiEndpoints.forgetPassword,
+      data: {"email": email},
+      fromJsonT: (json) => {},
+    );
+  }
+
+  @override
+  Future<ApiResult<void>> resetPassword(
+    String email,
+    String otp,
+    String newPassword,
+  ) {
+    return _apiClient.post(
+      ApiEndpoints.resetPassword,
+      data: {"email": email, "otp": otp, "newPassword": newPassword},
+      fromJsonT: (json) => {},
+    );
+  }
+
+  @override
+  Future<ApiResult<void>> changePassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  ) {
+    return _apiClient.post(
+      ApiEndpoints.changePassword,
+      data: {
+        "email": email,
+        "oldPassword": oldPassword,
+        "newPassword": newPassword,
+      },
+
+      fromJsonT: (json) => {},
+    );
+  }
 }

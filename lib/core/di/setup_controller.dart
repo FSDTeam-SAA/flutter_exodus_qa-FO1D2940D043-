@@ -1,6 +1,9 @@
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/services/app_state_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
+import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
+import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
+import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_available_suttles_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_routes_usecase.dart';
 import 'package:exodus/domain/usecases/home/get_home_data.dart';
@@ -8,6 +11,7 @@ import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/domain/usecases/home/notification_data_usecase.dart';
 import 'package:exodus/domain/usecases/userProfile/ride_history_usecase.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
+import 'package:exodus/presentation/screens/auth/controllers/password_reset_controller.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/list_of_routs.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
 import 'package:exodus/presentation/screens/notification/controllers/notification_controller.dart';
@@ -20,6 +24,12 @@ void setupController() {
   sl.registerFactory(
     () => LoginController(sl<LoginUsecase>(), sl<SecureStoreServices>(), sl<SocketService>()),
   );
+  // Password Controllers
+  sl.registerFactory(() => PasswordResetController(
+        forgotPasswordUseCase: sl<ForgotPasswordUseCase>(),
+        resetPasswordUseCase: sl<ResetPasswordUseCase>(),
+        changePasswordUseCase: sl<ChangePasswordUseCase>(),
+      ));
 
   sl.registerFactory(
     () => HomeController(sl<AppStateService>(), sl<GetHomeDataUsecase>()),

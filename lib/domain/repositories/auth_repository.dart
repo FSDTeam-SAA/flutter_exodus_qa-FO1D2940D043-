@@ -9,5 +9,8 @@ abstract class AuthRepository {
   Future<ApiResult<LoginResponse>> login(String email, String password);
   Future<ApiResult<User>> register(RegisterRequest params);
   Future<ApiResult<UserData>> getUserData();
-  // Future<ApiResult<void>> refreshToken();
+  Future<ApiResult<void>> forgatePassword(String email);
+  Future<ApiResult<void>> resetPassword(String email, String otp, String newPassword);
+  Future<ApiResult<void>> changePassword(String email, String oldPassword, String newPassword);
+
 }
