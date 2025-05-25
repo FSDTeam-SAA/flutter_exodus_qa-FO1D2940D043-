@@ -57,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // }
 
   Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
 
     try {
@@ -75,6 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
           final double maxFormWidth =
               constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
           final bool isMobile = constraints.maxWidth < 600;
+
+          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+          final isKeyboardVisible = bottomInset > 0;
 
           return Stack(
             children: [
@@ -190,10 +194,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             Gap.h22,
 
                             /// [Submit button]
-                            context.primaryButton(
-                              onPressed: _submit,
-                              text: "Login",
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return context.primaryButton(
+                                  onPressed: _submit,
+                                  text: "Login",
+                                  isLoading: _controller.isLoading,
+                                );
+                              },
                             ),
+
                             if (!isMobile) ...[
                               Gap.h16,
 
@@ -220,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              if (isMobile)
+              if (!isKeyboardVisible && isMobile)
                 /// [Sign up Button]
                 Positioned(
                   left: 0,

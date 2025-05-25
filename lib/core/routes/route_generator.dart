@@ -73,8 +73,10 @@ class RouteGenerator {
         return FadeRoute(page: UserProfileScreen());
       case AppRoutes.rideHistory:
         return SlideLeftTransition(page: RideHistoryScreen());
+      case AppRoutes.changePassword:
+        return SlideLeftTransition(page: CreateNewPasswordScreen());
 
-      // About, Privacy, Terms
+      /// [About], [Privacy], [Terms] screens
       case AppRoutes.aboutApp:
         return SlideLeftTransition(page: AboutApp());
       case AppRoutes.privacyPolicy:

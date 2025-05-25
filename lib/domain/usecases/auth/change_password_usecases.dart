@@ -6,7 +6,7 @@ class ChangePasswordUseCase {
 
   ChangePasswordUseCase(this._repository);
 
-  Future<ApiResult<void>> execute(
+  Future<ApiResult<void>> call(
     String email,
     String oldPassword,
     String newPassword,

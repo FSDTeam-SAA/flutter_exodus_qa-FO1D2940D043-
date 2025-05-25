@@ -25,6 +25,39 @@ class PasswordResetController extends BaseController {
 
     dPrint("Forgot Password Result: $result");
     setLoading(false);
+  }
 
+  // Reset Password
+  Future<void> resetPassword(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
+    setLoading(true);
+    notifyListeners();
+
+    final result = await resetPasswordUseCase.call(email, code, newPassword);
+
+    dPrint("Reset Password Result: $result");
+    setLoading(false);
+  }
+
+  // Change Password
+  Future<void> changePassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    setLoading(true);
+    notifyListeners();
+
+    final result = await changePasswordUseCase.call(
+      email,
+      oldPassword,
+      newPassword,
+    );
+
+    dPrint("Change Password Result: $result");
+    setLoading(false);
   }
 }

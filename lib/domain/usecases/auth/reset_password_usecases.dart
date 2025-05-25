@@ -6,11 +6,7 @@ class ResetPasswordUseCase {
 
   ResetPasswordUseCase(this._repository);
 
-  Future<ApiResult<void>> execute(
-    String email,
-    String otp,
-    String newPassword,
-  ) {
+  Future<ApiResult<void>> call(String email, String otp, String newPassword) {
     return _repository.resetPassword(email, otp, newPassword);
   }
 }

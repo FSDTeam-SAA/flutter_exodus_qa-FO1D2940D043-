@@ -30,6 +30,7 @@ class LoginController extends BaseController {
       if (result is ApiSuccess<LoginResponse>) {
         dPrint("Success}");
         final data = result.data;
+
         await _secureStoreServices.storeData(
           KeyConstants.accessToken,
           data.accessToken,
@@ -54,6 +55,11 @@ class LoginController extends BaseController {
         dPrint("Navigation complete");
       } else {
         final message = (result as ApiError).message;
+        // check if OTP is not verified
+        if (message.toLowerCase().contains("otp is not verified")) {
+          NavigationService().sailTo(AppRoutes.codeVerify);
+          return;
+        }
         setError(message);
         dPrint(" Controller login message print $message");
         notifyListeners();
