@@ -5,17 +5,21 @@ import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
 import 'package:exodus/core/constants/app/key_constants.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/network/api_result_mapper.dart';
-import 'package:exodus/core/network/base_response.dart';
+import 'package:exodus/core/network/models/base_response.dart';
 import 'package:exodus/core/network/dio_error_handler.dart';
 import 'package:exodus/core/network/interceptor/custom_cache_interceptor.dart';
-import 'package:exodus/core/network/interceptor/token_refresh_interceptor.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
+
+import 'models/error_response.dart';
 
 class ApiClient {
   late final Dio _dio;
 
-  Dio get dio => _dio;
+  // Dio get dio => _dio;
+
+  bool _isRefreshing = false;
+  final List<Completer<void>> _pendingRequests = [];
 
   // Singleton instance
   static ApiClient? _instance;
@@ -39,18 +43,17 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json'},
-        // // Don't throw for 4xx errors - we'll handle them manually
-        // validateStatus: (status) => status != 400,
+        validateStatus: (status) => status != null && status < 500,
       ),
     );
 
     // Add interceptors
-    _dio.interceptors.add(TokenRefreshInterceptor(this, _secureStoreServices));
+    // _dio.interceptors.add(TokenRefreshInterceptor(this, _secureStoreServices));
     _dio.interceptors.add(CustomCacheInterceptor());
   }
 
   // Add the refreshToken method here - it should be private
-  Future<bool> refreshToken() async {
+  Future<bool> _refreshToken() async {
     try {
       final refreshToken = await _secureStoreServices.retrieveData(
         KeyConstants.refreshToken,
@@ -61,7 +64,7 @@ class ApiClient {
       }
 
       final response = await _dio.post(
-        ApiEndpoints.refreshToken,
+        '${ApiEndpoints.baseUrl}${ApiEndpoints.refreshToken}',
         data: {'refreshToken': refreshToken},
       );
 
@@ -94,73 +97,103 @@ class ApiClient {
 
   /// [Api Methods] ------------------------------------------------------------------
 
-  Future<ApiResult<T>> get<T>(
-    String endpoint, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onReceiveProgress,
-    required T Function(dynamic json) fromJsonT,
-  }) async {
-    try {
-      final response = await _dio.get(
-        endpoint,
-        data: queryParameters,
-        queryParameters: queryParameters,
-        options: await _addAuthHeader(options),
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
-
-      dPrint("Get Response API -> $response");
-
-      final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
-
-      dPrint("Base Response Message -> ${baseResponse.success}");
-
-      return mapBaseResponse<T>(baseResponse);
-    } on DioException catch (error) {
-      final message = dioErrorToUserMessage(error);
-      return ApiError(message);
-    }
-  }
-
-  Future<ApiResult<T>> post<T>(
-    String endpoint, {
+  Future<ApiResult<T>> _request<T>({
+    required String method,
+    required String endpoint,
+    required T Function(dynamic) fromJsonT,
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
-    required T Function(dynamic json) fromJsonT,
   }) async {
     try {
-      final response = await _dio.post(
+      if (_isRefreshing) {
+        final completer = Completer<void>();
+        _pendingRequests.add(completer);
+        await completer.future;
+      }
+
+      options = await _addAuthHeader(options);
+      final response = await _dio.request(
         endpoint,
         data: data,
         queryParameters: queryParameters,
-        options: await _addAuthHeader(options),
+        options: options..method = method,
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
 
-      dPrint(" Base Api Response -> $response");
       final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
-      // dPrint(" Base Api Response -> $baseResponse");
-
-      return mapBaseResponse<T>(baseResponse);
+      if (!baseResponse.success) {
+        return ApiError(
+          baseResponse.errorSources?.first.message ?? baseResponse.message,
+        );
+      }
+      return ApiSuccess(baseResponse.data as T);
     } on DioException catch (error) {
-      final message = dioErrorToUserMessage(error);
-      dPrint("Post Error message -> $error");
-      return ApiError(message);
+      if (error.response?.statusCode == 401 && !_isRefreshing) {
+        _isRefreshing = true;
+        try {
+          if (await _refreshToken()) {
+            return _request<T>(
+              method: method,
+              endpoint: endpoint,
+              fromJsonT: fromJsonT,
+              data: data,
+              queryParameters: queryParameters,
+              options: options,
+              cancelToken: cancelToken,
+              onSendProgress: onSendProgress,
+              onReceiveProgress: onReceiveProgress,
+            );
+          }
+        } finally {
+          _isRefreshing = false;
+          for (var completer in _pendingRequests) {
+            completer.complete();
+          }
+          _pendingRequests.clear();
+        }
+      }
+      return _handleDioError<T>(error);
     } catch (e) {
-      dPrint("Unexpected Error: $e");
-      return ApiError("Unexpected error occurred.");
+      dPrint("Unexpected error: $e");
+      return ApiError("An unexpected error occurred");
     }
   }
+
+  Future<ApiResult<T>> get<T>(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+    required T Function(dynamic) fromJsonT,
+    Options? options,
+    CancelToken? cancelToken,
+  }) => _request(
+    method: 'GET',
+    endpoint: endpoint,
+    fromJsonT: fromJsonT,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+  );
+
+  Future<ApiResult<T>> post<T>(
+    String endpoint, {
+    dynamic data,
+    required T Function(dynamic) fromJsonT,
+    Options? options,
+    CancelToken? cancelToken,
+  }) => _request(
+    method: 'POST',
+    endpoint: endpoint,
+    fromJsonT: fromJsonT,
+    data: data,
+    options: options,
+    cancelToken: cancelToken,
+  );
 
   /// [Helper Methods] -----------------------------------------------------------
 
@@ -179,5 +212,31 @@ class ApiClient {
     }
     dPrint("Authorization header : ${options.headers}");
     return options;
+  }
+
+  ApiResult<T> _handleDioError<T>(DioException error) {
+    dPrint("** Dio Error: ${error.message}");
+    // Check if we have a response with error details
+    if (error.response != null) {
+      try {
+        final responseData = error.response?.data;
+        if (responseData is Map) {
+          if (responseData.containsKey('errorSources')) {
+            final errorResponse = ErrorResponse.fromJson(
+              responseData as Map<String, dynamic>,
+            );
+            return ApiError(errorResponse.combinedErrorMessage);
+          }
+          if (responseData.containsKey('message')) {
+            return ApiError(responseData['message'] as String);
+          }
+        }
+      } catch (e) {
+        dPrint("Error parsing error response: $e");
+      }
+    }
+
+    // Fall back to status code or Dio error type
+    return ApiError(dioErrorToUserMessage(error));
   }
 }

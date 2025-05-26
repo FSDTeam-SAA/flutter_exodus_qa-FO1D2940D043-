@@ -2,14 +2,18 @@ import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
+import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
 import 'package:exodus/core/utils/validator/validators.dart';
 import 'package:exodus/presentation/screens/auth/constants/auth_constant.dart';
+import 'package:exodus/presentation/screens/auth/controllers/register_controller.dart';
+import 'package:exodus/presentation/screens/auth/model/register_request.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
+import 'package:exodus/presentation/widgets/form_error_message.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -37,6 +41,8 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  final _controller = sl<RegisterController>();
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -51,7 +57,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(context, AppRoutes.home);
+      _controller.register(
+        RegisterRequest(
+          name: _nameController.text,
+          email: _emailController.text,
+          phone: _phoneController.text,
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -87,17 +100,33 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            /// [App Logo]
                             AppLogo(height: 117, width: 160),
                             Gap.h32,
+
+                            /// [Api Error messages]
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return FormErrorMessage(
+                                  message: _controller.errorMessage,
+                                );
+                              },
+                            ),
+
+                            /// [Title and Subtitle]
                             Text(AuthConstants.title.login, style: AppText.h1),
+
                             Gap.h8,
+
+                            /// [Subtitle]
                             Text(
                               AuthConstants.subtitle.login,
                               style: AppText.bodyRegular,
                             ),
                             Gap.h22,
 
-                            // Name Field
+                            /// [Name Field]
                             TextFormField(
                               controller: _nameController,
                               focusNode: _nameFocus,
@@ -117,7 +146,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             Gap.h16,
 
-                            // Email Field
+                            /// [Email Field]
                             TextFormField(
                               controller: _emailController,
                               focusNode: _emailFocus,
@@ -138,7 +167,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             Gap.h16,
 
-                            // Phone Field
+                            /// [Phone Field]
                             TextFormField(
                               controller: _phoneController,
                               focusNode: _phoneFocus,
@@ -159,7 +188,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             Gap.h16,
 
-                            // Password Field
+                            /// [Password Field]
                             TextFormField(
                               controller: _passwordController,
                               focusNode: _passwordFocus,
@@ -195,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             Gap.h16,
 
-                            // Confirm Password Field
+                            /// [Confirm Password Field]
                             TextFormField(
                               controller: _confirmPasswordController,
                               focusNode: _confirmPasswordFocus,
@@ -230,13 +259,23 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
 
                             Gap.h22,
-                            context.primaryButton(
-                              onPressed: _submit,
-                              text: "Sign Up",
+
+                            /// [Sign Up Button]
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return context.primaryButton(
+                                  onPressed: _submit,
+                                  isLoading: _controller.isLoading,
+                                  text: "Sign Up",
+                                );
+                              },
                             ),
+
                             if (isKeyboardVisible || !isMobile) ...[
                               Gap.h16,
-                              // Already have an Account
+
+                              /// [Already have an Account]
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
                                 child: Text(

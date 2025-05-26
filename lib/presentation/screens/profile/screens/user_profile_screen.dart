@@ -73,7 +73,9 @@ class UserProfileScreen extends StatelessWidget {
                 _buildMenuItem(
                   iconPath: "assets/icons/password.png",
                   title: "Change Password",
-                  onTap: () {},
+                  onTap: () {
+                    NavigationService().sailTo(AppRoutes.changePassword);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/about.png",

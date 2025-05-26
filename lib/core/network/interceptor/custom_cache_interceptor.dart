@@ -8,79 +8,153 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class CustomCacheInterceptor extends Interceptor {
   final Duration maxCacheAge;
+  final Set<String> _excludedPaths;
+  final Box<HiveCacheModel> _cacheBox;
 
-  CustomCacheInterceptor({this.maxCacheAge = const Duration(minutes: 10)});
+  CustomCacheInterceptor({
+    this.maxCacheAge = const Duration(minutes: 10),
+    List<String>? excludedPaths,
+  }) : _excludedPaths = Set.from(excludedPaths ?? []),
+       _cacheBox = Hive.box<HiveCacheModel>(ApiCacheConstants.userCacheKey);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    dPrint("Cache Is coming in ...");
-
-    // Only cache GET requests
-    if (options.method.toUpperCase() != 'GET') {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    // Skip non-GET requests and excluded paths
+    if (options.method.toUpperCase() != 'GET' ||
+        _excludedPaths.contains(options.path)) {
       return handler.next(options);
     }
 
-    final key = options.uri.toString();
-    final box = Hive.box<HiveCacheModel>(ApiCacheConstants.userCacheKey);
+    final key = _generateCacheKey(options);
+    final cached = _cacheBox.get(key);
 
-    final cached = box.get(key);
     if (cached != null) {
-      final isExpired = DateTime.now().difference(cached.cachedAt) > maxCacheAge;
+      final isExpired =
+          DateTime.now().difference(cached.cachedAt) > maxCacheAge;
 
       if (!isExpired) {
-        return handler.resolve(
-          Response(
-            requestOptions: options,
-            data: jsonDecode(cached.responseBody),
-            statusCode: 200,
-            statusMessage: 'OK (from cache)',
-          ),
-        );
+        dPrint("Returning cached response for ${options.path}");
+        try {
+          final cachedData = jsonDecode(cached.responseBody);
+          return handler.resolve(
+            Response(
+              requestOptions: options,
+              data: cachedData,
+              statusCode: 200,
+              headers: Headers.fromMap({
+                'x-cache': ['HIT'],
+                'x-cache-age': [
+                  DateTime.now()
+                      .difference(cached.cachedAt)
+                      .inSeconds
+                      .toString(),
+                ],
+              }),
+            ),
+          );
+        } catch (e) {
+          dPrint("Error parsing cached data: $e");
+          await _cacheBox.delete(key);
+        }
+      } else {
+        dPrint("Cache expired for ${options.path}");
+        await _cacheBox.delete(key);
       }
     }
 
+    // Add cache-control header to request
+    options.headers['Cache-Control'] = 'no-cache';
     handler.next(options);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    if (response.requestOptions.method.toUpperCase() == 'GET' && 
+  Future<void> onResponse(
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) async {
+    final options = response.requestOptions;
+
+    // Only cache successful GET responses with specific criteria
+    if (options.method.toUpperCase() == 'GET' &&
         response.statusCode == 200 &&
         response.data is Map<String, dynamic> &&
-        (response.data as Map<String, dynamic>)['success'] == true) {
-      final key = response.requestOptions.uri.toString();
-      final box = Hive.box<HiveCacheModel>(ApiCacheConstants.userCacheKey);
-      await box.put(
-        key,
-        HiveCacheModel(
-          responseBody: jsonEncode(response.data),
-          cachedAt: DateTime.now(),
-        ),
-      );
+        (response.data as Map<String, dynamic>)['success'] == true &&
+        !_excludedPaths.contains(options.path)) {
+      final key = _generateCacheKey(options);
+      dPrint("Caching response for ${options.path}");
+
+      try {
+        await _cacheBox.put(
+          key,
+          HiveCacheModel(
+            responseBody: jsonEncode(response.data),
+            cachedAt: DateTime.now(),
+          ),
+        );
+
+        // Add cache info to response headers
+        response.headers.add('x-cache', 'MISS');
+      } catch (e) {
+        dPrint("Error caching response: $e");
+      }
     }
 
     handler.next(response);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.requestOptions.method.toUpperCase() == 'GET') {
-      final key = err.requestOptions.uri.toString();
-      final box = Hive.box<HiveCacheModel>(ApiCacheConstants.userCacheKey);
-      final cached = box.get(key);
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final options = err.requestOptions;
+
+    // Only attempt cache fallback for GET requests
+    if (options.method.toUpperCase() == 'GET' &&
+        !_excludedPaths.contains(options.path)) {
+      final key = _generateCacheKey(options);
+      final cached = _cacheBox.get(key);
 
       if (cached != null) {
-        return handler.resolve(
-          Response(
-            requestOptions: err.requestOptions,
-            data: jsonDecode(cached.responseBody),
-            statusCode: 200,
-            statusMessage: 'OK (from cache on error)',
-          ),
-        );
+        dPrint("Returning cached response after error for ${options.path}");
+        try {
+          final cachedData = jsonDecode(cached.responseBody);
+          return handler.resolve(
+            Response(
+              requestOptions: options,
+              data: cachedData,
+              statusCode: 200,
+              headers: Headers.fromMap({
+                'x-cache': ['HIT (error fallback)'],
+                'x-cache-age': [
+                  DateTime.now()
+                      .difference(cached.cachedAt)
+                      .inSeconds
+                      .toString(),
+                ],
+              }),
+              statusMessage: 'OK (from cache on error)',
+            ),
+          );
+        } catch (e) {
+          dPrint("Error parsing cached data: $e");
+          await _cacheBox.delete(key);
+        }
       }
     }
 
     handler.next(err);
+  }
+
+  String _generateCacheKey(RequestOptions options) {
+    // Include query parameters in cache key
+    final query =
+        options.queryParameters.isNotEmpty
+            ? '?${Uri(queryParameters: options.queryParameters).query}'
+            : '';
+    return '${options.path}$query';
   }
 }

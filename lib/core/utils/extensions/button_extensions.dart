@@ -10,15 +10,26 @@ extension ButtonStyleExtensions on BuildContext {
     required VoidCallback onPressed,
     required String text,
     double? width,
+    bool isLoading = false,
   }) {
     return GradientButtonPrimary(
       onPressed: onPressed,
       isPrimary: true,
       gradient: AppColors.primaryGradient,
-      child: Text(
-        text,
-        style: AppText.bodyMedium.copyWith(color: AppColors.background),
-      ),
+      child:
+          isLoading
+              ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.background),
+                ),
+              )
+              : Text(
+                text,
+                style: AppText.bodyMedium.copyWith(color: AppColors.background),
+              ),
       // const LinearGradient(
       //   colors: [
       //     AppColors.primary,
