@@ -20,6 +20,7 @@ abstract class AppRoutes {
   /// [Book a Ride]
   static const bookARide = 'book-a-ride';
   static const reserveBus = 'reserve-bus';
+  static const busSeats = 'bus-seats';
 
   /// [Subscriptions]
   static const subscription = 'subscription';
@@ -31,4 +32,11 @@ abstract class AppRoutes {
   static const privacyPolicy = 'privacy-policy';
   static const termsAndCondition = 'terms-and-condition';
   static const changePassword = 'change-password';
+
+  /// [Map Screen]
+  static const map = 'map';
+
+
+  /// [Driver Routes]
+  static const driverHome = '/driver-home';
 }

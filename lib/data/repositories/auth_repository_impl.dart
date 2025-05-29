@@ -27,7 +27,22 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<ApiResult<User>> register(RegisterRequest register) {
     return _apiClient.post(
       ApiEndpoints.register,
+      data: {
+        'name': register.name,
+        'email': register.email,
+        'password': register.password,
+        'phone': register.phone,
+      },
       fromJsonT: (json) => User.fromJson(json),
+    );
+  }
+
+  @override
+  Future<ApiResult<void>> verifyOTP(String email, String otp) {
+    return _apiClient.post(
+      ApiEndpoints.verifyOtp,
+      data: {"email": email, "otp": otp},
+      fromJsonT: (json) => {},
     );
   }
 

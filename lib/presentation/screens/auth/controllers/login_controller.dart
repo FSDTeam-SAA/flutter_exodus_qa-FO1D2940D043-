@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:exodus/core/constants/app/key_constants.dart';
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
@@ -12,12 +14,12 @@ import 'package:exodus/data/models/auth/login_response.dart';
 class LoginController extends BaseController {
   final LoginUsecase _loginUsecase;
   final SecureStoreServices _secureStoreServices;
-  final SocketService _socketService;
+
 
   LoginController(
     this._loginUsecase,
     this._secureStoreServices,
-    this._socketService,
+
   );
 
   Future<void> login(String email, String password) async {
@@ -39,17 +41,15 @@ class LoginController extends BaseController {
           KeyConstants.refreshToken,
           data.refreshToken,
         );
-
-        try {
-          // Initialize socket connection with the access token
-          _socketService.initializeSocket(authToken: data.accessToken);
-        } catch (e) {
-          dPrint("Socket initialization error: $e");
-        }
+        await _secureStoreServices.storeData(KeyConstants.role, data.role);
 
         if (data.isUser) {
           NavigationService().freshStartTo(AppRoutes.bottomNavbar);
         }
+        // if (data.isDriver) {
+        //   NavigationService().freshStartTo(AppRoutes.driverHome);
+        // }
+
         dPrint("User role: ${data.role}");
         // Navigator.pushNamedAndRemoveUntil(context, newRouteName, predicate)
         dPrint("Navigation complete");
@@ -57,7 +57,10 @@ class LoginController extends BaseController {
         final message = (result as ApiError).message;
         // check if OTP is not verified
         if (message.toLowerCase().contains("otp is not verified")) {
-          NavigationService().sailTo(AppRoutes.codeVerify);
+          NavigationService().sailTo(
+            AppRoutes.codeVerify,
+            arguments: {'email': email, 'fromLogin': true},
+          );
           return;
         }
         setError(message);

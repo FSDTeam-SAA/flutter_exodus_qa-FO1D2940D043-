@@ -20,9 +20,4 @@ void setupCore() {
   /// [Global User Data Store]
   sl.registerLazySingleton(() => AppStateService());
   sl.registerLazySingleton<AppDataStore>(() => AppDataStore());
-
-  // Register SocketService as a LazySingleton (global instance)
-  sl.registerLazySingleton<SocketService>(
-    () => SocketService(), // Initialize without token here
-  );
 }

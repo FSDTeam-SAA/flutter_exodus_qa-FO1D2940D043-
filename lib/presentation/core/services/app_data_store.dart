@@ -49,6 +49,4 @@ class AppDataStore {
   /// [Routes]
   /// store the list of routes
   List<String> routesList = [];
-
-
 }

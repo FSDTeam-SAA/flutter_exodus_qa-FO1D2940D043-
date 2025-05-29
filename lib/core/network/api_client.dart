@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
 import 'package:exodus/core/constants/app/key_constants.dart';
 import 'package:exodus/core/network/api_result.dart';
-import 'package:exodus/core/network/api_result_mapper.dart';
 import 'package:exodus/core/network/models/base_response.dart';
 import 'package:exodus/core/network/dio_error_handler.dart';
 import 'package:exodus/core/network/interceptor/custom_cache_interceptor.dart';

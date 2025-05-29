@@ -29,8 +29,12 @@ class HourSelector extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _iconButton(Icons.remove, controller.decrease),
-
+                    // _iconButton(Icons.remove, controller.decrease, longPress: controller.resetHours),
+                    _RemoveButton(
+                      onPressed: controller.decrease,
+                      onLongPress: controller.resetHours,
+                      controller: controller,
+                    ),
                     Gap.w8,
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -50,7 +54,11 @@ class HourSelector extends StatelessWidget {
                     ),
 
                     Gap.w8,
-                    _iconButton(Icons.add, controller.increase),
+                    _iconButton(
+                      Icons.add,
+                      controller.increase,
+                      longPress: null,
+                    ),
                   ],
                 ),
               ),
@@ -89,7 +97,7 @@ class HourSelector extends StatelessWidget {
 
             Gap.h40,
             _subscriptionToggle(),
-            
+
             Gap.h16,
             _bookButton(context),
           ],
@@ -98,9 +106,14 @@ class HourSelector extends StatelessWidget {
     );
   }
 
-  Widget _iconButton(IconData icon, VoidCallback onPressed) {
+  Widget _iconButton(
+    IconData icon,
+    VoidCallback onPressed, {
+    VoidCallback? longPress,
+  }) {
     return InkWell(
       onTap: onPressed,
+      onLongPress: longPress,
       borderRadius: AppSizes.borderRadiusSmall,
       child: Container(
         width: 28,
@@ -166,6 +179,79 @@ class HourSelector extends StatelessWidget {
       //   ),
       //   child: const Text("Book Request"),
       // ),
+    );
+  }
+}
+
+class _RemoveButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final VoidCallback onLongPress;
+  final HourSelectorController controller;
+
+  const _RemoveButton({
+    required this.onPressed,
+    required this.onLongPress,
+    required this.controller,
+  });
+
+  @override
+  State<_RemoveButton> createState() => _RemoveButtonState();
+}
+
+class _RemoveButtonState extends State<_RemoveButton> {
+  int _pressCount = 0;
+  DateTime? _lastPressTime;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        widget.onPressed();
+        _handlePressCount(context);
+      },
+      onLongPress: widget.onLongPress,
+      borderRadius: AppSizes.borderRadiusSmall,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.background),
+          borderRadius: AppSizes.borderRadiusSmall,
+        ),
+        child: const Icon(Icons.remove, size: 16, color: AppColors.background),
+      ),
+    );
+  }
+
+  void _handlePressCount(BuildContext context) {
+    final now = DateTime.now();
+    final isQuickPress =
+        _lastPressTime != null &&
+        now.difference(_lastPressTime!) < const Duration(seconds: 1);
+
+    if (isQuickPress) {
+      _pressCount++;
+    } else {
+      _pressCount = 1;
+    }
+
+    _lastPressTime = now;
+
+    if (_pressCount >= 3 &&
+        widget.controller.hours > widget.controller.minHours) {
+      _showLongPressTip(context);
+      _pressCount = 0; // Reset counter after showing tip
+    }
+  }
+
+  void _showLongPressTip(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Tip: Long press to reset hours to minimum'),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
     );
   }
 }

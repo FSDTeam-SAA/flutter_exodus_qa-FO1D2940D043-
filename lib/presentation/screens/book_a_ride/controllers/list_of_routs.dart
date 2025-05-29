@@ -2,19 +2,26 @@ import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/bus/available_bus_response.dart';
+import 'package:exodus/data/models/bus/single_bus_response.dart';
+import 'package:exodus/domain/usecases/bookARide/get_single_bus_data_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_available_suttles_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_routes_usecase.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/screens/book_a_ride/model/shuttle_query.dart';
 
-class ListOfRouts extends BaseController {
+class ListOfRoutsController extends BaseController {
   // use case for ListOfRoutsController
   final ListOfRoutesUsecase _listOfRoutesUsecase;
   final GetAvailableShuttlesUseCase _getAvailableShuttlesUseCase;
+  final GetSingleBusDataUsecase _getSingleBusDataUsecase;
 
-  ListOfRouts(this._listOfRoutesUsecase, this._getAvailableShuttlesUseCase);
+  ListOfRoutsController(
+    this._listOfRoutesUsecase,
+    this._getAvailableShuttlesUseCase,
+    this._getSingleBusDataUsecase,
+  );
 
-   List<AvailableShuttle> availableShuttlesList = [];
+  List<AvailableShuttle> availableShuttlesList = [];
 
   Future<void> getListOfRoutes() async {
     setLoading(true);
@@ -39,9 +46,17 @@ class ListOfRouts extends BaseController {
   }
 
   // Available Shuttles
-  Future<List<AvailableShuttle>> getAvailableShuttles(String from, String to, DateTime date) async {
+  Future<List<AvailableShuttle>> getAvailableShuttles(
+    String from,
+    String to,
+    DateTime date,
+  ) async {
     setLoading(true);
-    final query = ShuttleQuery(from: 'C', to: 'dhaka', date: '2025-05-28');
+    final query = ShuttleQuery(
+      from: from,
+      to: to,
+      date: date.toIso8601String(),
+    );
     final result = await _getAvailableShuttlesUseCase.call(query);
     setLoading(false);
     if (result is ApiSuccess<List<AvailableShuttle>>) {
@@ -63,5 +78,30 @@ class ListOfRouts extends BaseController {
       // notifyListeners();
       // return [];
     }
+  }
+
+  Future<BusDetailResponse> getSingleBusDetails(
+    String busId,
+    String source,
+    String destination,
+    String date,
+    String time,
+  ) async {
+    try {
+      final result = await _getSingleBusDataUsecase.call(
+        busId,
+        source,
+        destination,
+        date,
+        time,
+      );
+
+      if (result is ApiSuccess<BusDetailResponse>) {
+        return result.data;
+      }
+    } catch (e) {
+      dPrint(e);
+    }
+    throw Exception("Failed to fetch bus details");
   }
 }

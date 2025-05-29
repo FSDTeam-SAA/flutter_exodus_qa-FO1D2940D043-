@@ -4,6 +4,9 @@ import 'package:exodus/domain/usecases/auth/check_auth_status_usecase.dart';
 import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/register_usecase.dart';
 import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
+import 'package:exodus/domain/usecases/auth/verify_otp_usecase.dart';
+import 'package:exodus/domain/usecases/bookARide/create_ticket_usecase.dart';
+import 'package:exodus/domain/usecases/bookARide/get_single_bus_data_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_available_suttles_usecase.dart';
 import 'package:exodus/domain/usecases/bookARide/list_of_routes_usecase.dart';
 import 'package:exodus/domain/usecases/home/get_home_data.dart';
@@ -15,6 +18,7 @@ void setupUseCase() {
   sl.registerLazySingleton(() => CheckAuthStatusUsecase(sl()));
   sl.registerLazySingleton(() => LoginUsecase(sl()));
   sl.registerLazySingleton(() => RegisterUsecase(sl()));
+  sl.registerLazySingleton(() => VerfifyOTPUseCase(sl()));
   sl.registerLazySingleton(() => GetHomeDataUsecase(sl()));
   sl.registerLazySingleton(() => NotificationDataUsecase(sl()));
 
@@ -29,4 +33,6 @@ void setupUseCase() {
   // Book A Ride Usecases
   sl.registerLazySingleton(() => ListOfRoutesUsecase(sl()));
   sl.registerLazySingleton(() => GetAvailableShuttlesUseCase(repository: sl()));
+  sl.registerLazySingleton(() => GetSingleBusDataUsecase(sl()));
+  sl.registerLazySingleton(() => CreateTicketUsecase(sl()));
 }

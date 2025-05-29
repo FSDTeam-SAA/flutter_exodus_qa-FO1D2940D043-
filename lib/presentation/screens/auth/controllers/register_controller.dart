@@ -28,7 +28,13 @@ class RegisterController extends BaseController {
       if (result is ApiSuccess<User>) {
         dPrint("Registration successful: ${result.data}");
         // Handle successful registration, e.g., navigate to login or home screen
-        NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+        NavigationService().freshStartTo(
+          AppRoutes.codeVerify,
+          arguments: {
+            'email': request.email,
+            'fromLogin': true,
+          },
+        );
       } else {
         final message = (result as ApiError).message;
         setError(message);

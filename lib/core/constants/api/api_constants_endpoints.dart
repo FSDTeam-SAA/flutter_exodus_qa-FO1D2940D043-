@@ -2,7 +2,7 @@ class ApiEndpoints {
   // BaseURL
   // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
 
-  static const String baseDomain = 'http://192.168.0.218:5000';
+  static const String baseDomain = 'http://192.168.40.213:5000';
   static const String baseUrl = '$baseDomain/api/v1';
 
   static const String refreshToken = '/auth/refresh-token';
@@ -22,7 +22,9 @@ class ApiEndpoints {
   /// [Ride]
   static const String getRouteList = '/users/get-bus-route';
   static const String getAvailableBus = "/bus/get-available-bus";
-
+  static const String getSingleBus = '/bus/';
+  static const String createTicket = '/ticket/create-ticket';
+  static const String reserveBus = "/reserve-bus";
 
   /// [Profile]
   ///
@@ -37,7 +39,7 @@ class ApiEndpoints {
   static const String deleteBus = '/bus/'; // + {busId}
 
   // Ticket
-  static const String createTicket = '/ticket/create-ticket';
+
   static const String acceptStanding =
       '/ticket/accept-standing/'; // + {ticketId}
   static const String getAllTickets = '/ticket/all-ticket';

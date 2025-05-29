@@ -25,7 +25,7 @@ class RideHistoryController extends BaseController {
       // _getAllRideHistoryController.add(rideHistoryData);
       AppDataStore().updateRideHistory(rideHistoryData);
 
-      dPrint("Ride History -> ${rideHistoryData.first.busNumber}");
+      // dPrint("Ride History -> ${rideHistoryData.first.busNumber}");
       return rideHistoryData;
     } else {
       final message = (result as ApiError).message;

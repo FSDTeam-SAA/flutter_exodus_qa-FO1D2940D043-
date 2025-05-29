@@ -1,6 +1,7 @@
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
+import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/domain/usecases/auth/check_auth_status_usecase.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -23,12 +25,22 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
 
     // Check auth status and navigate
-    final isAuthenticate = await sl<CheckAuthStatusUsecase>().call();
+    final role = await sl<CheckAuthStatusUsecase>().call();
 
     if (mounted) {
-      NavigationService().freshStartTo(
-        isAuthenticate ? AppRoutes.bottomNavbar : AppRoutes.login,
-      );
+      if (role == null) {
+        // Navigate to login if token or role is invalid
+        NavigationService().freshStartTo(AppRoutes.login);
+      } else {
+        // Navigate based on the role
+        if (role == 'user') {
+          NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+
+        } else {
+          // Handle unknown roles
+          NavigationService().freshStartTo(AppRoutes.login);
+        }
+      }
     }
   }
 

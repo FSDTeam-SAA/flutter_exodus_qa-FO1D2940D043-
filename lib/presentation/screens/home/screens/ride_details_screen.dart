@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
+
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
@@ -12,9 +15,19 @@ import '../../../../core/constants/app/app_gap.dart';
 import '../../../../core/constants/app/app_sizes.dart';
 import '../../../../core/theme/text_style.dart';
 
-class RideDetailsScreen extends StatelessWidget {
+class RideDetailsScreen extends StatefulWidget {
   final List<TicketModel> tickets;
   const RideDetailsScreen({super.key, required this.tickets});
+
+  @override
+  State<RideDetailsScreen> createState() => _RideDetailsScreenState();
+}
+
+class _RideDetailsScreenState extends State<RideDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +40,16 @@ class RideDetailsScreen extends StatelessWidget {
             body: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
-                _buildNextRideCard(tickets),
+                _buildNextRideCard(widget.tickets),
 
                 Gap.h22,
                 _buildTitle("Your Next Ride"),
 
                 Gap.h22,
-                _buildQRcode(tickets),
+                _buildQRcode(widget.tickets),
 
                 Gap.h22,
-                _cancellationPolicy(context, tickets),
+                _cancellationPolicy(context, widget.tickets),
               ],
             ),
           );
@@ -48,7 +61,9 @@ class RideDetailsScreen extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 2,
-                  child: ListView(children: [_buildNextRideCard(tickets)]),
+                  child: ListView(
+                    children: [_buildNextRideCard(widget.tickets)],
+                  ),
                 ),
                 Expanded(
                   flex: 3,
@@ -224,7 +239,16 @@ class RideDetailsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: AppText.bodySemiBold),
-          _goldButton("See Map"),
+          GestureDetector(
+            onTap:
+                () => NavigationService().sailTo(
+                  AppRoutes.map,
+                  arguments: {
+                    'Tickets': [widget.tickets.first],
+                  },
+                ),
+            child: _goldButton("See Map"),
+          ),
         ],
       ),
     );

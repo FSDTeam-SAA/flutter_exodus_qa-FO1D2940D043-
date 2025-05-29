@@ -36,6 +36,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
+      appBar: AppBar(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)

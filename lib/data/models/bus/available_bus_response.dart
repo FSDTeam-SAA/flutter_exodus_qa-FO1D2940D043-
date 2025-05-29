@@ -23,17 +23,20 @@ class Stop {
 }
 
 class Schedule {
+  final String date;
   final String day;
   final String arrivalTime;
   final String departureTime;
 
   Schedule({
+    required this.date,
     required this.day,
     required this.arrivalTime,
     required this.departureTime,
   });
 
   factory Schedule.fromJson(Map<String, dynamic> json) => Schedule(
+    date: json['date'],
     day: json['day'],
     arrivalTime: json['arrivalTime'],
     departureTime: json['departureTime'],
@@ -78,7 +81,7 @@ class Bus {
 
 class AvailableShuttle {
   final String id;
-  final List<Schedule> schedules;
+  final Schedule schedules;
   final String driverId;
   final Bus bus;
   final bool isActive;
@@ -93,7 +96,7 @@ class AvailableShuttle {
 
   factory AvailableShuttle.fromJson(Map<String, dynamic> json) => AvailableShuttle(
     id: json['_id'],
-    schedules: List<Schedule>.from(json['schedules']?.map((x) => Schedule.fromJson(x)) ?? []),
+    schedules: Schedule.fromJson(json['schedules']),
     driverId: json['driverId'],
     bus: Bus.fromJson(json['busId']),
     isActive: json['isActive'] ?? true,

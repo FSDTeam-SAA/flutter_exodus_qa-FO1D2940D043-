@@ -2,6 +2,7 @@ import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
+import 'package:exodus/data/models/bus/available_bus_response.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/list_of_routs.dart';
 import 'package:exodus/presentation/screens/book_a_ride/widgets/bottom_sheet_route_list.dart';
@@ -27,12 +28,20 @@ class BookARideScreen extends StatefulWidget {
 }
 
 class _BookARideScreenState extends State<BookARideScreen> {
-  final controller = sl<ListOfRouts>();
+  final controller = sl<ListOfRoutsController>();
+
+  final ValueNotifier<String> fromSelectNotifier = ValueNotifier<String>(
+    'Any location',
+  );
+  final ValueNotifier<String> toSelectNotifier = ValueNotifier<String>(
+    'Any location',
+  );
 
   String toSelect = '';
   String fromSelect = '';
-  DateTime? selectedDate;
-  String formattedSelectedDate = '';
+  late DateTime selectedDate = DateTime.now();
+  int selectedDateIndex = 0;
+  // String formattedSelectedDate = '';
 
   @override
   void initState() {
@@ -51,13 +60,13 @@ class _BookARideScreenState extends State<BookARideScreen> {
       dPrint("Please select both 'From' and 'To' locations and a date.");
       return;
     } else {
-      controller.getAvailableShuttles(
-        fromSelect,
-        toSelect,
-        selectedDate ?? DateTime.now(),
-      );
+      controller.getAvailableShuttles(fromSelect, toSelect, selectedDate);
     }
   }
+
+  // Future<void> _getSingleBusDetails() async {
+  //   controller.getSingleBusDetails(busId, source, destination, date, time)
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +146,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
               ) {
                 if (value != null && value.isNotEmpty) {
                   fromSelect = value;
-                  // Handle the selected route
+                  fromSelectNotifier.value = value;
                   dPrint("Selected route: $value");
                 }
               });
@@ -149,10 +158,18 @@ class _BookARideScreenState extends State<BookARideScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                children: [Text("Any location", style: AppText.bodyRegular)],
+                children: [
+                  ValueListenableBuilder<String>(
+                    valueListenable: fromSelectNotifier,
+                    builder: (context, value, _) {
+                      return Text(value, style: AppText.bodyRegular);
+                    },
+                  ),
+                ],
               ),
             ),
           ),
+
           Gap.h16,
           Row(
             children: [
@@ -169,13 +186,12 @@ class _BookARideScreenState extends State<BookARideScreen> {
           GestureDetector(
             onTap: () {
               controller.getListOfRoutes();
-
               showLocationBottomSheet(context, AppDataStore().routesList).then((
                 value,
               ) {
                 if (value != null && value.isNotEmpty) {
                   toSelect = value;
-                  // Handle the selected route
+                  toSelectNotifier.value = value;
                   dPrint("Selected route: $value");
                 }
               });
@@ -187,7 +203,14 @@ class _BookARideScreenState extends State<BookARideScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                children: [Text("Any location", style: AppText.bodyRegular)],
+                children: [
+                  ValueListenableBuilder<String>(
+                    valueListenable: toSelectNotifier,
+                    builder: (context, value, _) {
+                      return Text(value, style: AppText.bodyRegular);
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -198,7 +221,6 @@ class _BookARideScreenState extends State<BookARideScreen> {
 
   /// [Date Select] widget
   ///
-  /// [TODO] [Need to improve this screen according the backend response and UI need to update] widget
   Widget _dateSelect() {
     final dates = DateUtilsForThirtyDays.getFormattedNextDays();
 
@@ -226,23 +248,33 @@ class _BookARideScreenState extends State<BookARideScreen> {
               itemCount: dates.length,
               separatorBuilder: (context, index) => Gap.w8,
               itemBuilder: (context, index) {
-                final isToday = index == 0;
+                final isSelected = index == selectedDateIndex;
 
                 return GestureDetector(
                   onTap: () {
-                    // selectedDate = DateUtilsForThirtyDays.getDateFromFormattedString(
-                    //   dates[index]['date']!,
-                    // );
-                    // formattedSelectedDate = dates[index]['date']!;
-                    // dPrint("Selected date: $formattedSelectedDate");
+                    setState(() {
+                      selectedDateIndex = index;
+                      final dateString =
+                          DateUtilsForThirtyDays.getUtcDateStringFromIndex(
+                            index,
+                          );
+                      dPrint("Date String from index $index: $dateString");
+                      selectedDate = DateTime.parse(dateString);
+                      dPrint("Parsed DateTime: $selectedDate");
+                    });
                     _getAvailableShuttles();
                   },
+
                   child: Container(
                     width: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color:
-                          isToday ? AppColors.secondary : AppColors.secondary,
+                          isSelected
+                              ? AppColors.secondary
+                              : AppColors.secondary.withAlpha(
+                                (0.2 * 255).toInt(),
+                              ),
                     ),
                     child: Center(
                       child: Column(
@@ -250,16 +282,20 @@ class _BookARideScreenState extends State<BookARideScreen> {
                         children: [
                           Text(
                             dates[index]['day']!,
-
                             style: AppText.smallRegular.copyWith(
-                              color: AppColors.background,
+                              color:
+                                  isSelected
+                                      ? AppColors.background
+                                      : AppColors.secondary,
                             ),
                           ),
                           Text(
                             dates[index]['date']!,
-
                             style: AppText.h2.copyWith(
-                              color: AppColors.background,
+                              color:
+                                  isSelected
+                                      ? AppColors.background
+                                      : AppColors.secondary,
                             ),
                           ),
                         ],
@@ -282,7 +318,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
       future: controller.getAvailableShuttles(
         fromSelect,
         toSelect,
-        selectedDate ?? DateTime.now(),
+        selectedDate,
       ),
       builder: (context, snapshot) {
         // Show loading indicator while data is being fetched
@@ -342,7 +378,6 @@ class _BookARideScreenState extends State<BookARideScreen> {
           padding: AppSizes.paddingHorizontalMedium,
           child: Container(
             decoration: AppDecorations.card,
-
             child: Column(
               children:
                   availableShuttles.asMap().entries.map((entry) {
@@ -362,12 +397,15 @@ class _BookARideScreenState extends State<BookARideScreen> {
                             : 'Unknown Stop';
 
                     // Get the first schedule (or handle multiple schedules if needed)
-                    final firstSchedule =
-                        ride.schedules.isNotEmpty ? ride.schedules.first : null;
-                    final timeRange =
-                        firstSchedule != null
-                            ? '${firstSchedule.departureTime} - ${firstSchedule.arrivalTime}'
-                            : 'Time not specified';
+                    // final firstSchedule =
+                    //     ride.schedules ? ride.schedules.first : null;
+
+                    final departureTime = ride.schedules.departureTime;
+                    final arrivalTime = ride.schedules.arrivalTime;
+                    final timeRange = '$departureTime - $arrivalTime';
+                    final date = ride.schedules.date;
+
+                    // final firstScaduleDate = firstSchedule!.date;
 
                     // Calculate available seats
                     final availableSeats =
@@ -380,82 +418,104 @@ class _BookARideScreenState extends State<BookARideScreen> {
                             ? ride.bus.name
                             : 'Unknown Bus';
 
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: AppSizes.paddingAllMedium,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    /// [Soure] to [Destination] Ticket
-                                    Wrap(
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      spacing: 4, // Equivalent to Gap.w4
-                                      runSpacing:
-                                          4, // Optional vertical spacing between lines
-                                      children: [
-                                        Text(
-                                          firstStop.capitalizeFirstOfEach,
-                                          style: AppText.h3,
-                                        ),
-                                        ArrowIcon(),
-                                        Text(
-                                          lastStop.capitalizeFirstOfEach,
-                                          style: AppText.h3,
-                                        ),
-                                      ],
-                                    ),
+                    return GestureDetector(
+                      onTap: () async {
+                        final data = await controller.getSingleBusDetails(
+                          ride.bus.id,
+                          firstStop,
+                          lastStop,
+                          date,
+                          departureTime,
+                        );
 
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          timeRange,
-                                          style: const TextStyle(
-                                            color: AppColors.secondary,
+                        NavigationService().sailTo(
+                          AppRoutes.busSeats,
+                          arguments: {
+                            'Seates': data,
+                            'source': toSelect,
+                            'destination': fromSelect,
+                            'date': selectedDate,
+                          },
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: AppSizes.paddingAllMedium,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      /// [Soure] to [Destination] Ticket
+                                      Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        spacing: 4, // Equivalent to Gap.w4
+                                        runSpacing:
+                                            4, // Optional vertical spacing between lines
+                                        children: [
+                                          Text(
+                                            firstStop.capitalizeFirstOfEach,
+                                            style: AppText.h3,
                                           ),
-                                        ),
-                                        Text(
-                                          seatsText,
-                                          style: const TextStyle(
-                                            color: AppColors.secondary,
+                                          ArrowIcon(),
+                                          Text(
+                                            lastStop.capitalizeFirstOfEach,
+                                            style: AppText.h3,
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                        ],
+                                      ),
 
-                                    Gap.h12,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            timeRange,
+                                            style: const TextStyle(
+                                              color: AppColors.secondary,
+                                            ),
+                                          ),
+                                          Text(
+                                            seatsText,
+                                            style: const TextStyle(
+                                              color: AppColors.secondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
 
-                                    /// [Bus Name] Shuttle
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          busName.capitalizeFirstLetter(),
-                                          style: AppText.smallRegular,
-                                        ),
-                                        _goldButton("Book", onPressed: () {}),
-                                      ],
-                                    ),
-                                  ],
+                                      Gap.h12,
+
+                                      /// [Bus Name] Shuttle
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            busName.capitalizeFirstLetter(),
+                                            style: AppText.smallRegular,
+                                          ),
+                                          _goldButton("Book", onPressed: () {}),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        if (!isLastItem) // Only add divider if not the last item
-                          Divider(
-                            color: AppColors.secondary,
-                            height: 16, // Adjust height as needed
-                            thickness: 1,
-                          ),
-                      ],
+                          if (!isLastItem) // Only add divider if not the last item
+                            Divider(
+                              color: AppColors.secondary,
+                              height: 16, // Adjust height as needed
+                              thickness: 1,
+                            ),
+                        ],
+                      ),
                     );
                   }).toList(),
             ),

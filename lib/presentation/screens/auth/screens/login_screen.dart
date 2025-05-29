@@ -4,6 +4,7 @@ import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
@@ -178,8 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               alignment: Alignment.centerRight,
                               child: InkWell(
                                 onTap:
-                                    () => Navigator.pushNamed(
-                                      context,
+                                    () => NavigationService().sailTo(
                                       AppRoutes.forgatePassword,
                                     ),
                                 child: Text(

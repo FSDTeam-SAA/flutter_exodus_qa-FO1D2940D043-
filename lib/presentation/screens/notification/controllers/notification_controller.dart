@@ -11,29 +11,29 @@ import 'package:exodus/presentation/core/services/app_data_store.dart';
 class NotificationController extends BaseController {
   // Add NotificationUsecase to the constructor
   final NotificationDataUsecase _notificationDataUsecase;
-  final SocketService _socketService;
+
   // final _notificationsStreamController = StreamController<List<NotificationModel>>.broadcast();
 
-  NotificationController(this._notificationDataUsecase, this._socketService) {
-    _setupSocketListeners();
+  NotificationController(this._notificationDataUsecase,) {
+    // _setupSocketListeners();
   }
 
   // Notification List
   List<NotificationModel> _currentNotifications = [];
   // Stream<List<NotificationModel>> get notificationsStream => _notificationsStreamController.stream;
 
-  void _setupSocketListeners() {
-    _socketService.on('now_notification', (data) {
-      try {
-        final newNotification = NotificationModel.fromJson(data);
-        final updated = [newNotification, ..._currentNotifications];
-        AppDataStore().updateNotifications(updated);
-        // AppDataStore..add(_currentNotifications);
-      } catch (e) {
-        dPrint("Error parsing notification data: $e");
-      }
-    });
-  }
+  // void _setupSocketListeners() {
+  //   _socketService.on('now_notification', (data) {
+  //     try {
+  //       final newNotification = NotificationModel.fromJson(data);
+  //       final updated = [newNotification, ..._currentNotifications];
+  //       AppDataStore().updateNotifications(updated);
+  //       // AppDataStore..add(_currentNotifications);
+  //     } catch (e) {
+  //       dPrint("Error parsing notification data: $e");
+  //     }
+  //   });
+  // }
 
   Future<void> getAllNotifications() async {
     try {

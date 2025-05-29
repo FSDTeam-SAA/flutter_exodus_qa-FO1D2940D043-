@@ -1,5 +1,6 @@
 import 'package:exodus/core/routes/transitions/fade_route.dart';
 import 'package:exodus/core/routes/transitions/slide_left.dart';
+import 'package:exodus/presentation/map/map_screen.dart';
 import 'package:exodus/presentation/screens/app/about_app.dart';
 import 'package:exodus/presentation/screens/app/privacy_policy.dart';
 import 'package:exodus/presentation/screens/app/terms_condition.dart';
@@ -10,7 +11,9 @@ import 'package:exodus/presentation/screens/auth/screens/security_code.dart';
 import 'package:exodus/presentation/screens/auth/screens/signup_screen.dart';
 import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride_screen.dart';
 import 'package:exodus/presentation/screens/book_a_ride/screens/reserve_bus_screen.dart';
+import 'package:exodus/presentation/screens/book_a_ride/screens/seats_screen.dart';
 import 'package:exodus/presentation/screens/bot/screens/bottom_navbar.dart';
+import 'package:exodus/presentation/screens/driver/home/screens/driver_home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
 import 'package:exodus/presentation/screens/notification/screens/notification_screen.dart';
@@ -58,11 +61,36 @@ class RouteGenerator {
       case AppRoutes.notification:
         return SlideLeftTransition(page: NotificationScreen());
 
+
+      /// [Map Screen]
+      case AppRoutes.map:
+        return SlideLeftTransition(
+          page: MapScreen(
+            tickets:
+                args != null ? (args as Map<String, dynamic>)['Tickets'] : null,
+          ),
+        );
+
       /// [Book a Ride]
       case AppRoutes.bookARide:
         return FadeRoute(page: BookARideScreen());
       case AppRoutes.reserveBus:
         return SlideLeftTransition(page: ReserveBusScreen());
+      case AppRoutes.busSeats:
+        return SlideLeftTransition(
+          page: SeatsScreen(
+            seates:
+                args != null ? (args as Map<String, dynamic>)['Seates'] : null,
+
+            source:
+                args != null ? (args as Map<String, dynamic>)['source'] : null,
+            destination:
+                args != null
+                    ? (args as Map<String, dynamic>)['destination']
+                    : null,
+            date: args != null ? (args as Map<String, dynamic>)['date'] : null,
+          ),
+        );
 
       /// [Subscriptions]
       case AppRoutes.subscription:
@@ -83,6 +111,11 @@ class RouteGenerator {
         return SlideLeftTransition(page: PrivacyPolicy());
       case AppRoutes.termsAndCondition:
         return SlideLeftTransition(page: TermsCondition());
+
+      /// [Driver Routes]
+      ///
+      case AppRoutes.driverHome:
+        return SlideLeftTransition(page: DriverHomeScreen());
 
       default:
         return _errorRoute();

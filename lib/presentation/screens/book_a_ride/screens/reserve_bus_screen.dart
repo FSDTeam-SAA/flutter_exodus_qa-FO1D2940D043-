@@ -8,12 +8,22 @@ import '../../../../core/utils/date_utils.dart';
 import '../controllers/hour_selector_controller.dart';
 import '../widgets/hour_selector.dart';
 
-class ReserveBusScreen extends StatelessWidget {
+class ReserveBusScreen extends StatefulWidget {
   const ReserveBusScreen({super.key});
 
   @override
+  State<ReserveBusScreen> createState() => _ReserveBusScreenState();
+}
+
+class _ReserveBusScreenState extends State<ReserveBusScreen> {
+  @override
   Widget build(BuildContext context) {
     final HourSelectorController hourController = HourSelectorController();
+
+    TimeOfDay? _selectedTime;
+    DateTime? _selectedDate;
+    int _selectedDateIndex = 0;
+
     return AppScaffold(
       appBar: AppBar(title: const Text("Reserve Bus")),
       body: LayoutBuilder(
@@ -23,7 +33,14 @@ class ReserveBusScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  _timeSelect(),
+                  _timeSelect(
+                    selectedTime: _selectedTime,
+                    onTimeSelected: (time) {
+                      setState(() {
+                        _selectedTime = time;
+                      });
+                    },
+                  ),
                   Gap.h16,
                   _dateSelect(),
                   Gap.h16,
@@ -37,7 +54,17 @@ class ReserveBusScreen extends StatelessWidget {
     );
   }
 
-  Widget _timeSelect() {
+  Widget _timeSelect({
+    required TimeOfDay? selectedTime,
+    required Function(TimeOfDay) onTimeSelected,
+  }) {
+    // Generate time slots from 6:00 AM to 10:00 PM in 30-minute increments
+    final times = List.generate(34, (index) {
+      final hour = 6 + (index ~/ 2);
+      final minute = (index % 2) * 30;
+      return TimeOfDay(hour: hour, minute: minute);
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -57,20 +84,37 @@ class ReserveBusScreen extends StatelessWidget {
           height: 60,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: 10,
+            itemCount: times.length,
             separatorBuilder: (context, index) => Gap.w8,
             itemBuilder: (context, index) {
-              return Container(
-                width: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColors.secondary,
-                ),
-                child: Center(
-                  child: Text(
-                    "${index + 1}:00",
-                    style: AppText.smallRegular.copyWith(
-                      color: AppColors.background,
+              final time = times[index];
+              final isSelected =
+                  selectedTime?.hour == time.hour &&
+                  selectedTime?.minute == time.minute;
+
+              return GestureDetector(
+                onTap: () => onTimeSelected(time),
+                child: Container(
+                  width: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: isSelected ? AppColors.primary : AppColors.secondary,
+                    border:
+                        isSelected
+                            ? Border.all(color: AppColors.primaryDark, width: 2)
+                            : null,
+                  ),
+                  child: Center(
+                    child: Text(
+                      _formatTime(time),
+                      style: AppText.smallRegular.copyWith(
+                        color:
+                            isSelected
+                                ? AppColors.background
+                                : AppColors.background,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
@@ -80,6 +124,14 @@ class ReserveBusScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod;
+    final minute =
+        time.minute == 0 ? '' : ':${time.minute.toString().padLeft(2, '0')}';
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour$minute $period';
   }
 
   Widget _dateSelect() {
