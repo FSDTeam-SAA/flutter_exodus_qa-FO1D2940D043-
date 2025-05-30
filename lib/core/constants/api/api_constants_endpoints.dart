@@ -1,9 +1,10 @@
 class ApiEndpoints {
   // BaseURL
-  // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
+  // static const String baseDomain = 'http://192.168.40.213:5000';
 
-  static const String baseDomain = 'http://192.168.40.213:5000';
+  static const String baseDomain = 'https://exodus-backend-59hw.onrender.com';
   static const String baseUrl = '$baseDomain/api/v1';
+  // static const String baseUrl = 'https://exodus-backend-59hw.onrender.com';
 
   static const String refreshToken = '/auth/refresh-token';
   // Auth
@@ -29,6 +30,7 @@ class ApiEndpoints {
   /// [Profile]
   ///
   static const String getRideHistory = '/users/ride-history';
+  static const String updateUserProfile = '/drivers';
 
   // Bus
   static const String createBus = '/bus/';
@@ -53,7 +55,6 @@ class ApiEndpoints {
   // Driver
   static const String createDriver = '/api/v1/add/driver';
   static const String getAllDrivers = '/api/v1/all/drivers';
-  static const String updateDriver = '/api/v1/drivers/'; // + {driverId}
   static const String deleteDriver = '/api/v1/drivers/'; // + {driverId}
 
   // Helper method for URL construction

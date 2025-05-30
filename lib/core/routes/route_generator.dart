@@ -17,6 +17,7 @@ import 'package:exodus/presentation/screens/driver/home/screens/driver_home_scre
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
 import 'package:exodus/presentation/screens/notification/screens/notification_screen.dart';
+import 'package:exodus/presentation/screens/profile/screens/edit_profile_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/ride_history_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.dart';
 import 'package:exodus/presentation/screens/splash/screens/splash_screen.dart';
@@ -39,7 +40,13 @@ class RouteGenerator {
       case AppRoutes.forgatePassword:
         return SlideLeftTransition(page: ForgotPasswordScreen());
       case AppRoutes.codeVerify:
-        return SlideLeftTransition(page: SecurityCodeScreen());
+        final args = settings.arguments as Map<String, dynamic>?;
+        return SlideLeftTransition(
+          page: SecurityCodeScreen(
+            email: args?['email'],
+            fromLogin: args?['fromLogin'] ?? false,
+          ),
+        );
       case AppRoutes.createNewPassword:
         return SlideLeftTransition(page: CreateNewPasswordScreen());
 
@@ -60,7 +67,6 @@ class RouteGenerator {
 
       case AppRoutes.notification:
         return SlideLeftTransition(page: NotificationScreen());
-
 
       /// [Map Screen]
       case AppRoutes.map:

@@ -18,6 +18,7 @@ class VerifyCodeController extends BaseController {
 
       if (result is ApiSuccess<void>) {
         dPrint("Verification successful");
+        
         return true;
       } else {
         final message = (result as ApiError).message;

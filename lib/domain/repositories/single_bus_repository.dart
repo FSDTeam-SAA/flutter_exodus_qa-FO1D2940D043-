@@ -9,4 +9,6 @@ abstract class GetSingleBusRepository {
     String date,
     String time,
   );
+
+  Future<ApiResult<void>> cancelRide(String busId);
 }

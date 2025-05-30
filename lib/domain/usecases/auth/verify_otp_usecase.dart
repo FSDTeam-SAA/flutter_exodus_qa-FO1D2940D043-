@@ -6,7 +6,7 @@ class VerfifyOTPUseCase {
 
   VerfifyOTPUseCase(this._repository);
 
-  Future<ApiResult<void>> call(String email, otp) {
+  Future<ApiResult<void>> call(String email, String otp) {
     return _repository.verifyOTP(email, otp);
   }
 }

@@ -32,6 +32,7 @@ abstract class AppRoutes {
   static const privacyPolicy = 'privacy-policy';
   static const termsAndCondition = 'terms-and-condition';
   static const changePassword = 'change-password';
+  static const editUserProfile = 'edit-user-profile';
 
   /// [Map Screen]
   static const map = 'map';

@@ -47,14 +47,14 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
       // Combine all digits into a single code
       final code = _digitControllers.map((c) => c.text).join();
 
-      // TODO: Implement actual verification logic
       await Future.delayed(const Duration(seconds: 1)); // Simulate network call
 
       if (mounted) {
         dPrint("Code Print $code");
+        dPrint("Email in Code Print ${widget.email}");
 
         final result = await _verifyCodeController.verifyCode(
-          widget.email.toString(),
+          widget.email!,
           code,
         );
 

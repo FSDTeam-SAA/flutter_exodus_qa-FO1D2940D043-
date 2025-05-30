@@ -11,7 +11,7 @@ class LocationService {
 
   StreamSubscription<Position>? _positionStreamSubscription;
 
-  Future<void> init(String busId) async {
+  Future<void> init() async {
     final hasPermission = await _handlePermission();
     if (!hasPermission) return;
 

@@ -41,14 +41,17 @@ class ApiClient {
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         validateStatus: (status) => status != null && status < 500,
       ),
     );
 
     // Add interceptors
     // _dio.interceptors.add(TokenRefreshInterceptor(this, _secureStoreServices));
-    _dio.interceptors.add(CustomCacheInterceptor());
+    // _dio.interceptors.add(CustomCacheInterceptor());
   }
 
   // Add the refreshToken method here - it should be private
@@ -187,6 +190,36 @@ class ApiClient {
     CancelToken? cancelToken,
   }) => _request(
     method: 'POST',
+    endpoint: endpoint,
+    fromJsonT: fromJsonT,
+    data: data,
+    options: options,
+    cancelToken: cancelToken,
+  );
+
+  Future<ApiResult<T>> patch<T>(
+    String endpoint, {
+    dynamic data,
+    required T Function(dynamic) fromJsonT,
+    Options? options,
+    CancelToken? cancelToken,
+  }) => _request(
+    method: 'PATCH',
+    endpoint: endpoint,
+    fromJsonT: fromJsonT,
+    data: data,
+    options: options,
+    cancelToken: cancelToken,
+  );
+
+  Future<ApiResult<T>> put<T>(
+    String endpoint, {
+    dynamic data,
+    required T Function(dynamic) fromJsonT,
+    Options? options,
+    CancelToken? cancelToken,
+  }) => _request(
+    method: 'PUT',
     endpoint: endpoint,
     fromJsonT: fromJsonT,
     data: data,

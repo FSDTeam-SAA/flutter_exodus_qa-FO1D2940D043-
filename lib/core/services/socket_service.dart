@@ -5,63 +5,176 @@ import '../constants/socket/socket_constants.dart';
 
 class SocketService {
   static final SocketService _instance = SocketService._internal();
-  IO.Socket? socket; // make it nullable
+  IO.Socket? socket;
   String? userId;
+  bool _isConnecting = false;
+  bool _isDisposed = false;
 
   factory SocketService() => _instance;
   SocketService._internal();
 
   void initializeSocket(String serverUrl, String token) {
-    socket = IO.io(serverUrl, <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-      'auth': {'token': token},
-    });
+    if (_isDisposed) {
+      dPrint('SocketService has been disposed and cannot be reused');
+      return;
+    }
 
-    socket!.connect();
+    if (socket != null && socket!.connected) {
+      dPrint('Socket is already connected');
+      return;
+    }
 
-    socket!.onConnect((_) {
-      dPrint('Connected to socket server');
-      if (userId != null) {
-        joinUserRoom(userId!);
-      }
-    });
+    if (_isConnecting) {
+      dPrint('Socket connection already in progress');
+      return;
+    }
 
-    socket!.onDisconnect((_) => dPrint('Disconnected from socket server'));
-    socket!.onError((error) => dPrint('Socket error: $error'));
+    _isConnecting = true;
+
+    try {
+      socket = IO.io(serverUrl, <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': false,
+        'auth': {'token': 'Bearer $token'},
+        'reconnection': true,
+        'reconnectionAttempts': 5,
+        'reconnectionDelay': 1000,
+        'timeout': 20000,
+      });
+
+      // Setup error handler before connecting
+      socket!.onConnectError((error) {
+        _isConnecting = false;
+        dPrint('Socket connection error: $error');
+      });
+
+      socket!.connect();
+
+      socket!.onConnect((_) {
+        _isConnecting = false;
+        dPrint('Connected to socket server');
+        if (userId != null) {
+          try {
+            joinUserRoom(userId!);
+          } catch (e) {
+            dPrint('Error joining user room after connect: $e');
+          }
+        }
+      });
+
+      socket!.onDisconnect((_) {
+        dPrint('Disconnected from socket server');
+      });
+
+      socket!.onError((error) {
+        dPrint('Socket error: $error');
+      });
+    } catch (e) {
+      _isConnecting = false;
+      dPrint('Socket initialization error: $e');
+      // Consider adding a retry mechanism or notifying listeners
+    }
   }
 
   void joinUserRoom(String userId) {
-    this.userId = userId;
-    socket?.emit( SocketConstants.joinUserRoomEvent, userId);
+    try {
+      this.userId = userId;
+      if (socket?.connected ?? false) {
+        socket?.emit(SocketConstants.joinUserRoomEvent, userId);
+      } else {
+        dPrint('Cannot join room - socket not connected');
+        // Optionally queue this action for when connection is established
+      }
+    } catch (e) {
+      dPrint('Error joining user room: $e');
+      rethrow; // Or handle it as per your application needs
+    }
   }
 
   void joinBusLive(String busId) {
-    socket?.emit(SocketConstants.joinBusLiveEvent, busId);
+    try {
+      if (socket?.connected ?? false) {
+        socket?.emit(SocketConstants.joinBusLiveEvent, busId);
+      } else {
+        dPrint('Cannot join bus live - socket not connected');
+      }
+    } catch (e) {
+      dPrint('Error joining bus live: $e');
+    }
   }
 
   void sendLiveLocation(String busId, double lat, double lng) {
-    socket?.emit(SocketConstants.liveLocationEvent, {
-      'busId': busId,
-      'lat': lat,
-      'lng': lng,
-      'timestamp': DateTime.now().toIso8601String(),
-    });
+    try {
+      if (socket?.connected ?? false) {
+        socket?.emit(SocketConstants.liveLocationEvent, {
+          'busId': busId,
+          'lat': lat,
+          'lng': lng,
+          'timestamp': DateTime.now().toIso8601String(),
+        });
+      } else {
+        dPrint('Cannot send location - socket not connected');
+        // Consider queuing the location data to send when reconnected
+      }
+    } catch (e) {
+      dPrint('Error sending live location: $e');
+    }
   }
 
   void listenToNotifications(Function(dynamic) callback) {
-    socket?.on( SocketConstants.notificationEvent, callback);
+    try {
+      socket?.off(
+        SocketConstants.notificationEvent,
+      ); // Remove previous listener
+      socket?.on(SocketConstants.notificationEvent, (data) {
+        try {
+          callback(data);
+        } catch (e) {
+          dPrint('Error in notification callback: $e');
+        }
+      });
+    } catch (e) {
+      dPrint('Error setting up notification listener: $e');
+    }
   }
 
   void listenToLiveLocation(String busId, Function(dynamic) callback) {
-    socket?.on(SocketConstants.liveLocationEvent, (data) {
-      if (data['busId'] == busId) {
-        callback(data);
-      }
-    });
+    try {
+      socket?.off(
+        SocketConstants.liveLocationEvent,
+      ); // Remove previous listener
+      socket?.on(SocketConstants.liveLocationEvent, (data) {
+        try {
+          if (data is Map && data['busId'] == busId) {
+            callback(data);
+          }
+        } catch (e) {
+          dPrint('Error in live location callback: $e');
+        }
+      });
+    } catch (e) {
+      dPrint('Error setting up live location listener: $e');
+    }
   }
 
   void disconnect() {
-    socket?.disconnect();
+    try {
+      socket?.disconnect();
+      socket?.clearListeners();
+    } catch (e) {
+      dPrint('Error disconnecting socket: $e');
+    }
+  }
+
+  void dispose() {
+    if (_isDisposed) return;
+
+    try {
+      disconnect();
+      socket?.dispose();
+      _isDisposed = true;
+    } catch (e) {
+      dPrint('Error disposing socket: $e');
+    }
   }
 }

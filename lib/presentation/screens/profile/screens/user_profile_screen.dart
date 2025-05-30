@@ -52,7 +52,9 @@ class UserProfileScreen extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    NavigationService().sailTo(AppRoutes.editUserProfile);
+                  },
                   icon: Icon(Icons.edit, color: AppColors.secondary),
                 ),
               ],

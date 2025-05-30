@@ -1,3 +1,4 @@
+import 'package:exodus/core/services/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -27,10 +28,12 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _mapController = MapController();
     busId = widget.tickets.first.busNumber;
+    
     _initLocationService();
   }
 
   void _initLocationService() {
+    LocationService().init();
     SocketService().joinBusLive(busId);
 
     SocketService().listenToLiveLocation(busId, (data) {

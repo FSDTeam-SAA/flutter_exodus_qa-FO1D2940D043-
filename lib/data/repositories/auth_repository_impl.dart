@@ -39,6 +39,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<ApiResult<void>> verifyOTP(String email, String otp) {
+    dPrint(email);
     return _apiClient.post(
       ApiEndpoints.verifyOtp,
       data: {"email": email, "otp": otp},

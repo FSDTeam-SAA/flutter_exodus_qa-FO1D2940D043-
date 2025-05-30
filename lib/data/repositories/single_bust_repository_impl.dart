@@ -29,4 +29,11 @@ class GetSingleBustRepositoryImpl implements GetSingleBusRepository {
       fromJsonT: (json) => BusDetailResponse.fromJson(json),
     );
   }
+
+  Future<ApiResult<void>> cancelRide(String busId) async {
+    return _apiClient.patch<void>(
+      ApiEndpoints.cancelTicket + busId,
+      fromJsonT: (json) => {},
+    );
+  }
 }

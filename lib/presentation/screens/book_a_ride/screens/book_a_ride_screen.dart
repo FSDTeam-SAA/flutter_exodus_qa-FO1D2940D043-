@@ -2,7 +2,6 @@ import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/extensions/string_extensions.dart';
-import 'package:exodus/data/models/bus/available_bus_response.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/list_of_routs.dart';
 import 'package:exodus/presentation/screens/book_a_ride/widgets/bottom_sheet_route_list.dart';

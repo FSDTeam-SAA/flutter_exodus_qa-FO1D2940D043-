@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
+import 'package:exodus/presentation/screens/book_a_ride/controllers/create_ticket_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +26,7 @@ class RideDetailsScreen extends StatefulWidget {
 }
 
 class _RideDetailsScreenState extends State<RideDetailsScreen> {
+  final controller = sl<CreateTicketController>();
   @override
   void initState() {
     super.initState();
@@ -312,7 +315,9 @@ class _RideDetailsScreenState extends State<RideDetailsScreen> {
 
               Gap.h16,
               context.secondaryButton(
-                onPressed: () {},
+                onPressed: () async {
+                  await controller.cancelTicket(tickets.first.id);
+                },
                 widget: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
