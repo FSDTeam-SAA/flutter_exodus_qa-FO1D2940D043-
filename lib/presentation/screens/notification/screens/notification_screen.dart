@@ -1,5 +1,6 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/date_utils.dart';
@@ -26,7 +27,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     _loadNotifications = _notificationController.getAllNotifications();
   }
 
-    @override
+  @override
   void dispose() {
     AppDataStore().notificationClose();
     super.dispose();
@@ -88,10 +89,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   ),
                   Gap.h16,
                   if (!isLastItem) // Only add divider if not the last item
-                    Divider(
-                      color: AppColors.secondary,
-                      height: 16, // Adjust height as needed
-                      thickness: 1,
+                    Padding(
+                      padding: AppSizes.paddingHorizontalExtraMedium,
+                      child: Divider(
+                        color: AppColors.secondary,
+                        height: 16, // Adjust height as needed
+                        thickness: 1,
+                      ),
                     ),
                 ],
               );

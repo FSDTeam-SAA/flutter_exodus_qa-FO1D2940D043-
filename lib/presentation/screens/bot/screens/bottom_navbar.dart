@@ -71,6 +71,7 @@ class _BottomNavbarState extends State<BottomNavbar>
               });
             },
             indicator: const TopIndicator(),
+            indicatorSize: TabBarIndicatorSize.tab,
 
             labelColor: AppColors.secondary,
             unselectedLabelColor: AppColors.secondary,

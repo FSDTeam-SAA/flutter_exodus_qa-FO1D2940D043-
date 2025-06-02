@@ -109,6 +109,8 @@ class RouteGenerator {
         return SlideLeftTransition(page: RideHistoryScreen());
       case AppRoutes.changePassword:
         return SlideLeftTransition(page: CreateNewPasswordScreen());
+      case AppRoutes.editUserProfile:
+        return SlideLeftTransition(page: EditProfileScreen());
 
       /// [About], [Privacy], [Terms] screens
       case AppRoutes.aboutApp:

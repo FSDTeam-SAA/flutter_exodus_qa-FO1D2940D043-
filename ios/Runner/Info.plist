@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Additional -->
+	<!-- Notification -->
+	<key>NSUserNotificationAlertStyle</key>
+	<string>alert</string>
+	<key>NSUserNotificationCenterDefaultSoundName</key>
+	<string>default</string>
+
+	
 </dict>
 </plist>
