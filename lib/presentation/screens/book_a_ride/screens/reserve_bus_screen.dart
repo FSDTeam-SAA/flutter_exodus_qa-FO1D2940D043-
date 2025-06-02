@@ -1,12 +1,18 @@
-import 'package:exodus/presentation/widgets/app_scaffold.dart';
+import 'package:exodus/core/utils/extensions/button_extensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+// Assuming these imports exist in your project
 import '../../../../core/constants/app/app_colors.dart';
-import '../../../../core/constants/app/app_gap.dart';
 import '../../../../core/theme/text_style.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../controllers/hour_selector_controller.dart';
 import '../widgets/hour_selector.dart';
+
+import 'package:intl/intl.dart';
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReserveBusScreen extends StatefulWidget {
   const ReserveBusScreen({super.key});
@@ -16,108 +22,122 @@ class ReserveBusScreen extends StatefulWidget {
 }
 
 class _ReserveBusScreenState extends State<ReserveBusScreen> {
+  final HourSelectorController hourController = HourSelectorController();
+  final ValueNotifier<TimeOfDay?> _selectedTimeNotifier = ValueNotifier(null);
+  final ValueNotifier<DateTime?> _selectedDateNotifier = ValueNotifier(null);
+  final ValueNotifier<int> _selectedDateIndexNotifier = ValueNotifier(0);
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current time rounded to nearest 30 minutes
+    final now = TimeOfDay.now();
+    final minute = now.minute < 30 ? 0 : 30;
+    _selectedTimeNotifier.value = TimeOfDay(hour: now.hour, minute: minute);
+    _selectedDateNotifier.value = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    hourController.dispose();
+    _selectedTimeNotifier.dispose();
+    _selectedDateNotifier.dispose();
+    _selectedDateIndexNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final HourSelectorController hourController = HourSelectorController();
-
-    TimeOfDay? _selectedTime;
-    DateTime? _selectedDate;
-    int _selectedDateIndex = 0;
-
-    return AppScaffold(
+    return Scaffold(
       appBar: AppBar(title: const Text("Reserve Bus")),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return ListView(
-            physics: const BouncingScrollPhysics(),
-            children: [
-              Column(
-                children: [
-                  _timeSelect(
-                    selectedTime: _selectedTime,
-                    onTimeSelected: (time) {
-                      setState(() {
-                        _selectedTime = time;
-                      });
-                    },
-                  ),
-                  Gap.h16,
-                  _dateSelect(),
-                  Gap.h16,
-                  HourSelector(controller: hourController),
-                ],
-              ),
-            ],
-          );
-        },
+      body: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildTimeSelector(),
+          const SizedBox(height: 16),
+          _buildDateSelector(),
+          const SizedBox(height: 16),
+          HourSelector(controller: hourController),
+          const SizedBox(height: 24),
+          _buildReserveButton(context),
+        ],
       ),
     );
   }
 
-  Widget _timeSelect({
-    required TimeOfDay? selectedTime,
-    required Function(TimeOfDay) onTimeSelected,
-  }) {
-    // Generate time slots from 6:00 AM to 10:00 PM in 30-minute increments
-    final times = List.generate(34, (index) {
-      final hour = 6 + (index ~/ 2);
-      final minute = (index % 2) * 30;
-      return TimeOfDay(hour: hour, minute: minute);
-    });
-
+  Widget _buildTimeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(
-              Icons.access_time_outlined,
-              size: 16,
-              color: AppColors.secondary,
-            ),
-            Gap.w8,
+            Icon(Icons.access_time, size: 16, color: AppColors.secondary),
+            const SizedBox(width: 8),
             Text("Select Time", style: AppText.smallRegular),
           ],
         ),
-        Gap.h8,
+        const SizedBox(height: 8),
         SizedBox(
-          height: 60,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: times.length,
-            separatorBuilder: (context, index) => Gap.w8,
-            itemBuilder: (context, index) {
-              final time = times[index];
-              final isSelected =
-                  selectedTime?.hour == time.hour &&
-                  selectedTime?.minute == time.minute;
+          height: 70, // Increased height for animation
+          child: ValueListenableBuilder<TimeOfDay?>(
+            valueListenable: _selectedTimeNotifier,
+            builder: (context, selectedTime, _) {
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 34, // From 6:00 to 22:00 in 30-min increments
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final hour = 6 + (index ~/ 2);
+                  final minute = (index % 2) * 30;
+                  final time = TimeOfDay(hour: hour, minute: minute);
+                  final isSelected =
+                      selectedTime?.hour == hour &&
+                      selectedTime?.minute == minute;
 
-              return GestureDetector(
-                onTap: () => onTimeSelected(time),
-                child: Container(
-                  width: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: isSelected ? AppColors.primary : AppColors.secondary,
-                    border:
-                        isSelected
-                            ? Border.all(color: AppColors.primaryDark, width: 2)
-                            : null,
-                  ),
-                  child: Center(
-                    child: Text(
-                      _formatTime(time),
-                      style: AppText.smallRegular.copyWith(
-                        color:
-                            isSelected
-                                ? AppColors.background
-                                : AppColors.background,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    width: isSelected ? 65 : 60, // Wider when selected
+                    height: 60, 
+                    child: GestureDetector(
+                      onTap: () => _selectedTimeNotifier.value = time,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color:
+                              isSelected
+                                  ? AppColors.secondary
+                                  : AppColors.secondary.withAlpha(
+                                    (0.2 * 255).toInt(),
+                                  ),
+                          boxShadow:
+                              isSelected
+                                  ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ]
+                                  : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            _formatTime(time),
+                            style: AppText.smallRegular.copyWith(
+                              color:
+                                  isSelected
+                                      ? AppColors.background
+                                      : AppColors.secondary,
+                              fontWeight: isSelected ? FontWeight.bold : null,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
@@ -126,15 +146,7 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
     );
   }
 
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod;
-    final minute =
-        time.minute == 0 ? '' : ':${time.minute.toString().padLeft(2, '0')}';
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour$minute $period';
-  }
-
-  Widget _dateSelect() {
+  Widget _buildDateSelector() {
     final dates = DateUtilsForThirtyDays.getFormattedNextDays();
 
     return Column(
@@ -142,49 +154,87 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 16,
-              color: AppColors.secondary,
-            ),
-            Gap.w8,
+            Icon(Icons.calendar_today, size: 16, color: AppColors.secondary),
+            const SizedBox(width: 8),
             Text("Select Date", style: AppText.smallRegular),
           ],
         ),
-        Gap.h8,
+        const SizedBox(height: 8),
         SizedBox(
-          height: 60,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: dates.length,
-            separatorBuilder: (context, index) => Gap.w8,
-            itemBuilder: (context, index) {
-              final isToday = index == 0;
-              return Container(
-                width: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: isToday ? AppColors.secondary : AppColors.secondary,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        dates[index]['day']!,
+          height: 70, // Increased height for animation
+          child: ValueListenableBuilder<int>(
+            valueListenable: _selectedDateIndexNotifier,
+            builder: (context, selectedIndex, _) {
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: dates.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final isSelected = selectedIndex == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeInOut,
+                    width: isSelected ? 65 : 60, // Wider when selected
+                    height: 60,
 
-                        style: AppText.smallRegular.copyWith(
-                          color: AppColors.background,
+                    child: GestureDetector(
+                      onTap: () {
+                        _selectedDateIndexNotifier.value = index;
+                        _selectedDateNotifier.value = DateTime.now().add(
+                          Duration(days: index),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color:
+                              isSelected
+                                  ? AppColors.secondary
+                                  : AppColors.secondary.withAlpha(
+                                    (0.2 * 255).toInt(),
+                                  ),
+                          boxShadow:
+                              isSelected
+                                  ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ]
+                                  : null,
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                dates[index]['day']!,
+                                style: AppText.smallRegular.copyWith(
+                                  color:
+                                      isSelected
+                                          ? AppColors.background
+                                          : AppColors.secondary,
+                                ),
+                              ),
+                              Text(
+                                dates[index]['date']!,
+                                style: AppText.h2.copyWith(
+                                  color:
+                                      isSelected
+                                          ? AppColors.background
+                                          : AppColors.secondary,
+                                  fontWeight:
+                                      isSelected ? FontWeight.bold : null,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      Text(
-                        dates[index]['date']!,
-
-                        style: AppText.h2.copyWith(color: AppColors.background),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -193,73 +243,118 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
     );
   }
 
-  Widget _iconButton(IconData icon, VoidCallback onPressed) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.background),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Icon(icon, size: 16, color: AppColors.background),
-      ),
-    );
-  }
-
-  Widget _priceRow(String label, double value, {bool bold = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: bold ? AppText.h3 : AppText.smallRegular),
-        Text(
-          "\$${value.toStringAsFixed(2)}",
-          style:
-              bold
-                  ? AppText.h3.copyWith(fontWeight: FontWeight.bold)
-                  : AppText.smallRegular,
-        ),
-      ],
-    );
-  }
-
-  Widget _subscriptionToggle() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.secondary),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.radio_button_unchecked,
-            color: AppColors.secondary,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text("With Subscription", style: AppText.smallRegular),
-        ],
-      ),
-    );
-  }
-
-  Widget _bookButton() {
+  Widget _buildReserveButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          // Handle booking action here
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.secondary,
-          foregroundColor: Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-        ),
-        child: const Text("Book Request"),
+      child: context.primaryButton(
+        onPressed: () => _showReservationDetails(context),
+        text: "Book Request",
       ),
+    );
+  }
+
+  void _showReservationDetails(BuildContext context) {
+    if (_selectedTimeNotifier.value == null ||
+        _selectedDateNotifier.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select time and date')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ValueListenableBuilder3<TimeOfDay?, DateTime?, int>(
+          valueListenable1: _selectedTimeNotifier,
+          valueListenable2: _selectedDateNotifier,
+          valueListenable3: _selectedDateIndexNotifier,
+          builder: (context, time, date, index, _) {
+            return AlertDialog(
+              title: const Text('Reservation Summary'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Date: ${DateFormat('EEE, MMM d').format(date!)}'),
+                  Text('Time: ${_formatTime(time!)}'),
+                  Text(
+                    'Duration: ${hourController.hours.toStringAsFixed(1)} hours',
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Subtotal: \$${hourController.subtotal.toStringAsFixed(2)}',
+                  ),
+                  Text('Tax: \$${hourController.tax.toStringAsFixed(2)}'),
+                  const Divider(),
+                  Text(
+                    'Total: \$${hourController.total.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reservation confirmed!')),
+                    );
+                  },
+                  child: const Text('Confirm'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// Helper class to listen to multiple ValueNotifiers
+class ValueListenableBuilder3<A, B, C> extends StatelessWidget {
+  final ValueListenable<A> valueListenable1;
+  final ValueListenable<B> valueListenable2;
+  final ValueListenable<C> valueListenable3;
+  final Widget Function(BuildContext context, A a, B b, C c, Widget? child)
+  builder;
+  final Widget? child;
+
+  const ValueListenableBuilder3({
+    required this.valueListenable1,
+    required this.valueListenable2,
+    required this.valueListenable3,
+    required this.builder,
+    this.child,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<A>(
+      valueListenable: valueListenable1,
+      builder: (_, a, __) {
+        return ValueListenableBuilder<B>(
+          valueListenable: valueListenable2,
+          builder: (_, b, __) {
+            return ValueListenableBuilder<C>(
+              valueListenable: valueListenable3,
+              builder: (context, c, __) {
+                return builder(context, a, b, c, child);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

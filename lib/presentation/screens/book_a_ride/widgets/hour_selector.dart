@@ -1,20 +1,32 @@
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
-import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app/app_colors.dart';
 import '../../../../core/theme/text_style.dart';
 import '../controllers/hour_selector_controller.dart';
 
-class HourSelector extends StatelessWidget {
+class HourSelector extends StatefulWidget {
   final HourSelectorController controller;
 
   const HourSelector({super.key, required this.controller});
 
   @override
+  State<HourSelector> createState() => _HourSelectorState();
+}
+
+class _HourSelectorState extends State<HourSelector> {
+  final ValueNotifier<bool> _isSubscribed = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    _isSubscribed.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: Listenable.merge([widget.controller, _isSubscribed]),
       builder: (context, _) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,9 +43,9 @@ class HourSelector extends StatelessWidget {
                   children: [
                     // _iconButton(Icons.remove, controller.decrease, longPress: controller.resetHours),
                     _RemoveButton(
-                      onPressed: controller.decrease,
-                      onLongPress: controller.resetHours,
-                      controller: controller,
+                      onPressed: widget.controller.decrease,
+                      onLongPress: widget.controller.resetHours,
+                      controller: widget.controller,
                     ),
                     Gap.w8,
                     Container(
@@ -46,7 +58,7 @@ class HourSelector extends StatelessWidget {
                         borderRadius: AppSizes.borderRadiusSmall,
                       ),
                       child: Text(
-                        "${controller.hours.toStringAsFixed(1)}hr",
+                        "${widget.controller.hours.toStringAsFixed(1)}hr",
                         style: AppText.bodyMedium.copyWith(
                           color: AppColors.secondary,
                         ),
@@ -56,7 +68,7 @@ class HourSelector extends StatelessWidget {
                     Gap.w8,
                     _iconButton(
                       Icons.add,
-                      controller.increase,
+                      widget.controller.increase,
                       longPress: null,
                     ),
                   ],
@@ -66,7 +78,7 @@ class HourSelector extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: Text(
-                "Amount: \$${controller.subtotal.toStringAsFixed(0)}",
+                "Amount: \$${widget.controller.subtotal.toStringAsFixed(0)}",
                 style: AppText.h2.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
@@ -84,22 +96,19 @@ class HourSelector extends StatelessWidget {
               ),
             ),
             Gap.h16,
-            _priceRow("Subtotal", controller.subtotal),
+            _priceRow("Subtotal", widget.controller.subtotal),
 
             Gap.h16,
-            _priceRow("Tax", controller.tax),
+            _priceRow("Tax", widget.controller.tax),
 
             Gap.h16,
             Divider(thickness: 0.8, color: AppColors.secondary),
 
             Gap.h16,
-            _priceRow("Total", controller.total),
+            _priceRow("Total", widget.controller.total),
 
             Gap.h40,
-            _subscriptionToggle(),
-
-            Gap.h16,
-            _bookButton(context),
+            _buildSubscriptionToggle(),
           ],
         );
       },
@@ -137,48 +146,44 @@ class HourSelector extends StatelessWidget {
     );
   }
 
-  Widget _subscriptionToggle() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.secondary),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.radio_button_unchecked,
-            color: AppColors.secondary,
-            size: 20,
+  Widget _buildSubscriptionToggle() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isSubscribed,
+      builder: (context, isSubscribed, _) {
+        return GestureDetector(
+          onTap: () => _isSubscribed.value = !isSubscribed,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isSubscribed ? AppColors.primary : AppColors.secondary,
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              color: AppColors.background,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isSubscribed
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color: AppColors.secondary,
+                  size: 20,
+                ),
+                Gap.w8,
+                Text(
+                  "With Subscription",
+                  style: AppText.smallRegular.copyWith(
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(width: 8),
-          Text("With Subscription", style: AppText.smallRegular),
-        ],
-      ),
-    );
-  }
-
-  Widget _bookButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: context.primaryButton(
-        onPressed: () {
-          // Handle booking action here
-        },
-        text: "Book Request",
-      ),
-
-      // ElevatedButton(
-      //   onPressed: () {
-      //     // Handle booking action here
-      //   },
-      //   style: ElevatedButton.styleFrom(
-      //     backgroundColor: AppColors.secondary,
-      //     foregroundColor: Colors.black,
-      //     padding: const EdgeInsets.symmetric(vertical: 16),
-      //   ),
-      //   child: const Text("Book Request"),
-      // ),
+        );
+      },
     );
   }
 }
