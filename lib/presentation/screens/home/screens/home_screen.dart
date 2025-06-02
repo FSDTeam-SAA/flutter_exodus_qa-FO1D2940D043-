@@ -9,7 +9,6 @@ import 'package:exodus/core/utils/extensions/string_extensions.dart';
 import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
-import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:exodus/presentation/widgets/arrow_icon_widget.dart';
 import 'package:exodus/presentation/widgets/build_title.dart';
@@ -26,19 +25,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = sl<HomeController>();
-  final _rideHistoryController = sl<RideHistoryController>();
+  // final _rideHistoryController = sl<RideHistoryController>();
 
   @override
   void initState() {
     super.initState();
     _controller.getUserData();
-    _rideHistoryController.getAllRideHistory();
+    // _rideHistoryController.getAllRideHistory();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _rideHistoryController.dispose();
+    // _rideHistoryController.dispose();
     super.dispose();
   }
 
@@ -46,48 +45,100 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Get screen dimensions
-          final screenWidth = constraints.maxWidth;
-          final isMobile = screenWidth < 600;
-
-          return ValueListenableBuilder<UserData?>(
-            valueListenable: _controller.userDataNotifier,
-
-            builder: (context, value, _) {
-              if (value == null) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 0 : screenWidth * 0.1,
-                  vertical: 16.0,
-                ),
-                children: [
-                  // _buildHeader(value.user),
-                  Gap.h16,
-                  _buildRideLeftRewardPoints(),
-
-                  Gap.h40,
-                  TitleTextWidget(title: "Your Next Ride"),
-
-                  Gap.h16,
-                  _buildNextRideCard(value.ticket),
-
-                  Gap.h22,
-                  TitleTextWidget(title: "Your All Ride"),
-
-                  Gap.h16,
-                  _buildAllRidesList(),
-
-                  Gap.bottomAppBarGap,
-                ],
-              );
-            },
-          );
+      body: RefreshIndicator.adaptive(
+        onRefresh: () async {
+          await _controller.getUserData();
         },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Get screen dimensions
+            final screenWidth = constraints.maxWidth;
+            final isMobile = screenWidth < 600;
+
+            return FutureBuilder(
+              future: _controller.getUserData(),
+              builder: (context, snapshot) {
+                // Show loading indicator while waiting for data
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // Show error message if something went wrong
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "Failed to load rides: ${snapshot.error}",
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                  );
+                }
+
+                return ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 0 : screenWidth * 0.1,
+                    vertical: 16.0,
+                  ),
+                  children: [
+                    // _buildHeader(value.user),
+                    Gap.h16,
+                    _buildRideLeftRewardPoints(),
+
+                    Gap.h40,
+                    TitleTextWidget(title: "Your Next Ride"),
+
+                    Gap.h16,
+                    _buildNextRideCard(snapshot.data!.ticket),
+
+                    Gap.h22,
+                    TitleTextWidget(title: "Your All Ride"),
+
+                    Gap.h16,
+                    _buildRideList(snapshot.data!.ticket),
+
+                    Gap.bottomAppBarGap,
+                  ],
+                );
+              },
+            );
+
+            // ValueListenableBuilder<UserData?>(
+            //   valueListenable: _controller.userDataNotifier,
+
+            //   builder: (context, value, _) {
+            //     if (value == null) {
+            //       return Center(child: CircularProgressIndicator());
+            //     }
+            //     return ListView(
+            //       physics: const BouncingScrollPhysics(),
+            //       padding: EdgeInsets.symmetric(
+            //         horizontal: isMobile ? 0 : screenWidth * 0.1,
+            //         vertical: 16.0,
+            //       ),
+            //       children: [
+            //         // _buildHeader(value.user),
+            //         Gap.h16,
+            //         _buildRideLeftRewardPoints(),
+
+            //         Gap.h40,
+            //         TitleTextWidget(title: "Your Next Ride"),
+
+            //         Gap.h16,
+            //         _buildNextRideCard(value.ticket),
+
+            //         Gap.h22,
+            //         TitleTextWidget(title: "Your All Ride"),
+
+            //         Gap.h16,
+            //         _buildRideList(value.ticket),
+
+            //         Gap.bottomAppBarGap,
+            //       ],
+            //     );
+            //   },
+            // );
+          },
+        ),
       ),
     );
   }
@@ -226,130 +277,108 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return Column(
-      children:
-          tickets.map((ticket) {
-            return GestureDetector(
-              onTap:
-                  () => Navigator.pushNamed(
-                    context,
-                    AppRoutes.rideDetails,
-                    arguments: {
-                      'Tickets': [ticket],
-                    },
-                  ),
-              child: Padding(
-                padding: AppSizes.paddingHorizontalExtraMedium.copyWith(
-                  bottom: 16,
+    // Only take the first ticket
+    final ticket = tickets.last;
+
+    return GestureDetector(
+      onTap:
+          () => Navigator.pushNamed(
+            context,
+            AppRoutes.rideDetails,
+            arguments: {
+              'Tickets': [ticket],
+            },
+          ),
+      child: Padding(
+        padding: AppSizes.paddingHorizontalExtraMedium.copyWith(bottom: 16),
+        child: Container(
+          decoration: AppDecorations.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: Source -> Destination & Date
+              Container(
+                padding: AppSizes.paddingAllRegular,
+                decoration: const BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                 ),
-                child: Container(
-                  decoration: AppDecorations.card,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header: Source -> Destination & Date
-                      Container(
-                        padding: AppSizes.paddingAllRegular,
-                        decoration: const BoxDecoration(
-                          color: AppColors.secondary,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Text(
-                                      ticket.source,
-                                      style: AppText.h3.copyWith(
-                                        color: AppColors.background,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Gap.w4,
-                                    ArrowIcon(color: AppColors.background),
-                                    Gap.w4,
-                                    Text(
-                                      ticket.destination,
-                                      style: AppText.h3.copyWith(
-                                        color: AppColors.background,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
                             Text(
-                              DateFormat('EEE, MMM d').format(ticket.date),
-                              style: AppText.bodySemiBold.copyWith(
+                              ticket.source,
+                              style: AppText.h3.copyWith(
                                 color: AppColors.background,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Gap.w4,
+                            ArrowIcon(color: AppColors.background),
+                            Gap.w4,
+                            Text(
+                              ticket.destination,
+                              style: AppText.h3.copyWith(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
+                      ],
+                    ),
+                    Text(
+                      DateFormat('EEE, MMM d').format(ticket.date),
+                      style: AppText.bodySemiBold.copyWith(
+                        color: AppColors.background,
                       ),
+                    ),
+                  ],
+                ),
+              ),
 
-                      // Body: Ride Info
-                      Padding(
-                        padding: AppSizes.paddingAllRegular,
-                        child: Column(
+              // Body: Ride Info
+              Padding(
+                padding: AppSizes.paddingAllRegular,
+                child: Column(
+                  children: [
+                    _rideInfoRow(Icons.directions_bus, "Bus", ticket.busNumber),
+                    Gap.h16,
+                    _rideInfoRow(Icons.event_seat, "Seat", ticket.seatNumber),
+                    Gap.h16,
+                    _rideInfoRow(Icons.access_time, "Time", ticket.time),
+                    Gap.h24,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _goldButton(ticket.status),
+                        Row(
                           children: [
-                            _rideInfoRow(
-                              Icons.directions_bus,
-                              "Bus",
-                              ticket.busNumber,
-                            ),
-                            Gap.h16,
-                            _rideInfoRow(
-                              Icons.event_seat,
-                              "Seat",
-                              ticket.seatNumber,
-                            ),
-                            Gap.h16,
-                            _rideInfoRow(
-                              Icons.access_time,
-                              "Time",
-                              ticket.time,
-                            ),
-                            Gap.h24,
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _goldButton(ticket.status),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "View Details",
-                                      style: AppText.smallRegular,
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      color: AppColors.secondary,
-                                      size: 16,
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            Text("View Details", style: AppText.smallRegular),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.secondary,
+                              size: 16,
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          }).toList(),
+            ],
+          ),
+        ),
+      ),
     );
   }
-
   // Widget _buildNextRideCard(List<TicketModel> tickets) {
   //   // Find the next upcoming ticket (you might want to add proper logic here)
   //   final nextTicket = tickets.isNotEmpty ? tickets.first : null;
@@ -516,61 +545,75 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAllRidesList() {
-    return Padding(
-      padding: AppSizes.paddingHorizontalExtraMedium,
-      child: FutureBuilder<List<TicketModel>>(
-        future: _rideHistoryController.getAllRideHistory(),
-        builder: (context, snapshot) {
-          // Show loading indicator while waiting for data
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  // Widget _buildAllRidesList() {
+  //   return Padding(
+  //     padding: AppSizes.paddingHorizontalExtraMedium,
+  //     child: FutureBuilder<List<TicketModel>>(
+  //       future: _rideHistoryController.getAllRideHistory(),
+  //       builder: (context, snapshot) {
+  //         // Show loading indicator while waiting for data
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return const Center(child: CircularProgressIndicator());
+  //         }
 
-          // Show error message if something went wrong
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "Failed to load rides: ${snapshot.error}",
-                style: TextStyle(color: AppColors.error),
-              ),
-            );
-          }
+  //         // Show error message if something went wrong
+  //         if (snapshot.hasError) {
+  //           return Center(
+  //             child: Text(
+  //               "Failed to load rides: ${snapshot.error}",
+  //               style: TextStyle(color: AppColors.error),
+  //             ),
+  //           );
+  //         }
 
-          // Get all rides without filtering
-          final rides = snapshot.data ?? [];
+  //         // Get all rides without filtering
+  //         final rides = snapshot.data ?? [];
 
-          // Show empty state if no rides
-          if (rides.isEmpty) {
-            return Center(
-              child: Text("No rides found", style: AppText.bodyMedium),
-            );
-          }
+  //         // Show empty state if no rides
+  //         if (rides.isEmpty) {
+  //           return Center(
+  //             child: Text("No rides found", style: AppText.bodyMedium),
+  //           );
+  //         }
 
-          // return SizedBox(child: Text("Data -> ${rides.first.busNumber}"));
+  //         // return SizedBox(child: Text("Data -> ${rides.first.busNumber}"));
 
-          // Display all rides
-          return _buildRideList(rides);
-        },
-      ),
-    );
-  }
+  //         // Display all rides
+  //         return _buildRideList(rides);
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget _buildRideList(List<TicketModel> rides) {
-    return Container(
-      decoration: AppDecorations.card,
-      child: ListView.builder(
-        key: ValueKey(rides.length),
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: rides.length,
-        itemBuilder: (context, index) {
-          final ride = rides[index];
-          return Container(
-            // decoration: AppDecorations.card,
-            child: _buildRideCard(ride, index == rides.length - 1),
-          );
-        },
+    return Padding(
+      padding: AppSizes.paddingHorizontalExtraMedium,
+      child: Container(
+        decoration: AppDecorations.card,
+        child: ListView.builder(
+          key: ValueKey(rides.length),
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: rides.length,
+          itemBuilder: (context, index) {
+            final ride = rides[index];
+            return GestureDetector(
+              onTap:
+                  () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.rideDetails,
+                    arguments: {
+                      'Tickets': [ride],
+                    },
+                  ),
+              child: Container(
+                color: AppColors.background,
+                // decoration: AppDecorations.card,
+                child: _buildRideCard(ride, index == rides.length - 1),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

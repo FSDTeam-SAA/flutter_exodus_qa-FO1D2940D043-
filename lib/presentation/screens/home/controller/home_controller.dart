@@ -16,7 +16,9 @@ class HomeController extends BaseController {
 
   final ValueNotifier<UserData?> userDataNotifier = ValueNotifier(null);
 
-  Future<void> getUserData() async {
+  Future<UserData?> getUserData() async {
+    setLoading(true);
+
     try {
       final result = await _getHomeDataUsecase.call();
 
@@ -25,9 +27,12 @@ class HomeController extends BaseController {
         userDataNotifier.value = result.data;
         _appStateService.setUser(result.data);
         dPrint("User Data Print -> ${data.user.email}");
+
+        return data;
       }
-    } catch (e) {
-      dPrint(e);
+    } finally {
+      setLoading(false);
     }
+    return null;
   }
 }

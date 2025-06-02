@@ -6,7 +6,6 @@ import 'package:exodus/core/constants/app/key_constants.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/network/models/base_response.dart';
 import 'package:exodus/core/network/dio_error_handler.dart';
-import 'package:exodus/core/network/interceptor/custom_cache_interceptor.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 
@@ -38,9 +37,9 @@ class ApiClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        sendTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
