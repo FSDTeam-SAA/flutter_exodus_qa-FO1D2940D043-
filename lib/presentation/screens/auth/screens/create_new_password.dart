@@ -1,15 +1,12 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
-import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
 import 'package:exodus/core/utils/validator/validators.dart';
 import 'package:exodus/presentation/screens/auth/constants/auth_constant.dart';
-import 'package:exodus/presentation/screens/auth/controllers/register_controller.dart';
-import 'package:exodus/presentation/screens/auth/model/register_request.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';

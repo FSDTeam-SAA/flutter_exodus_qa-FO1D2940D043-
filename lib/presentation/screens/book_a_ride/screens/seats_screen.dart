@@ -88,7 +88,6 @@ class _SeatsScreenState extends State<SeatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bus = widget.seates.bus;
     final availableSeats = widget.seates.availableSeats;
     final totalSeats = widget.seates.totalSeats;
 
@@ -155,9 +154,6 @@ class _SeatsScreenState extends State<SeatsScreen> {
               _standingApplied.value,
             ]),
             builder: (context, _, __) {
-              final isEnabled =
-                  _selectedSeat.value != null || _standingApplied.value;
-
               return context.primaryButton(
                 width: 130,
                 text: "Submit",

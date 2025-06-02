@@ -1,12 +1,10 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
-import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/date_utils.dart';
 import 'package:exodus/data/models/user_profile_models/notification.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
-import 'package:exodus/presentation/screens/notification/controllers/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,13 +16,9 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  final _notificationController = sl<NotificationController>();
-  late Future<void> _loadNotifications;
-
   @override
   void initState() {
     super.initState();
-    _loadNotifications = _notificationController.getAllNotifications();
   }
 
   @override

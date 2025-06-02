@@ -6,7 +6,6 @@ import 'package:exodus/presentation/core/services/app_data_store.dart';
 
 // import '../network/interceptor/token_refresh_interceptor.dart';
 import '../services/app_state_service.dart';
-import '../services/socket_services.dart';
 
 void setupCore() {
   sl.registerLazySingleton(() => ApiClient());

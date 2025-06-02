@@ -2,7 +2,6 @@ import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/extensions/code_input_decoration_extensions.dart';
-import 'package:exodus/domain/usecases/auth/verify_otp_usecase.dart';
 import 'package:exodus/presentation/screens/auth/controllers/verify_code_controller.dart';
 import 'package:exodus/presentation/widgets/form_error_message.dart';
 import 'package:flutter/material.dart';

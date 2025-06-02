@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
-import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/user_profile_models/notification.dart';
 import 'package:exodus/domain/usecases/home/notification_data_usecase.dart';

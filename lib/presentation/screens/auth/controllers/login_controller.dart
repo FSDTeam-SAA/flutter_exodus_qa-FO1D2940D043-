@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:exodus/core/constants/app/key_constants.dart';
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
-import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';

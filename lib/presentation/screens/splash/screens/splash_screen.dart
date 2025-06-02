@@ -1,7 +1,6 @@
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
-import 'package:exodus/core/services/socket_services.dart';
 import 'package:exodus/domain/usecases/auth/check_auth_status_usecase.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:flutter/material.dart';

@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../utils/debug_logger.dart';
-import 'socket_service.dart';
+
 
 class LocationService {
   static final LocationService _instance = LocationService._internal();
   factory LocationService() => _instance;
   LocationService._internal();
 
-  StreamSubscription<Position>? _positionStreamSubscription;
 
   Future<void> init() async {
     final hasPermission = await _handlePermission();

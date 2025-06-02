@@ -1,5 +1,4 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
-import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
 import 'package:exodus/presentation/theme/app_styles.dart';

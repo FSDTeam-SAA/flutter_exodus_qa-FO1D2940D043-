@@ -1,6 +1,4 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
-import 'package:exodus/core/constants/app/app_gap.dart';
-import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
