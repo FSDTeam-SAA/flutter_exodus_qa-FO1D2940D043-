@@ -4,10 +4,13 @@ import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
+import 'package:exodus/core/utils/snackbar_utils.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/create_ticket_controller.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:exodus/data/models/bus/single_bus_response.dart';
+
+import '../../../../core/services/navigation_service.dart';
 
 class SeatsScreen extends StatefulWidget {
   final BusDetailResponse seates;
@@ -76,11 +79,16 @@ class _SeatsScreenState extends State<SeatsScreen> {
       }
 
       // Navigate back or to next screen
-      Navigator.pop(context);
+      if (mounted) {
+        NavigationService().backtrack();
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      if (mounted) {
+        SnackbarUtils.showSnackbar(context, message: "Error: ${e.toString()}");
+        //   ScaffoldMessenger.of(
+        //   context,
+        // ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
     } finally {
       // _isLoading.value = false;
     }

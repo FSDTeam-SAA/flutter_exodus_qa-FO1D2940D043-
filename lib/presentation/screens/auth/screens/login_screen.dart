@@ -211,10 +211,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               /// [Sign up button]
                               TextButton(
                                 onPressed:
-                                    () => Navigator.pushNamed(
-                                      context,
-                                      AppRoutes.signup,
-                                    ),
+                                    () => NavigationService().sailTo(AppRoutes.signup),
+                                    // Navigator.pushNamed(
+                                    //   context,
+                                    //   AppRoutes.signup,
+                                    // ),
                                 child: Text(
                                   AuthConstants.label.noAccount,
                                   style: TextStyle(
@@ -240,7 +241,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Center(
                     child: TextButton(
                       onPressed:
-                          () => Navigator.pushNamed(context, AppRoutes.signup),
+                          () => NavigationService().sailTo(AppRoutes.signup),
+                          // Navigator.pushNamed(context, ),
                       child: Text(
                         AuthConstants.label.noAccount,
                         style: TextStyle(

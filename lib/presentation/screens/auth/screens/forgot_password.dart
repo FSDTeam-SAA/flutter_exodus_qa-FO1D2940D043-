@@ -2,6 +2,7 @@ import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
@@ -29,7 +30,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       passwordController.forgotPassword(_emailController.text.trim());
-      Navigator.pushNamed(context, AppRoutes.codeVerify);
+      // Navigator.pushNamed(context, AppRoutes.codeVerify);
+      NavigationService().sailTo(AppRoutes.codeVerify);
     }
   }
 

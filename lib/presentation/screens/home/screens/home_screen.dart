@@ -282,13 +282,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return GestureDetector(
       onTap:
-          () => Navigator.pushNamed(
-            context,
+          () => NavigationService().sailTo(
             AppRoutes.rideDetails,
             arguments: {
               'Tickets': [ticket],
             },
           ),
+      // Navigator.pushNamed(
+      //   context,
+      //   AppRoutes.rideDetails,
+      //   arguments: {
+      //     'Tickets': [ticket],
+      //   },
+      // ),
       child: Padding(
         padding: AppSizes.paddingHorizontalExtraMedium.copyWith(bottom: 16),
         child: Container(
@@ -599,13 +605,20 @@ class _HomeScreenState extends State<HomeScreen> {
             final ride = rides[index];
             return GestureDetector(
               onTap:
-                  () => Navigator.pushNamed(
-                    context,
+                  () => NavigationService().sailTo(
                     AppRoutes.rideDetails,
                     arguments: {
                       'Tickets': [ride],
                     },
                   ),
+
+              // Navigator.pushNamed(
+              //   context,
+              //   AppRoutes.rideDetails,
+              //   arguments: {
+              //     'Tickets': [ride],
+              //   },
+              // ),
               child: Container(
                 color: AppColors.background,
                 // decoration: AppDecorations.card,

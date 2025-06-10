@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 // Assuming these imports exist in your project
 import '../../../../core/constants/app/app_colors.dart';
+import '../../../../core/services/navigation_service.dart';
 import '../../../../core/theme/text_style.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../controllers/hour_selector_controller.dart';
 import '../widgets/hour_selector.dart';
 
 import 'package:intl/intl.dart';
-
 
 class ReserveBusScreen extends StatefulWidget {
   const ReserveBusScreen({super.key});
@@ -97,7 +97,7 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeInOut,
                     width: isSelected ? 65 : 60, // Wider when selected
-                    height: 60, 
+                    height: 60,
                     child: GestureDetector(
                       onTap: () => _selectedTimeNotifier.value = time,
                       child: Container(
@@ -293,12 +293,12 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => NavigationService().backtrack(),
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    NavigationService().backtrack();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Reservation confirmed!')),
                     );

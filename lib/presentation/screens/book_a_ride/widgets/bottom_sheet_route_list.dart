@@ -1,4 +1,5 @@
 import 'package:exodus/core/constants/app/app_colors.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,8 @@ Future<String?> showLocationBottomSheet(
               return ListTile(
                 title: Text(route, style: AppText.bodyMedium),
                 onTap: () {
-                  Navigator.pop(context, route);
+                  NavigationService().sailTo(route);
+                  // Navigator.pop(context, route);
                 },
               );
             },
