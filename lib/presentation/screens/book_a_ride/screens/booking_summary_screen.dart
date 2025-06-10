@@ -1,0 +1,405 @@
+import 'package:exodus/core/constants/app/app_colors.dart';
+import 'package:exodus/core/constants/app/app_gap.dart';
+import 'package:exodus/core/constants/app/app_sizes.dart';
+import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/services/navigation_service.dart';
+import 'package:exodus/core/theme/text_style.dart';
+import 'package:exodus/core/utils/snackbar_utils.dart';
+import 'package:exodus/presentation/widgets/app_scaffold.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:intl/intl.dart';
+
+import '../controllers/payment_controller.dart';
+
+class BookingSummaryScreen extends StatefulWidget {
+  final String busName;
+  final String seatNumber;
+  final String source;
+  final String destination;
+  final DateTime date;
+  final String departureTime;
+  final String arrivalTime;
+  final double subtotal;
+  final double tax;
+  final double total;
+  final String userId;
+  final String? ticketId;
+  final String? reserveBusId;
+
+  const BookingSummaryScreen({
+    Key? key,
+    required this.busName,
+    required this.seatNumber,
+    required this.source,
+    required this.destination,
+    required this.date,
+    required this.departureTime,
+    required this.arrivalTime,
+    required this.subtotal,
+    required this.tax,
+    required this.total,
+    required this.userId,
+    this.ticketId,
+    this.reserveBusId,
+  }) : super(key: key);
+
+  @override
+  State<BookingSummaryScreen> createState() => _BookingSummaryScreenState();
+}
+
+class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
+  final PaymentController _paymentController = sl<PaymentController>();
+  bool _isLoading = false;
+  PaymentMethod? _selectedPaymentMethod;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      appBar: AppBar(
+        title: Text("Booking Summary", style: AppText.h2),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => NavigationService().backtrack(),
+        ),
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildBookingDetails(),
+                Gap.h24,
+                _buildPriceSummary(),
+                Gap.h24,
+                _buildPaymentOptions(),
+                Gap.h32,
+                _buildContinueButton(),
+                Gap.h24,
+              ],
+            ),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookingDetails() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: AppSizes.paddingAllMedium,
+        child: Column(
+          children: [
+            _buildDetailRow(
+              Icons.directions_bus_outlined,
+              "Bus",
+              widget.busName,
+            ),
+            Gap.h16,
+            _buildDetailRow(
+              Icons.event_seat_outlined,
+              "Seat",
+              widget.seatNumber,
+            ),
+            Gap.h16,
+            _buildDetailRow(Icons.location_on_outlined, "From", widget.source),
+            Gap.h16,
+            _buildDetailRow(
+              Icons.location_on_outlined,
+              "To",
+              widget.destination,
+            ),
+            Gap.h16,
+            _buildDetailRow(
+              Icons.calendar_today_outlined,
+              "Date",
+              DateFormat('EEE, dd MMM yyyy').format(widget.date),
+            ),
+            Gap.h16,
+            _buildDetailRow(
+              Icons.access_time_outlined,
+              "Time",
+              "${widget.departureTime} - ${widget.arrivalTime}",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.secondary, size: 20),
+        Gap.w12,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: AppText.smallRegular.copyWith(color: AppColors.secondary),
+            ),
+            Text(
+              value,
+              style: AppText.bodyMedium.copyWith(color: AppColors.primary),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceSummary() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Subtotal", style: AppText.bodyRegular),
+            Text(
+              "\$${widget.subtotal.toStringAsFixed(2)}",
+              style: AppText.bodyRegular,
+            ),
+          ],
+        ),
+        Gap.h12,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Tax", style: AppText.bodyRegular),
+            Text(
+              "\$${widget.tax.toStringAsFixed(2)}",
+              style: AppText.bodyRegular,
+            ),
+          ],
+        ),
+        Gap.h12,
+        const Divider(),
+        Gap.h12,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Total", style: AppText.h3),
+            Text("\$${widget.total.toStringAsFixed(2)}", style: AppText.h3),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentOptions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Payment Method", style: AppText.h3),
+        Gap.h16,
+        _buildPaymentOption(
+          "Pay With Stripe",
+          PaymentMethod.stripe,
+          trailing: Image.asset(
+            'assets/images/stripe_logo.png',
+            height: 20,
+            width: 40,
+          ),
+        ),
+        Gap.h12,
+        _buildPaymentOption("With Subscription", PaymentMethod.subscription),
+      ],
+    );
+  }
+
+  Widget _buildPaymentOption(
+    String title,
+    PaymentMethod method, {
+    Widget? trailing,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedPaymentMethod = method;
+        });
+      },
+      child: Container(
+        padding: AppSizes.paddingAllMedium,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color:
+                _selectedPaymentMethod == method
+                    ? AppColors.secondary
+                    : Colors.grey.withOpacity(0.3),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color:
+                      _selectedPaymentMethod == method
+                          ? AppColors.secondary
+                          : Colors.grey.withOpacity(0.5),
+                  width: 2,
+                ),
+              ),
+              child:
+                  _selectedPaymentMethod == method
+                      ? Center(
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      )
+                      : null,
+            ),
+            Gap.w12,
+            Text(title, style: AppText.bodyRegular),
+            const Spacer(),
+            if (trailing != null) trailing,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _selectedPaymentMethod == null ? null : _processPayment,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.secondary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: Text("Continue", style: AppText.bodyMedium),
+      ),
+    );
+  }
+
+  Future<void> _processPayment() async {
+    if (_selectedPaymentMethod == null) {
+      _showSnackbar("Please select a payment method");
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    try {
+      switch (_selectedPaymentMethod) {
+        case PaymentMethod.stripe:
+          await _processStripePayment();
+          break;
+        case PaymentMethod.subscription:
+          await _processSubscriptionPayment();
+          break;
+        default:
+          _showSnackbar("Invalid payment method");
+      }
+    } catch (e) {
+      _showSnackbar("An error occurred: ${e.toString()}");
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _processStripePayment() async {
+    try {
+      // Create payment intent
+      final result = await _paymentController.createPaymentIntent(
+        userId: widget.userId,
+        ticketId: widget.ticketId,
+        reserveBusId: widget.reserveBusId,
+        amount: widget.total,
+      );
+
+      if (result is ApiError) {
+        _showSnackbar((result as ApiError).message);
+        return;
+      }
+
+      final clientSecret = (result as ApiSuccess<String>).data;
+
+      // Process payment with Stripe
+      final paymentResult = await _paymentController.processPayment(
+        clientSecret: clientSecret,
+        context: context,
+      );
+
+      if (paymentResult is ApiError) {
+        _showSnackbar((paymentResult as ApiError).message);
+        return;
+      }
+
+      final paymentIntent = (paymentResult as ApiSuccess<PaymentIntent>).data;
+
+      // Confirm payment with backend
+      final confirmResult = await _paymentController.confirmPayment(
+        paymentIntent.id,
+      );
+
+      if (confirmResult is ApiError) {
+        _showSnackbar((confirmResult as ApiError).message);
+        return;
+      }
+
+      // Payment successful
+      _showSnackbar("Payment successful!", isSuccess: true);
+
+      if (mounted) {
+        NavigationService().backtrack();
+      }
+    } catch (e) {
+      _showSnackbar("Payment failed: ${e.toString()}");
+    }
+  }
+
+  void _showSnackbar(String message, {bool isSuccess = false}) {
+    if (!mounted) return;
+    SnackbarUtils.showSnackbar(
+      context,
+      message: message,
+      type: isSuccess ? SnackbarType.success : SnackbarType.error,
+    );
+  }
+
+  Future<void> _processSubscriptionPayment() async {
+    // Implement subscription payment logic
+    SnackbarUtils.showSnackbar(
+      context,
+      message: "Subscription payment not implemented yet",
+    );
+  }
+}
+
+enum PaymentMethod { stripe, subscription }

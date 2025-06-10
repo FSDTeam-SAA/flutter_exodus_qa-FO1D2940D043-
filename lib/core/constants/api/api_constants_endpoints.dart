@@ -52,10 +52,14 @@ class ApiEndpoints {
   // Schedule
   static const String createSchedule = '/add/schedule';
 
-  // Driver
-  static const String createDriver = '/api/v1/add/driver';
-  static const String getAllDrivers = '/api/v1/all/drivers';
-  static const String deleteDriver = '/api/v1/drivers/'; // + {driverId}
+  // Payment endpoints
+  static const String createPayment = '/payment/create-payment';
+  static const String confirmPayment = '/payment/confirm-payment';
+
+  // // Driver
+  // static const String createDriver = '/api/v1/add/driver';
+  // static const String getAllDrivers = '/api/v1/all/drivers';
+  // static const String deleteDriver = '/api/v1/drivers/'; // + {driverId}
 
   // Helper method for URL construction
   static String withId(String baseEndpoint, String id) => '$baseEndpoint$id';

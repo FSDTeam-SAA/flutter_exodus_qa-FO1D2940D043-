@@ -25,6 +25,8 @@ import 'package:exodus/presentation/screens/notification/controllers/notificatio
 import 'package:exodus/presentation/screens/profile/controllers/profile_controller.dart';
 import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 
+import '../services/payment_service.dart';
+
 void setupController() {
   sl.registerFactory(
     () => LoginController(
@@ -68,4 +70,6 @@ void setupController() {
   );
 
   sl.registerFactory(() => CreateTicketController(sl(), sl()));
+
+  sl.registerLazySingleton<PaymentService>(() => PaymentService(sl()));
 }
