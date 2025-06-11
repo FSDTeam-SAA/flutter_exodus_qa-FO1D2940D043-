@@ -6,18 +6,13 @@ import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/routes/route_generator.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/app_theme.dart';
+import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Stripe
-  Stripe.publishableKey = StripeKey.key;
-  // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
-  // Stripe.urlScheme = 'flutterstripe';
-  // await Stripe.instance.applySettings();
 
   // Initialize Hive
   await Hive.initFlutter();
@@ -29,6 +24,16 @@ void main() async {
 
   // Open Hive boxes with the correct type
   await Hive.openBox<HiveCacheModel>(ApiCacheConstants.userCacheKey);
+
+  // Initialize Stripe
+  Stripe.publishableKey = StripeKey.key;
+  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+
+  try {
+    await Stripe.instance.applySettings();
+  } catch (e) {
+    dPrint(e);
+  }
 
   runApp(const MyApp());
 }

@@ -181,33 +181,31 @@ class _SeatsScreenState extends State<SeatsScreen> {
                 width: 130,
                 text: "Submit",
                 onPressed: () async {
-                 final data = await _handleSubmission();
+                  final data = await _handleSubmission();
 
-                final bookingData = {
-                  'busName': widget.seates.bus.name,
-                  'reserveBusId': widget.seates.bus.id,
-                  'seatNumber': _selectedSeat.value,
-                  'source': widget.source,
-                  'destination': widget.destination,
-                  'date': widget.date,
-                  'departureTime': widget.departureTime,
-                  'arrivalTime': widget.arrivalTime,
-                  'subtotal': widget.seates.bus.price.toDouble(),
-                  'tax': 0.0, // Set tax if available
-                  'total':
-                      widget.seates.bus.price
-                          .toDouble(), // Adjust if tax applies
-                  'ticketId' : data.id,
-                };
+                  final bookingData = {
+                    'busName': widget.seates.bus.name,
+                    'reserveBusId': widget.seates.bus.id,
+                    'seatNumber': _selectedSeat.value,
+                    'source': widget.source,
+                    'destination': widget.destination,
+                    'date': widget.date,
+                    'departureTime': widget.departureTime,
+                    'arrivalTime': widget.arrivalTime,
+                    'subtotal': widget.seates.bus.price.toDouble(),
+                    'tax': 0.0, // Set tax if available
+                    'total':
+                        widget.seates.bus.price
+                            .toDouble(), // Adjust if tax applies
+                    'ticketId': data.id,
+                  };
 
-                dPrint("Booking screen data -> $bookingData");
+                  dPrint("Booking screen data -> $bookingData");
 
-                NavigationService().sailTo(
-                  AppRoutes.bookingSummaryScreen,
-                  arguments: bookingData,
-                );
-
-                  
+                  NavigationService().sailTo(
+                    AppRoutes.bookingSummaryScreen,
+                    arguments: bookingData,
+                  );
 
                   // _createTicketController.createTicket(
                   //   seatNumber,
@@ -220,6 +218,8 @@ class _SeatsScreenState extends State<SeatsScreen> {
               );
             },
           ),
+
+          Gap.h24,
 
           // Standing option
           ValueListenableBuilder<bool>(
@@ -380,14 +380,22 @@ class SeatWidget extends StatelessWidget {
           color: backgroundColor,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.secondary : Colors.transparent,
+            color:
+                isSelected
+                    ? AppColors.secondary
+                    : AppColors.secondary.withAlpha((0.4 * 255).toInt()),
             width: 2,
           ),
         ),
         child: Center(
           child: Text(
             seatNumber,
-            style: AppText.h2.copyWith(color: AppColors.background),
+            style: AppText.h2.copyWith(
+              color:
+                  isAvailable
+                      ? AppColors.background
+                      : AppColors.secondary.withAlpha((0.4 * 255).toInt()),
+            ),
           ),
         ),
       ),

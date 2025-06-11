@@ -44,6 +44,7 @@ class PaymentController extends BaseController {
     try {
       final result = await _paymentRepository.processPayment(
         clientSecret: clientSecret,
+        
       );
       
       dPrint("Process Payment result: $result");

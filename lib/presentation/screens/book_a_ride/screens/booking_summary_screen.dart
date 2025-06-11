@@ -7,6 +7,7 @@ import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/snackbar_utils.dart';
+import 'package:exodus/presentation/theme/app_styles.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -86,11 +87,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
               ],
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
+          if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
@@ -98,17 +95,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
 
   Widget _buildBookingDetails() {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.card,
       child: Padding(
         padding: AppSizes.paddingAllMedium,
         child: Column(
@@ -197,7 +184,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           ],
         ),
         Gap.h12,
-        const Divider(),
+        const Divider(color: AppColors.secondary),
         Gap.h12,
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -220,7 +207,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           "Pay With Stripe",
           PaymentMethod.stripe,
           trailing: Image.asset(
-            'assets/images/stripe_logo.png',
+            'assets/icon/stripe_logo.png',
             height: 20,
             width: 40,
           ),
@@ -249,7 +236,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
             color:
                 _selectedPaymentMethod == method
                     ? AppColors.secondary
-                    : Colors.grey.withOpacity(0.3),
+                    : Colors.grey.withAlpha((0.3 * 255).toInt()),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -265,7 +252,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                   color:
                       _selectedPaymentMethod == method
                           ? AppColors.secondary
-                          : Colors.grey.withOpacity(0.5),
+                          : Colors.grey.withAlpha((0.5 * 255).toInt()),
                   width: 2,
                 ),
               ),
@@ -354,12 +341,14 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
 
       if (result is ApiError) {
         _showSnackbar((result as ApiError).message);
+        setState(() => _isLoading = false);
         return;
       }
 
       final clientSecret = (result as ApiSuccess<PaymentResponse>).data;
 
       dPrint("clientSecret -> ${clientSecret.transactionId}");
+      setState(() => _isLoading = false);
 
       // Process payment with Stripe
       final paymentResult = await _paymentController.processPayment(
@@ -379,6 +368,8 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
       final confirmResult = await _paymentController.confirmPayment(
         paymentIntent.id,
       );
+
+      setState(() => _isLoading = false);
 
       if (confirmResult is ApiError) {
         _showSnackbar((confirmResult as ApiError).message);
@@ -412,6 +403,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
       message: "Subscription payment not implemented yet",
     );
   }
+  
 }
 
 enum PaymentMethod { stripe, subscription }
