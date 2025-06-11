@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/services/app_state_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
@@ -20,6 +21,7 @@ import 'package:exodus/presentation/screens/auth/controllers/register_controller
 import 'package:exodus/presentation/screens/auth/controllers/verify_code_controller.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/create_ticket_controller.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/list_of_routs.dart';
+import 'package:exodus/presentation/screens/book_a_ride/controllers/payment_controller.dart';
 import 'package:exodus/presentation/screens/home/controller/home_controller.dart';
 import 'package:exodus/presentation/screens/notification/controllers/notification_controller.dart';
 import 'package:exodus/presentation/screens/profile/controllers/profile_controller.dart';
@@ -29,10 +31,7 @@ import '../services/payment_service.dart';
 
 void setupController() {
   sl.registerFactory(
-    () => LoginController(
-      sl<LoginUsecase>(),
-      sl<SecureStoreServices>(),
-    ),
+    () => LoginController(sl<LoginUsecase>(), sl<SecureStoreServices>()),
   );
 
   sl.registerFactory(() => RegisterController(sl<RegisterUsecase>()));
@@ -51,7 +50,12 @@ void setupController() {
     () => HomeController(sl<AppStateService>(), sl<GetHomeDataUsecase>()),
   );
 
-  sl.registerFactory(() => ProfileController(sl<SecureStoreServices>(), sl<UserProfileUpdateUsecase>()));
+  sl.registerFactory(
+    () => ProfileController(
+      sl<SecureStoreServices>(),
+      sl<UserProfileUpdateUsecase>(),
+    ),
+  );
 
   sl.registerFactory(
     () => NotificationController(sl<NotificationDataUsecase>()),
@@ -70,6 +74,6 @@ void setupController() {
   );
 
   sl.registerFactory(() => CreateTicketController(sl(), sl()));
-
-  sl.registerLazySingleton<PaymentService>(() => PaymentService(sl()));
+  
+  sl.registerFactory(() => PaymentController(sl()));
 }

@@ -10,6 +10,7 @@ import 'package:exodus/presentation/screens/auth/screens/login_screen.dart';
 import 'package:exodus/presentation/screens/auth/screens/security_code.dart';
 import 'package:exodus/presentation/screens/auth/screens/signup_screen.dart';
 import 'package:exodus/presentation/screens/book_a_ride/screens/book_a_ride_screen.dart';
+import 'package:exodus/presentation/screens/book_a_ride/screens/booking_summary_screen.dart';
 import 'package:exodus/presentation/screens/book_a_ride/screens/reserve_bus_screen.dart';
 import 'package:exodus/presentation/screens/book_a_ride/screens/seats_screen.dart';
 import 'package:exodus/presentation/screens/bot/screens/bottom_navbar.dart';
@@ -87,7 +88,6 @@ class RouteGenerator {
           page: SeatsScreen(
             seates:
                 args != null ? (args as Map<String, dynamic>)['Seates'] : null,
-
             source:
                 args != null ? (args as Map<String, dynamic>)['source'] : null,
             destination:
@@ -95,6 +95,34 @@ class RouteGenerator {
                     ? (args as Map<String, dynamic>)['destination']
                     : null,
             date: args != null ? (args as Map<String, dynamic>)['date'] : null,
+            departureTime:
+                args != null
+                    ? (args as Map<String, dynamic>)['departureTime']
+                    : null,
+            arrivalTime:
+                args != null
+                    ? (args as Map<String, dynamic>)['arrivalTime']
+                    : null,
+          ),
+        );
+
+      case AppRoutes.bookingSummaryScreen:
+        final bookingArgs = args as Map<String, dynamic>? ?? {};
+
+        return SlideLeftTransition(
+          page: BookingSummaryScreen(
+            busName: bookingArgs['busName'] ?? '',
+            seatNumber: bookingArgs['seatNumber'] ?? '',
+            source: bookingArgs['source'] ?? '',
+            destination: bookingArgs['destination'] ?? '',
+            date: bookingArgs['date'] ?? '',
+            departureTime: bookingArgs['departureTime'] ?? '',
+            arrivalTime: bookingArgs['arrivalTime'] ?? '',
+            subtotal: bookingArgs['subtotal'] ?? 0.0,
+            tax: bookingArgs['tax'] ?? 0.0,
+            total: bookingArgs['total'] ?? 0.0,
+            ticketId: bookingArgs['ticketId'] ?? '',
+            reserveBusId: bookingArgs['reserveBusId'] ?? '',
           ),
         );
 

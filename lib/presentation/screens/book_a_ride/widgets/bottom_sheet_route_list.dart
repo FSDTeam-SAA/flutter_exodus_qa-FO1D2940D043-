@@ -29,8 +29,8 @@ Future<String?> showLocationBottomSheet(
               return ListTile(
                 title: Text(route, style: AppText.bodyMedium),
                 onTap: () {
-                  NavigationService().sailTo(route);
-                  // Navigator.pop(context, route);
+                  // NavigationService().sailTo(route);
+                  Navigator.pop(context, route);
                 },
               );
             },

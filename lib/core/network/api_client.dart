@@ -109,6 +109,7 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
+    dPrint("Api Endpoint -> $endpoint $queryParameters");
     try {
       if (_isRefreshing) {
         final completer = Completer<void>();

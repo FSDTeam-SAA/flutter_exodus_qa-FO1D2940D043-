@@ -434,6 +434,8 @@ class _BookARideScreenState extends State<BookARideScreen> {
                             'source': toSelect,
                             'destination': fromSelect,
                             'date': selectedDate,
+                            'departureTime' : departureTime,
+                            'arrivalTime' : arrivalTime
                           },
                         );
                       },

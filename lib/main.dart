@@ -1,4 +1,5 @@
 import 'package:exodus/core/constants/api/cache_constants.dart';
+import 'package:exodus/core/constants/stripe/stripe_key.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/network/models/hive_cache_model.dart';
 import 'package:exodus/core/routes/app_routes.dart';
@@ -13,8 +14,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Stripe
-  Stripe.publishableKey = 'sk_test_51RLzmKCctG7Qj84qUuHfTQkx16eK33EzS585wy4jO9k6jwBFne2VlQCuOuH5k56yO4a0kEV0HbMGY2COkCVpge6q00x97HBQk3';
-  await Stripe.instance.applySettings();
+  Stripe.publishableKey = StripeKey.key;
+  // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  // Stripe.urlScheme = 'flutterstripe';
+  // await Stripe.instance.applySettings();
 
   // Initialize Hive
   await Hive.initFlutter();

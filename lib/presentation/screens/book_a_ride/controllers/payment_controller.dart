@@ -1,30 +1,33 @@
 import 'package:exodus/core/controller/base_controller.dart';
-import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/network/api_result.dart';
-import 'package:exodus/core/services/payment_service.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
+import 'package:exodus/domain/repositories/payment_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-class PaymentController extends BaseController {
-  final PaymentService _paymentService = sl<PaymentService>();
+import '../../../../data/models/payment/payment_response.dart';
 
-  Future<ApiResult<String>> createPaymentIntent({
+class PaymentController extends BaseController {
+  final PaymentRepository _paymentRepository;
+
+  PaymentController(this._paymentRepository);
+
+  Future<ApiResult<PaymentResponse>> createPaymentIntent({
     required String userId,
-    String? ticketId,
-    String? reserveBusId,
+    required String ticketId,
+    required String reserveBusId,
     required double amount,
   }) async {
     setLoading(true);
     try {
-      final result = await _paymentService.createPaymentIntent(
+      final result = await _paymentRepository.createPaymentIntent(
         userId: userId,
         ticketId: ticketId,
         reserveBusId: reserveBusId,
         amount: amount,
       );
       
-      dPrint("Create Payment Intent result: $result");
+      dPrint("Create Payment Intent result: ${result}");
       return result;
     } catch (e) {
       dPrint("Error creating payment intent: $e");
@@ -36,13 +39,11 @@ class PaymentController extends BaseController {
 
   Future<ApiResult<PaymentIntent>> processPayment({
     required String clientSecret,
-    required BuildContext context,
   }) async {
     setLoading(true);
     try {
-      final result = await _paymentService.processPayment(
+      final result = await _paymentRepository.processPayment(
         clientSecret: clientSecret,
-        context: context,
       );
       
       dPrint("Process Payment result: $result");
@@ -58,7 +59,7 @@ class PaymentController extends BaseController {
   Future<ApiResult<bool>> confirmPayment(String paymentIntentId) async {
     setLoading(true);
     try {
-      final result = await _paymentService.confirmPayment(paymentIntentId);
+      final result = await _paymentRepository.confirmPayment(paymentIntentId);
       
       dPrint("Confirm Payment result: $result");
       return result;

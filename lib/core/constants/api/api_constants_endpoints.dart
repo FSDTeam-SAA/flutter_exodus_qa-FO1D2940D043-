@@ -1,8 +1,8 @@
 class ApiEndpoints {
   // BaseURL
-  // static const String baseDomain = 'http://192.168.40.213:5000';
+  static const String baseDomain = 'http://10.10.5.95:5000';
 
-  static const String baseDomain = 'https://exodus-backend-59hw.onrender.com';
+  // static const String baseDomain = 'https://exodus-backend-59hw.onrender.com';
   static const String baseUrl = '$baseDomain/api/v1';
   // static const String baseUrl = 'https://exodus-backend-59hw.onrender.com';
 
@@ -53,8 +53,8 @@ class ApiEndpoints {
   static const String createSchedule = '/add/schedule';
 
   // Payment endpoints
-  static const String createPayment = '/payment/create-payment';
-  static const String confirmPayment = '/payment/confirm-payment';
+  static const String createPayment = '/create-payment';
+  static const String confirmPayment = '/confirm-payment';
 
   // // Driver
   // static const String createDriver = '/api/v1/add/driver';

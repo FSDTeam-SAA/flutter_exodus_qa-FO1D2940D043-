@@ -2,27 +2,35 @@ import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/theme/text_style.dart';
+import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
-import 'package:exodus/core/utils/snackbar_utils.dart';
 import 'package:exodus/presentation/screens/book_a_ride/controllers/create_ticket_controller.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:exodus/data/models/bus/single_bus_response.dart';
 
 import '../../../../core/services/navigation_service.dart';
+import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../data/models/ticket/ticket_model.dart';
 
 class SeatsScreen extends StatefulWidget {
   final BusDetailResponse seates;
   final String source;
   final String destination;
   final DateTime date;
+  final String departureTime;
+  final String arrivalTime;
+
   const SeatsScreen({
     super.key,
     required this.seates,
     required this.source,
     required this.destination,
     required this.date,
+    required this.departureTime,
+    required this.arrivalTime,
   });
 
   @override
@@ -33,6 +41,7 @@ class _SeatsScreenState extends State<SeatsScreen> {
   final ValueNotifier<String?> _selectedSeat = ValueNotifier<String?>(null);
   final ValueNotifier<bool> _showStandingOption = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _standingApplied = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
 
   final _createTicketController = sl<CreateTicketController>();
 
@@ -45,24 +54,27 @@ class _SeatsScreenState extends State<SeatsScreen> {
         widget.seates.totalSeats.isNotEmpty;
   }
 
-  Future<void> _handleSubmission() async {
-    // _isLoading.value = true;
+  Future<TicketModel> _handleSubmission() async {
+    _isLoading.value = true;
 
     try {
       if (_selectedSeat.value != null) {
         // Create seated ticket
-        await _createTicketController.createTicket(
+        final data = await _createTicketController.createTicket(
           _selectedSeat.value!,
           widget.seates.bus.id,
           widget.source,
           widget.destination,
           widget.date,
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Seat ${_selectedSeat.value} booked successfully'),
-          ),
-        );
+
+        return data;
+
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Seat ${_selectedSeat.value} booked successfully'),
+        //   ),
+        // );
       } else if (_standingApplied.value) {
         // Create standing ticket
         // await _createTicketController.createStandingTicket(
@@ -90,8 +102,11 @@ class _SeatsScreenState extends State<SeatsScreen> {
         // ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
-      // _isLoading.value = false;
+      _isLoading.value = false;
     }
+    throw Exception(
+      'No ticket was created or returned from _handleSubmission.',
+    );
   }
 
   @override
@@ -165,8 +180,35 @@ class _SeatsScreenState extends State<SeatsScreen> {
               return context.primaryButton(
                 width: 130,
                 text: "Submit",
-                onPressed: () {
-                  _handleSubmission();
+                onPressed: () async {
+                 final data = await _handleSubmission();
+
+                final bookingData = {
+                  'busName': widget.seates.bus.name,
+                  'reserveBusId': widget.seates.bus.id,
+                  'seatNumber': _selectedSeat.value,
+                  'source': widget.source,
+                  'destination': widget.destination,
+                  'date': widget.date,
+                  'departureTime': widget.departureTime,
+                  'arrivalTime': widget.arrivalTime,
+                  'subtotal': widget.seates.bus.price.toDouble(),
+                  'tax': 0.0, // Set tax if available
+                  'total':
+                      widget.seates.bus.price
+                          .toDouble(), // Adjust if tax applies
+                  'ticketId' : data.id,
+                };
+
+                dPrint("Booking screen data -> $bookingData");
+
+                NavigationService().sailTo(
+                  AppRoutes.bookingSummaryScreen,
+                  arguments: bookingData,
+                );
+
+                  
+
                   // _createTicketController.createTicket(
                   //   seatNumber,
                   //   busNumber,
@@ -294,10 +336,12 @@ class _SeatsScreenState extends State<SeatsScreen> {
   }
 
   @override
+  @override
   void dispose() {
     _selectedSeat.dispose();
     _showStandingOption.dispose();
     _standingApplied.dispose();
+    _isLoading.dispose();
     super.dispose();
   }
 }

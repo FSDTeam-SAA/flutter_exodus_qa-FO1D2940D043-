@@ -5,12 +5,15 @@ import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
+import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/snackbar_utils.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/services/app_state_service.dart';
+import '../../../../data/models/payment/payment_response.dart';
 import '../controllers/payment_controller.dart';
 
 class BookingSummaryScreen extends StatefulWidget {
@@ -24,12 +27,12 @@ class BookingSummaryScreen extends StatefulWidget {
   final double subtotal;
   final double tax;
   final double total;
-  final String userId;
-  final String? ticketId;
-  final String? reserveBusId;
+  // final String userId;
+  final String ticketId;
+  final String reserveBusId;
 
   const BookingSummaryScreen({
-    Key? key,
+    super.key,
     required this.busName,
     required this.seatNumber,
     required this.source,
@@ -40,10 +43,10 @@ class BookingSummaryScreen extends StatefulWidget {
     required this.subtotal,
     required this.tax,
     required this.total,
-    required this.userId,
-    this.ticketId,
-    this.reserveBusId,
-  }) : super(key: key);
+    // required this.userId,
+    required this.ticketId,
+    required this.reserveBusId,
+  });
 
   @override
   State<BookingSummaryScreen> createState() => _BookingSummaryScreenState();
@@ -51,6 +54,8 @@ class BookingSummaryScreen extends StatefulWidget {
 
 class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
   final PaymentController _paymentController = sl<PaymentController>();
+  final AppStateService appStateService = sl<AppStateService>();
+
   bool _isLoading = false;
   PaymentMethod? _selectedPaymentMethod;
 
@@ -159,7 +164,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
             ),
             Text(
               value,
-              style: AppText.bodyMedium.copyWith(color: AppColors.primary),
+              style: AppText.bodyMedium.copyWith(color: AppColors.secondary),
             ),
           ],
         ),
@@ -299,7 +304,10 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: Text("Continue", style: AppText.bodyMedium),
+        child: Text(
+          "Continue",
+          style: AppText.bodyMedium.copyWith(color: AppColors.background),
+        ),
       ),
     );
   }
@@ -337,24 +345,28 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
     try {
       // Create payment intent
       final result = await _paymentController.createPaymentIntent(
-        userId: widget.userId,
+        userId: appStateService.currentUser!.user.id,
         ticketId: widget.ticketId,
         reserveBusId: widget.reserveBusId,
         amount: widget.total,
       );
+      dPrint("Result in payment -> $result");
 
       if (result is ApiError) {
         _showSnackbar((result as ApiError).message);
         return;
       }
 
-      final clientSecret = (result as ApiSuccess<String>).data;
+      final clientSecret = (result as ApiSuccess<PaymentResponse>).data;
+
+      dPrint("clientSecret -> ${clientSecret.transactionId}");
 
       // Process payment with Stripe
       final paymentResult = await _paymentController.processPayment(
-        clientSecret: clientSecret,
-        context: context,
+        clientSecret: clientSecret.transactionId,
       );
+
+      dPrint("Payment resutl -> $paymentResult");
 
       if (paymentResult is ApiError) {
         _showSnackbar((paymentResult as ApiError).message);

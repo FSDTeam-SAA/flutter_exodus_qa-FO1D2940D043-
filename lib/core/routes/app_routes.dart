@@ -1,3 +1,5 @@
+import 'package:exodus/presentation/screens/book_a_ride/screens/booking_summary_screen.dart';
+
 abstract class AppRoutes {
   static const splash = '/';
 
@@ -40,4 +42,8 @@ abstract class AppRoutes {
 
   /// [Driver Routes]
   static const driverHome = '/driver-home';
+
+  /// [Booking Summary Screen]
+  static const bookingSummaryScreen = '/booking-summary-screen';
+  
 }
