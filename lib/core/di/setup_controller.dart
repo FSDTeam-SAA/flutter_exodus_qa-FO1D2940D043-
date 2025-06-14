@@ -54,6 +54,8 @@ void setupController() {
     () => ProfileController(
       sl<SecureStoreServices>(),
       sl<UserProfileUpdateUsecase>(),
+      sl<GetHomeDataUsecase>(),
+      sl<AppStateService>(),
     ),
   );
 
@@ -74,6 +76,6 @@ void setupController() {
   );
 
   sl.registerFactory(() => CreateTicketController(sl(), sl()));
-  
+
   sl.registerFactory(() => PaymentController(sl()));
 }

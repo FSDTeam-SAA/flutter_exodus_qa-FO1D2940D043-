@@ -207,8 +207,8 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           "Pay With Stripe",
           PaymentMethod.stripe,
           trailing: Image.asset(
-            'assets/icon/stripe_logo.png',
-            height: 20,
+            'assets/icons/stripe_logo.png',
+            height: 26,
             width: 40,
           ),
         ),

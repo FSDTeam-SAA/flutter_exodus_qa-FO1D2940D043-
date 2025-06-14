@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:exodus/domain/repositories/user_profile_update_repository.dart';
-import 'package:exodus/presentation/screens/profile/model/user_profile_update_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/network/api_result.dart';
+import '../../../data/models/auth/profile_update_repository.dart';
 
 class UserProfileUpdateUsecase {
   final UserProfileUpdateRepository repository;
 
   UserProfileUpdateUsecase(this.repository);
 
-  Future<ApiResult<UserProfileUpdateModel>> call(UserProfileUpdateModel driver) {
-    return repository.updateDriver(driver);
+  Future<ApiResult<ProfileUpdateRepository>> call(String id, XFile formData) {
+    return repository.updateDriver(id: id, avatarFile: formData);
   }
 }

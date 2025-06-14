@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
@@ -109,7 +110,6 @@ class ApiClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    dPrint("Api Endpoint -> $endpoint $queryParameters");
     try {
       if (_isRefreshing) {
         final completer = Completer<void>();
@@ -118,6 +118,7 @@ class ApiClient {
       }
 
       options = await _addAuthHeader(options);
+      dPrint("Api Endpoint -> $endpoint ${options..contentType} $method");
       final response = await _dio.request(
         endpoint,
         data: data,
@@ -127,6 +128,7 @@ class ApiClient {
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+      dPrint("BASE Response -> ${response.data}");
 
       final baseResponse = BaseResponse<T>.fromJson(response.data, fromJsonT);
       if (!baseResponse.success) {

@@ -1,31 +1,25 @@
 class UserProfileUpdateModel {
   final String id;
-  final String name;
-  final String email;
-  final String phone;
-  final String username;
+  final String? name;
+  final String? avatar;
 
   UserProfileUpdateModel({
     required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.username,
+    this.name,
+    this.avatar,
   });
 
-  factory UserProfileUpdateModel.fromJson(Map<String, dynamic> json) => UserProfileUpdateModel(
-        id: json['_id'],
-        name: json['name'],
-        email: json['email'],
-        phone: json['phone'] ?? '',
-        username: json['username'],
-      );
-
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'username': username,
-      };
+    'id': id,
+    if (name != null) 'name': name,
+    if (avatar != null) 'avatar': avatar,
+  };
+
+  // factory UserProfileUpdateModel.fromJson(Map<String, dynamic> json) {
+  //   return UserProfileUpdateModel(
+  //     id: json['id'],
+  //     name: json['name'],
+  //     avatar: json['avatar'],
+  //   );
+  // }
 }
