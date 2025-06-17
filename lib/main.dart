@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Exodus',
       theme: AppTheme.light,
+      darkTheme: AppTheme.light,
       // home: CheckThemeScreen(),
       navigatorKey: NavigationService().navigatorKey,
       initialRoute: AppRoutes.splash,
