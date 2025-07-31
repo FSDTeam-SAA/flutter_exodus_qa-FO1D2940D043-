@@ -1,7 +1,7 @@
-import 'package:exodus/core/constants/app/app_colors.dart';
-import 'package:exodus/core/theme/text_style.dart';
-// import 'package:exodus/core/theme/text_style.dart';
 import 'package:flutter/material.dart';
+
+import '../constants/app/app_colors.dart';
+import 'text_style.dart';
 
 class AppTheme {
   static ThemeData get light => ThemeData(

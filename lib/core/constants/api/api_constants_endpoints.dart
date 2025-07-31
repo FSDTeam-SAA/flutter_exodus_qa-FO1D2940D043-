@@ -2,7 +2,7 @@ class ApiEndpoints {
   // BaseURL
   // static const String baseDomain = 'http://10.10.5.95:5000';
 
-  static const String baseDomain = 'https://exodus-backend-59hw.onrender.com';
+  static const String baseDomain = 'https://api.exodusqa.com/';
   static const String baseUrl = '$baseDomain/api/v1';
   // static const String baseUrl = 'https://exodus-backend-59hw.onrender.com';
 
