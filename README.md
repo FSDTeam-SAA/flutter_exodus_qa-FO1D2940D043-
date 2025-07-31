@@ -13,7 +13,7 @@ A new Flutter project.
 
 ```bash
 git clone https://github.com/FSDTeam-SAA/flutter_exodus_qa-FO1D2940D043-.git
-cd flutter_exodus_qa
+cd flutter_exodus_qa-FO1D2940D043-
 ```
 
 ### 3. Install Dependencies
