@@ -4,6 +4,7 @@ import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
@@ -12,6 +13,7 @@ import 'package:exodus/presentation/screens/auth/constants/auth_constant.dart';
 import 'package:exodus/presentation/screens/auth/controllers/login_controller.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
+import 'package:exodus/presentation/widgets/form_error_message.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,6 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
 
+  // final ValueNotifier<String?> errorMessage = ValueNotifier(null);
+
   final _controller = sl<LoginController>();
 
   @override
@@ -49,7 +53,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Future<void> errorMessage() async {
+  //   errorMessage = _controller.errorMessage;
+  // }
+
   Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
 
     try {
@@ -62,12 +71,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)
           final double maxFormWidth =
               constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
           final bool isMobile = constraints.maxWidth < 600;
+
+          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+          final isKeyboardVisible = bottomInset > 0;
 
           return Stack(
             children: [
@@ -88,6 +100,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             AppLogo(height: 117, width: 160),
 
                             Gap.h32,
+
+                            /// [Api Error messages]
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return FormErrorMessage(
+                                  message: _controller.errorMessage,
+                                );
+                              },
+                            ),
 
                             /// [Title]
                             Text(AuthConstants.title.login, style: AppText.h1),
@@ -157,8 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               alignment: Alignment.centerRight,
                               child: InkWell(
                                 onTap:
-                                    () => Navigator.pushNamed(
-                                      context,
+                                    () => NavigationService().sailTo(
                                       AppRoutes.forgatePassword,
                                     ),
                                 child: Text(
@@ -173,20 +194,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             Gap.h22,
 
                             /// [Submit button]
-                            context.primaryButton(
-                              onPressed: _submit,
-                              text: "Login",
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, _) {
+                                return context.primaryButton(
+                                  onPressed: _submit,
+                                  text: "Login",
+                                  isLoading: _controller.isLoading,
+                                );
+                              },
                             ),
+
                             if (!isMobile) ...[
                               Gap.h16,
 
                               /// [Sign up button]
                               TextButton(
                                 onPressed:
-                                    () => Navigator.pushNamed(
-                                      context,
-                                      AppRoutes.signup,
-                                    ),
+                                    () => NavigationService().sailTo(AppRoutes.signup),
+                                    // Navigator.pushNamed(
+                                    //   context,
+                                    //   AppRoutes.signup,
+                                    // ),
                                 child: Text(
                                   AuthConstants.label.noAccount,
                                   style: TextStyle(
@@ -203,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              if (isMobile)
+              if (!isKeyboardVisible && isMobile)
                 /// [Sign up Button]
                 Positioned(
                   left: 0,
@@ -212,7 +241,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Center(
                     child: TextButton(
                       onPressed:
-                          () => Navigator.pushNamed(context, AppRoutes.signup),
+                          () => NavigationService().sailTo(AppRoutes.signup),
+                          // Navigator.pushNamed(context, ),
                       child: Text(
                         AuthConstants.label.noAccount,
                         style: TextStyle(

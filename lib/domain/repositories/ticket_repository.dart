@@ -1,8 +1,7 @@
 import 'package:exodus/data/models/ticket/ticket_model.dart';
-import 'package:exodus/data/models/ticket_model.dart';
 
 abstract class TicketRepository {
-  Future<Ticket> createTicket({
+  Future<TicketModel> createTicket({
     required String seatNumber,
     required String busNumber,
     required String source,
@@ -10,7 +9,7 @@ abstract class TicketRepository {
     required DateTime date,
   });
   
-  Future<List<Ticket>> getAllTickets({
+  Future<List<TicketModel>> getAllTickets({
     required String busNumber,
     required String source,
     required String destination,
@@ -18,8 +17,8 @@ abstract class TicketRepository {
     required String time,
   });
 
-  Future<List<Ticket>> getAdminAllTickets();
-  Future<Ticket> acceptStanding(String ticketId);
-  Future<Ticket> cancelTicket(String ticketId);
-  Future<Ticket> scanQr(String ticketId, String secret, String stationName);
+  Future<List<TicketModel>> getAdminAllTickets();
+  Future<TicketModel> acceptStanding(String ticketId);
+  Future<TicketModel> cancelTicket(String ticketId);
+  Future<TicketModel> scanQr(String ticketId, String secret, String stationName);
 }

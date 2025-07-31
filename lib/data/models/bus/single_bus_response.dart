@@ -1,18 +1,21 @@
 import 'package:exodus/data/models/bus/available_bus_response.dart';
 
-class SingleBusData {
-  final BusId bus;
-  final List<String> availableSeat;
+class BusDetailResponse {
+  final Bus bus;
+  final List<String> availableSeats;
+  final List<String> totalSeats;
 
-  SingleBusData({
+  BusDetailResponse({
     required this.bus,
-    required this.availableSeat,
+    required this.availableSeats,
+    required this.totalSeats,
   });
 
-  factory SingleBusData.fromJson(Map<String, dynamic> json) {
-    return SingleBusData(
-      bus: BusId.fromJson(json['bus'] as Map<String, dynamic>),
-      availableSeat: (json['avaiableSeat'] as List).cast<String>(),
+  factory BusDetailResponse.fromJson(Map<String, dynamic> json) {
+    return BusDetailResponse(
+      bus: Bus.fromJson(json['bus']),
+      availableSeats: List<String>.from(json['avaiableSeat']),
+      totalSeats: List<String>.from(json['totalSeats']),
     );
   }
 }

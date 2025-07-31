@@ -1,24 +1,23 @@
-class Ticket {
+class TicketModel {
   final String id;
-  final String schedule;
+  final String scheduleId;
   final String userId;
-  final int price;
+  final double price;
   final String busNumber;
   final String seatNumber;
   final String source;
   final String destination;
-  final String date;
+  final DateTime date;
   final String time;
+  final String? qrCode;
+  final String? ticketSecret;
+  final List<String>? availableSeat;
   final String status;
-  final String ride;
   final String key;
-  final String createdAt;
-  final String updatedAt;
-  final String qrCode;
 
-  Ticket({
+  TicketModel({
     required this.id,
-    required this.schedule,
+    required this.scheduleId,
     required this.userId,
     required this.price,
     required this.busNumber,
@@ -27,32 +26,62 @@ class Ticket {
     required this.destination,
     required this.date,
     required this.time,
+    this.qrCode,
+    this.ticketSecret,
+    this.availableSeat,
     required this.status,
-    required this.ride,
     required this.key,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.qrCode,
   });
-
-  factory Ticket.fromJson(Map<String, dynamic> json) {
-    return Ticket(
-      id: json['_id'],
-      schedule: json['schedule'],
-      userId: json['userId'],
-      price: json['price'],
-      busNumber: json['busNumber'],
-      seatNumber: json['seatNumber'],
-      source: json['source'],
-      destination: json['destination'],
-      date: json['date'],
-      time: json['time'],
-      status: json['status'],
-      ride: json['ride'],
-      key: json['key'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+  factory TicketModel.fromJson(Map<String, dynamic> json) {
+    return TicketModel(
+      id: json['_id'] ?? '',
+      scheduleId:
+          json['schedule'] is Map<String, dynamic>
+              ? json['schedule']['_id'] ?? ''
+              : json['schedule'] ?? '',
+      userId:
+          json['userId'] is Map<String, dynamic>
+              ? json['userId']['_id'] ?? ''
+              : json['userId'] ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      busNumber:
+          json['busNumber'] is Map<String, dynamic>
+              ? json['busNumber']['_id'] ?? ''
+              : json['busNumber'] ?? '',
+      seatNumber: json['seatNumber'] ?? '',
+      source: json['source'] ?? '',
+      destination: json['destination'] ?? '',
+      date:
+          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+      time: json['time'] ?? '',
       qrCode: json['qrCode'],
+      ticketSecret: json['ticket_secret'],
+      availableSeat:
+          json['avaiableSeat'] != null
+              ? List<String>.from(json['avaiableSeat'])
+              : null,
+      status: json['status'] ?? 'pending',
+      key: json['key'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'schedule': scheduleId,
+      'userId': userId,
+      'price': price,
+      'busNumber': busNumber,
+      'seatNumber': seatNumber,
+      'source': source,
+      'destination': destination,
+      'date': date.toIso8601String(),
+      'time': time,
+      'qrCode': qrCode,
+      'ticket_secret': ticketSecret,
+      'avaiableSeat': availableSeat,
+      'status': status,
+      'key': key,
+    };
   }
 }

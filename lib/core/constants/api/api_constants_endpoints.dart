@@ -1,7 +1,10 @@
 class ApiEndpoints {
   // BaseURL
-  // static const String baseUrl = 'https://exodus-backend-ke7n.onrender.com/api/v1';
-  static const String baseUrl = 'http://192.168.40.213:5000/api/v1';
+  // static const String baseDomain = 'http://10.10.5.95:5000';
+
+  static const String baseDomain = 'https://api.exodusqa.com/';
+  static const String baseUrl = '$baseDomain/api/v1';
+  // static const String baseUrl = 'https://exodus-backend-59hw.onrender.com';
 
   static const String refreshToken = '/auth/refresh-token';
   // Auth
@@ -13,6 +16,22 @@ class ApiEndpoints {
   static const String changePassword = '/auth/change-password';
   static const String getUserData = '/auth/user-data';
 
+  /// [User]
+  static const String getAllNotification = '/users/get-notfication';
+  static const String makeAsAllRead = '/users/mark-as-read';
+
+  /// [Ride]
+  static const String getRouteList = '/users/get-bus-route';
+  static const String getAvailableBus = "/bus/get-available-bus";
+  static const String getSingleBus = '/bus/';
+  static const String createTicket = '/ticket/create-ticket';
+  static const String reserveBus = "/reserve-bus";
+
+  /// [Profile]
+  ///
+  static const String getRideHistory = '/users/ride-history';
+  static const String updateUserProfile = '/drivers';
+
   // Bus
   static const String createBus = '/bus/';
   static const String updateBus = '/bus/'; // + {busId}
@@ -22,7 +41,7 @@ class ApiEndpoints {
   static const String deleteBus = '/bus/'; // + {busId}
 
   // Ticket
-  static const String createTicket = '/ticket/create-ticket';
+
   static const String acceptStanding =
       '/ticket/accept-standing/'; // + {ticketId}
   static const String getAllTickets = '/ticket/all-ticket';
@@ -33,11 +52,14 @@ class ApiEndpoints {
   // Schedule
   static const String createSchedule = '/add/schedule';
 
-  // Driver
-  static const String createDriver = '/api/v1/add/driver';
-  static const String getAllDrivers = '/api/v1/all/drivers';
-  static const String updateDriver = '/api/v1/drivers/'; // + {driverId}
-  static const String deleteDriver = '/api/v1/drivers/'; // + {driverId}
+  // Payment endpoints
+  static const String createPayment = '/create-payment';
+  static const String confirmPayment = '/confirm-payment';
+
+  // // Driver
+  // static const String createDriver = '/api/v1/add/driver';
+  // static const String getAllDrivers = '/api/v1/all/drivers';
+  // static const String deleteDriver = '/api/v1/drivers/'; // + {driverId}
 
   // Helper method for URL construction
   static String withId(String baseEndpoint, String id) => '$baseEndpoint$id';

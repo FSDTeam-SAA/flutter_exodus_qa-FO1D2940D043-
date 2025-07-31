@@ -2,6 +2,7 @@ import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
@@ -34,14 +35,16 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(context, AppRoutes.home);
+      NavigationService().sailTo(AppRoutes.home);
+      // Navigator.pushNamed(context, AppRoutes.home);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      appBar: AppBar(),
+      body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)
           final double maxFormWidth =
@@ -87,7 +90,9 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                               ),
                               onPressed: () {
                                 setState(
-                                  () => _obscureNewPassword = !_obscureNewPassword,
+                                  () =>
+                                      _obscureNewPassword =
+                                          !_obscureNewPassword,
                                 );
                               },
                             ),

@@ -1,5 +1,9 @@
+import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/core/utils/extensions/code_input_decoration_extensions.dart';
+import 'package:exodus/presentation/screens/auth/controllers/verify_code_controller.dart';
+import 'package:exodus/presentation/widgets/form_error_message.dart';
 import 'package:flutter/material.dart';
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
@@ -11,7 +15,9 @@ import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 
 class SecurityCodeScreen extends StatefulWidget {
-  const SecurityCodeScreen({super.key});
+  final String? email;
+  final bool fromLogin;
+  const SecurityCodeScreen({super.key, this.email, this.fromLogin = false});
 
   @override
   State<SecurityCodeScreen> createState() => _SecurityCodeScreenState();
@@ -19,12 +25,17 @@ class SecurityCodeScreen extends StatefulWidget {
 
 class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final List<TextEditingController> _digitControllers = List.generate(
     6,
     (index) => TextEditingController(),
   );
+
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
+
   bool _isLoading = false;
+
+  final _verifyCodeController = sl<VerifyCodeController>();
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -35,12 +46,27 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
       // Combine all digits into a single code
       final code = _digitControllers.map((c) => c.text).join();
 
-      // TODO: Implement actual verification logic
       await Future.delayed(const Duration(seconds: 1)); // Simulate network call
 
       if (mounted) {
         dPrint("Code Print $code");
-        Navigator.pushNamed(context, AppRoutes.createNewPassword);
+        dPrint("Email in Code Print ${widget.email}");
+
+        final result = await _verifyCodeController.verifyCode(
+          widget.email!,
+          code,
+        );
+
+        if (result) {
+          if (widget.fromLogin) {
+            NavigationService().freshStartTo(AppRoutes.login);
+          } else if (!widget.fromLogin) {
+            NavigationService().freshStartTo(
+              AppRoutes.createNewPassword,
+              arguments: {'email': widget.email},
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -82,7 +108,7 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      body: LayoutBuilder(
         builder: (context, constraints) {
           final double maxFormWidth =
               constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
@@ -102,6 +128,16 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
                       children: [
                         const AppLogo(height: 117, width: 160),
                         Gap.h32,
+
+                        /// [Api Error messages]
+                        AnimatedBuilder(
+                          animation: _verifyCodeController,
+                          builder: (context, _) {
+                            return FormErrorMessage(
+                              message: _verifyCodeController.errorMessage,
+                            );
+                          },
+                        ),
                         Text(
                           AuthConstants.title.securityCode,
                           style: AppText.h1,

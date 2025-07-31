@@ -1,11 +1,14 @@
 import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_padding.dart';
+import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/routes/app_routes.dart';
+import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/extensions/button_extensions.dart';
 import 'package:exodus/core/utils/extensions/input_decoration_extensions.dart';
 import 'package:exodus/core/utils/validator/validators.dart';
 import 'package:exodus/presentation/screens/auth/constants/auth_constant.dart';
+import 'package:exodus/presentation/screens/auth/controllers/password_reset_controller.dart';
 import 'package:exodus/presentation/widgets/app_logo.dart';
 import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -22,16 +25,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   final TextEditingController _emailController = TextEditingController();
 
+  final passwordController = sl<PasswordResetController>();
+
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(context, AppRoutes.codeVerify);
+      passwordController.forgotPassword(_emailController.text.trim());
+      // Navigator.pushNamed(context, AppRoutes.codeVerify);
+      NavigationService().sailTo(AppRoutes.codeVerify);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      child: LayoutBuilder(
+      appBar: AppBar(),
+      body: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate max width for the form (600px for large screens)
           final double maxFormWidth =

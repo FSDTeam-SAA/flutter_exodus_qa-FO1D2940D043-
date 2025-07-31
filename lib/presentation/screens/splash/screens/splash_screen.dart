@@ -24,10 +24,22 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
 
     // Check auth status and navigate
-    final isAuthenticate = await sl<CheckAuthStatusUsecase>().call();
+    final role = await sl<CheckAuthStatusUsecase>().call();
 
-    if(mounted) {
-      NavigationService().freshStartTo( isAuthenticate? AppRoutes.home : AppRoutes.login);
+    if (mounted) {
+      if (role == null) {
+        // Navigate to login if token or role is invalid
+        NavigationService().freshStartTo(AppRoutes.login);
+      } else {
+        // Navigate based on the role
+        if (role == 'user') {
+          NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+
+        } else {
+          // Handle unknown roles
+          NavigationService().freshStartTo(AppRoutes.login);
+        }
+      }
     }
   }
 
