@@ -18,6 +18,7 @@ import 'package:exodus/presentation/screens/driver/home/screens/driver_home_scre
 import 'package:exodus/presentation/screens/home/screens/home_screen.dart';
 import 'package:exodus/presentation/screens/home/screens/ride_details_screen.dart';
 import 'package:exodus/presentation/screens/notification/screens/notification_screen.dart';
+import 'package:exodus/presentation/screens/profile/screens/change_password.dart';
 import 'package:exodus/presentation/screens/profile/screens/edit_profile_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/ride_history_screen.dart';
 import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.dart';
@@ -49,7 +50,7 @@ class RouteGenerator {
           ),
         );
       case AppRoutes.createNewPassword:
-        return SlideLeftTransition(page: CreateNewPasswordScreen());
+        return SlideLeftTransition(page: CreateNewPasswordScreen(), );
 
       /// [App Bottom Navbar]
       case AppRoutes.bottomNavbar:
@@ -136,7 +137,7 @@ class RouteGenerator {
       case AppRoutes.rideHistory:
         return SlideLeftTransition(page: RideHistoryScreen());
       case AppRoutes.changePassword:
-        return SlideLeftTransition(page: CreateNewPasswordScreen());
+        return SlideLeftTransition(page: ChangePasswordScreen());
       case AppRoutes.editUserProfile:
         return SlideLeftTransition(page: EditProfileScreen());
 

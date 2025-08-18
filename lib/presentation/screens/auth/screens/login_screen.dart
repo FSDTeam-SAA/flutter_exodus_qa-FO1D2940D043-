@@ -71,191 +71,199 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Calculate max width for the form (600px for large screens)
-          final double maxFormWidth =
-              constraints.maxWidth > 600 ? 600 : constraints.maxWidth;
-          final bool isMobile = constraints.maxWidth < 600;
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Form(
+                    key: _formKey,
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                /// [Logo]
+                                AppLogo(height: 117, width: 160),
 
-          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-          final isKeyboardVisible = bottomInset > 0;
+                                Gap.h32,
 
-          return Stack(
-            children: [
-              GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Center(
-                  child: SingleChildScrollView(
-                    padding:
-                        isMobile ? AppPaddings.bottom80 : AppPaddings.bottom20,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxFormWidth),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            /// [Logo]
-                            AppLogo(height: 117, width: 160),
+                                /// [Api Error messages]
+                                AnimatedBuilder(
+                                  animation: _controller,
+                                  builder: (context, _) {
+                                    return FormErrorMessage(
+                                      message: _controller.errorMessage,
+                                    );
+                                  },
+                                ),
 
-                            Gap.h32,
+                                /// [Title]
+                                Text(
+                                  AuthConstants.title.login,
+                                  style: AppText.h1,
+                                ),
+                                Gap.h8,
 
-                            /// [Api Error messages]
-                            AnimatedBuilder(
-                              animation: _controller,
-                              builder: (context, _) {
-                                return FormErrorMessage(
-                                  message: _controller.errorMessage,
-                                );
-                              },
-                            ),
+                                /// [Subtitle]
+                                Text(
+                                  AuthConstants.subtitle.login,
+                                  style: AppText.bodyRegular,
+                                ),
+                                Gap.h22,
 
-                            /// [Title]
-                            Text(AuthConstants.title.login, style: AppText.h1),
-                            Gap.h8,
-
-                            /// [Subtitle]
-                            Text(
-                              AuthConstants.subtitle.login,
-                              style: AppText.bodyRegular,
-                            ),
-                            Gap.h22,
-
-                            /// [Email Text field]
-                            TextFormField(
-                              controller: _emailController,
-                              focusNode: _emailFocus,
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              decoration: context.primaryInputDecoration
-                                  .copyWith(
-                                    hintText: AuthConstants.hint.email,
-                                    labelText: 'Email',
-                                  ),
-                              validator: Validators.email,
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(
-                                  context,
-                                ).requestFocus(_passwordFocus);
-                              },
-                            ),
-
-                            Gap.h16,
-
-                            /// [Password Text field]
-                            TextFormField(
-                              controller: _passwordController,
-                              focusNode: _passwordFocus,
-                              obscureText: _obscurePassword,
-                              textInputAction: TextInputAction.done,
-                              decoration: context.primaryInputDecoration
-                                  .copyWith(
-                                    hintText: AuthConstants.hint.password,
-                                    labelText: "Password",
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscurePassword
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
-                                        color: AppColors.inputIcon,
+                                /// [Email Text field]
+                                TextFormField(
+                                  controller: _emailController,
+                                  focusNode: _emailFocus,
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.next,
+                                  decoration: context.primaryInputDecoration
+                                      .copyWith(
+                                        hintText: AuthConstants.hint.email,
+                                        labelText: 'Email',
                                       ),
-                                      onPressed: () {
-                                        setState(
-                                          () =>
-                                              _obscurePassword =
-                                                  !_obscurePassword,
-                                        );
-                                      },
+                                  validator: Validators.email,
+                                  onFieldSubmitted: (_) {
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(_passwordFocus);
+                                  },
+                                ),
+
+                                Gap.h16,
+
+                                /// [Password Text field]
+                                TextFormField(
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocus,
+                                  obscureText: _obscurePassword,
+                                  textInputAction: TextInputAction.done,
+                                  decoration: context.primaryInputDecoration
+                                      .copyWith(
+                                        hintText: AuthConstants.hint.password,
+                                        labelText: "Password",
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscurePassword
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                            color: AppColors.inputIcon,
+                                          ),
+                                          onPressed: () {
+                                            setState(
+                                              () =>
+                                                  _obscurePassword =
+                                                      !_obscurePassword,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  validator: Validators.password,
+                                  onFieldSubmitted: (_) => _submit(),
+                                ),
+                                Gap.h16,
+
+                                /// [Forgote Password button]
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: InkWell(
+                                    onTap:
+                                        () => NavigationService().sailTo(
+                                          AppRoutes.forgatePassword,
+                                        ),
+                                    child: Text(
+                                      AuthConstants.label.forgotPassword,
+                                      style: TextStyle(
+                                        fontSize: AppText.bodyRegular.fontSize,
+                                        fontWeight:
+                                            AppText.bodyRegular.fontWeight,
+                                      ),
                                     ),
                                   ),
-                              validator: Validators.password,
-                              onFieldSubmitted: (_) => _submit(),
-                            ),
-                            Gap.h16,
+                                ),
+                                Gap.h22,
 
-                            /// [Forgote Password button]
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap:
-                                    () => NavigationService().sailTo(
-                                      AppRoutes.forgatePassword,
+                                /// [Submit button]
+                                AnimatedBuilder(
+                                  animation: _controller,
+                                  builder: (context, _) {
+                                    return context.primaryButton(
+                                      onPressed: _submit,
+                                      text: "Login",
+                                      isLoading: _controller.isLoading,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // if (!isMobile) ...[
+
+                          /// [Footer] pinned to bottom
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextButton(
+                                  onPressed:
+                                      () => NavigationService().sailTo(
+                                        AppRoutes.signup,
+                                      ),
+
+                                  child: Text(
+                                    AuthConstants.label.noAccount,
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: AppSizes.textSizeRegular,
                                     ),
-                                child: Text(
-                                  AuthConstants.label.forgotPassword,
-                                  style: TextStyle(
-                                    fontSize: AppText.bodyRegular.fontSize,
-                                    fontWeight: AppText.bodyRegular.fontWeight,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            Gap.h22,
-
-                            /// [Submit button]
-                            AnimatedBuilder(
-                              animation: _controller,
-                              builder: (context, _) {
-                                return context.primaryButton(
-                                  onPressed: _submit,
-                                  text: "Login",
-                                  isLoading: _controller.isLoading,
-                                );
-                              },
-                            ),
-
-                            if (!isMobile) ...[
-                              Gap.h16,
-
-                              /// [Sign up button]
-                              TextButton(
-                                onPressed:
-                                    () => NavigationService().sailTo(AppRoutes.signup),
-                                    // Navigator.pushNamed(
-                                    //   context,
-                                    //   AppRoutes.signup,
-                                    // ),
-                                child: Text(
-                                  AuthConstants.label.noAccount,
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: AppSizes.textSizeRegular,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                          ),
+                          // ],
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (!isKeyboardVisible && isMobile)
-                /// [Sign up Button]
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 20,
-                  child: Center(
-                    child: TextButton(
-                      onPressed:
-                          () => NavigationService().sailTo(AppRoutes.signup),
-                          // Navigator.pushNamed(context, ),
-                      child: Text(
-                        AuthConstants.label.noAccount,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: AppSizes.textSizeRegular,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ),
+        // if (!isKeyboardVisible && isMobile)
+        //   /// [Sign up Button]
+        //   Positioned(
+        //     left: 0,
+        //     right: 0,
+        //     bottom: 20,
+        //     child: Center(
+        //       child: TextButton(
+        //         onPressed:
+        //             () => NavigationService().sailTo(AppRoutes.signup),
+        //             // Navigator.pushNamed(context, ),
+        //         child: Text(
+        //           AuthConstants.label.noAccount,
+        //           style: TextStyle(
+        //             color: AppColors.textSecondary,
+        //             fontSize: AppSizes.textSizeRegular,
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ],
+        // );
+        // },
       ),
     );
   }

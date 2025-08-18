@@ -4,6 +4,10 @@ import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
 
+import '../../../../core/network/api_result.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../core/services/navigation_service.dart';
+
 class PasswordResetController extends BaseController {
   // Use cases
   final ForgotPasswordUseCase forgotPasswordUseCase;
@@ -56,6 +60,14 @@ class PasswordResetController extends BaseController {
       oldPassword,
       newPassword,
     );
+
+    if (result is ApiSuccess<void>) {
+      NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+    } else if (result is ApiError) {
+      setError(result.message);
+      notifyListeners();
+      return;
+    }
 
     dPrint("Change Password Result: $result");
     setLoading(false);

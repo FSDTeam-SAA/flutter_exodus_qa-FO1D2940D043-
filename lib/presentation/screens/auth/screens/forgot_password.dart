@@ -31,7 +31,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (_formKey.currentState!.validate()) {
       passwordController.forgotPassword(_emailController.text.trim());
       // Navigator.pushNamed(context, AppRoutes.codeVerify);
-      NavigationService().sailTo(AppRoutes.codeVerify);
+      NavigationService().sailTo(AppRoutes.codeVerify, arguments: {
+        'email': _emailController.text.trim(),
+        'fromLogin': true,
+      });
     }
   }
 

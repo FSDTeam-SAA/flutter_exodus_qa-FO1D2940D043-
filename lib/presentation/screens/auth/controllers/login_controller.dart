@@ -38,8 +38,8 @@ class LoginController extends BaseController {
           KeyConstants.refreshToken,
           data.refreshToken,
         );
+        await _secureStoreServices.storeData(KeyConstants.email, email);
         await _secureStoreServices.storeData(KeyConstants.role, data.role);
-
         if (data.isUser) {
           NavigationService().freshStartTo(AppRoutes.bottomNavbar);
         }
