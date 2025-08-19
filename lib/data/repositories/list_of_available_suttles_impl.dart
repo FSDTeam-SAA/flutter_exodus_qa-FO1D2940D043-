@@ -4,6 +4,8 @@ import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/data/models/bus/available_bus_response.dart';
 import 'package:exodus/domain/repositories/list_of_available_suttles_repository.dart';
 
+import '../../core/network/network_result.dart';
+
 class ListOfAvailableSuttlesImpl implements ListOfAvailableShuttlesRepository {
   final ApiClient _apiClient;
 
@@ -11,7 +13,7 @@ class ListOfAvailableSuttlesImpl implements ListOfAvailableShuttlesRepository {
     : _apiClient = apiClient;
 
   @override
-  Future<ApiResult<List<AvailableShuttle>>> getAvailableShuttles({
+  NetworkResult<List<AvailableShuttle>> getAvailableShuttles({
     required String from,
     required String to,
     required String date,

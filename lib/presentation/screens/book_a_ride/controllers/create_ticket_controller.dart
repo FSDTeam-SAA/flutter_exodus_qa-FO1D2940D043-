@@ -1,5 +1,6 @@
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
@@ -29,16 +30,26 @@ class CreateTicketController extends BaseController {
         date,
       );
 
-      dPrint("Create Ticket data result -> ${result}");
+      result.fold(
+        (failure) {
+          setError(failure.message);
+          dPrint("Ticket creation error: ${failure.message}");
+          throw Exception("Failed to create ticket");
+        },
+        (data) {
+          dPrint("Create Ticket data result -> ${data}");
+          return data;
+        },
+      );
 
-      if (result is ApiSuccess<TicketModel>) {
-        dPrint("Ticket Is create -> ${result}");
-        return result.data;
-      } else {
-        // Return an ApiError with a suitable message if creation failed
-        // return ApiError<TicketModel>("Failed to create ticket");
-        throw Exception("Failed to create ticket");
-      }
+      // if (result is ApiSuccess<TicketModel>) {
+      //   dPrint("Ticket Is create -> ${result}");
+      //   return result.data;
+      // } else {
+      //   // Return an ApiError with a suitable message if creation failed
+      //   // return ApiError<TicketModel>("Failed to create ticket");
+      //   throw Exception("Failed to create ticket");
+      // }
     } catch (e) {
       dPrint(e);
     }
@@ -51,13 +62,25 @@ class CreateTicketController extends BaseController {
 
       dPrint(result);
 
-      if (result is ApiSuccess<void>) {
-        dPrint("Cencal Ticket success ${result}");
-        NavigationService().backtrack();
-      } else {
-        final message = (result as ApiError).message;
-        dPrint("Cencel Ticket error -> $message");
-      }
+      result.handle(
+        onSuccess: (data) {
+          // dPrint("Cencal Ticket success $data");
+          NavigationService().backtrack();
+        },
+        onFailure: (failure) {
+          dPrint("Cencel Ticket error -> ${failure.message}");
+          setError(failure.message);
+          notifyListeners();
+        },
+      );
+
+      // if (result is ApiSuccess<void>) {
+      //   dPrint("Cencal Ticket success ${result}");
+      //   NavigationService().backtrack();
+      // } else {
+      //   final message = (result as ApiError).message;
+      //   dPrint("Cencel Ticket error -> $message");
+      // }
     } catch (e) {
       print(e);
     }

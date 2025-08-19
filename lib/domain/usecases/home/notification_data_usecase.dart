@@ -1,6 +1,7 @@
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/data/models/user_profile_models/notification.dart';
 
+import '../../../core/network/network_result.dart';
 import '../../repositories/notification_repository.dart';
 
 class NotificationDataUsecase {
@@ -8,7 +9,7 @@ class NotificationDataUsecase {
 
   NotificationDataUsecase(this._notificationRepository);
 
-  Future<ApiResult<List<NotificationModel>>> call() async {
+  NetworkResult<List<NotificationModel>> call() async {
     return await _notificationRepository.getAllNotifications();
   }
 }

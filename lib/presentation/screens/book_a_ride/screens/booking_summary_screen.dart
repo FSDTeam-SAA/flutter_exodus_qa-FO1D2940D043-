@@ -3,6 +3,7 @@ import 'package:exodus/core/constants/app/app_gap.dart';
 import 'package:exodus/core/constants/app/app_sizes.dart';
 import 'package:exodus/core/di/service_locator.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/theme/text_style.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
@@ -339,45 +340,90 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
       );
       dPrint("Result in payment -> $result");
 
-      if (result is ApiError) {
-        _showSnackbar((result as ApiError).message);
-        setState(() => _isLoading = false);
-        return;
-      }
+      result.handle(
+        onSuccess: (data) async {
+          final clientSecret = data;
 
-      final clientSecret = (result as ApiSuccess<PaymentResponse>).data;
+          dPrint("clientSecret -> ${clientSecret}");
+          setState(() => _isLoading = false);
 
-      dPrint("clientSecret -> ${clientSecret.transactionId}");
-      setState(() => _isLoading = false);
+          final paymentResult = await _paymentController.processPayment(
+            clientSecret: clientSecret.transactionId,
+          );
+          dPrint("Payment resutl -> $paymentResult");
+
+          paymentResult.fold(
+            (failure) {
+              _showSnackbar(failure.message);
+              return;
+            },
+            (data) async {
+              // final paymentIntent = data;
+              final confirmResult = await _paymentController.confirmPayment(
+                data.id,
+              );
+              setState(() => _isLoading = false);
+
+              confirmResult.fold(
+                (failure) {
+                  _showSnackbar(failure.message);
+                  return;
+                },
+                (data) {
+                  _showSnackbar("Payment successful!", isSuccess: true);
+                },
+              );
+            },
+          );
+        },
+        onFailure: (failure) {
+          _showSnackbar(failure.message);
+          setState(() => _isLoading = false);
+          return;
+        },
+      );
+
+
+
+      // if (result is ApiError) {
+      //   _showSnackbar((result as ApiError).message);
+      //   setState(() => _isLoading = false);
+      //   return;
+      // }
+
+      // final clientSecret = (result as ApiSuccess<PaymentResponse>).data;
+
+      // dPrint("clientSecret -> ${clientSecret.transactionId}");
+      // setState(() => _isLoading = false);
 
       // Process payment with Stripe
-      final paymentResult = await _paymentController.processPayment(
-        clientSecret: clientSecret.transactionId,
-      );
+      // final paymentResult = await _paymentController.processPayment(
+      //   clientSecret: clientSecret.transactionId,
+      // );
 
-      dPrint("Payment resutl -> $paymentResult");
+      // dPrint("Payment resutl -> $paymentResult");
 
-      if (paymentResult is ApiError) {
-        _showSnackbar((paymentResult as ApiError).message);
-        return;
-      }
+      // if (paymentResult is ApiError) {
+      //   _showSnackbar((paymentResult as ApiError).message);
+      //   return;
+      // }
 
-      final paymentIntent = (paymentResult as ApiSuccess<PaymentIntent>).data;
+      // final paymentIntent = (paymentResult as ApiSuccess<PaymentIntent>).data;
 
       // Confirm payment with backend
-      final confirmResult = await _paymentController.confirmPayment(
-        paymentIntent.id,
-      );
+      // final confirmResult = await _paymentController.confirmPayment(
+      //   paymentIntent.id,
+      // );
 
-      setState(() => _isLoading = false);
+      // setState(() => _isLoading = false);
 
-      if (confirmResult is ApiError) {
-        _showSnackbar((confirmResult as ApiError).message);
-        return;
-      }
+      // if (confirmResult is ApiError) {
+      //   _showSnackbar((confirmResult as ApiError).message);
+      //   return;
+      // }
 
       // Payment successful
-      _showSnackbar("Payment successful!", isSuccess: true);
+      // _showSnackbar("Payment successful!", isSuccess: true);
 
       if (mounted) {
         NavigationService().backtrack();
@@ -403,7 +449,6 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
       message: "Subscription payment not implemented yet",
     );
   }
-  
 }
 
 enum PaymentMethod { stripe, subscription }

@@ -299,9 +299,12 @@ class _ReserveBusScreenState extends State<ReserveBusScreen> {
                 TextButton(
                   onPressed: () {
                     NavigationService().backtrack();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reservation confirmed!')),
-                    );
+
+                    
+                    
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(content: Text('Reservation confirmed!')),
+                    // );
                   },
                   child: const Text('Confirm'),
                 ),

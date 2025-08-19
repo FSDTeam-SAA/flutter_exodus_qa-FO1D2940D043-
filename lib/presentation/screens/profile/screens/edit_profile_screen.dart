@@ -213,7 +213,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 return context.primaryButton(
                   onPressed: _submit,
                   text: "Update",
-                  // isLoading: _controller.isLoading,
+                  isLoading: profileController.isLoading,
                 );
               },
             ),

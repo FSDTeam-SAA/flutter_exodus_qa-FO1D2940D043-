@@ -1,5 +1,6 @@
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/bus/available_bus_response.dart';
 import 'package:exodus/data/models/bus/single_bus_response.dart';
@@ -27,22 +28,38 @@ class ListOfRoutsController extends BaseController {
     setLoading(true);
     final result = await _listOfRoutesUsecase.call();
     setLoading(false);
-    if (result is ApiSuccess<List<String>>) {
-      final data = result.data;
-      dPrint("List of Routes: $data");
 
-      AppDataStore().routesList = data;
+    result.handle(
+      onSuccess: (data) {
+        dPrint("List of Routes: $data");
 
-      // return the data
-      notifyListeners();
-      // return data;
-    } else {
-      final message = (result as ApiError).message;
-      setError(message);
-      dPrint(" Controller login message print $message");
-      notifyListeners();
-      // return [];
-    }
+        AppDataStore().routesList = data;
+
+        // return the data
+        notifyListeners();
+      },
+      onFailure: (failure) {
+        setError(failure.message);
+        dPrint("Controller login message print ${failure.message}");
+        notifyListeners();
+      },
+    );
+    // if (result is ApiSuccess<List<String>>) {
+    //   final data = result.data;
+    //   dPrint("List of Routes: $data");
+
+    //   AppDataStore().routesList = data;
+
+    //   // return the data
+    //   notifyListeners();
+    //   // return data;
+    // } else {
+    //   final message = (result as ApiError).message;
+    //   setError(message);
+    //   dPrint(" Controller login message print $message");
+    //   notifyListeners();
+    //   // return [];
+    // }
   }
 
   // Available Shuttles
@@ -59,25 +76,57 @@ class ListOfRoutsController extends BaseController {
     );
     final result = await _getAvailableShuttlesUseCase.call(query);
     setLoading(false);
-    if (result is ApiSuccess<List<AvailableShuttle>>) {
-      final data = result.data;
-      dPrint("Available Shuttles: $data");
 
-      availableShuttlesList = data;
+    result.fold(
+      (failure) {
+        setError(failure.message);
+        dPrint("Controller login message print ${failure.message}");
+        notifyListeners();
+      },
+      (data) {
+        availableShuttlesList = data;
 
-      return availableShuttlesList;
+        // return the data
+        notifyListeners();
+      },
+    );
+    return availableShuttlesList;
 
-      // return the data
-      // notifyListeners();
-      // return data;
-    } else {
-      final message = (result as ApiError).message;
-      setError(message);
-      dPrint(" Controller login message print $message");
-      return [];
-      // notifyListeners();
-      // return [];
-    }
+    // result.handle(
+    //   onSuccess: (data) {
+    //     dPrint("Available Shuttles: $data");
+
+    //     availableShuttlesList = data;
+
+    //     // return the data
+    //     notifyListeners();
+    //   },
+    //   onFailure: (failure) {
+    //
+    //   },
+    // );
+
+    // return availableShuttlesList;
+
+    // if (result is ApiSuccess<List<AvailableShuttle>>) {
+    //   final data = result.data;
+    //   dPrint("Available Shuttles: $data");
+
+    //   availableShuttlesList = data;
+
+    //   return availableShuttlesList;
+
+    //   // return the data
+    //   // notifyListeners();
+    //   // return data;
+    // } else {
+    //   final message = (result as ApiError).message;
+    //   setError(message);
+    //   dPrint(" Controller login message print $message");
+    //   return [];
+    //   // notifyListeners();
+    //   // return [];
+    // }
   }
 
   Future<BusDetailResponse> getSingleBusDetails(
@@ -96,9 +145,20 @@ class ListOfRoutsController extends BaseController {
         time,
       );
 
-      if (result is ApiSuccess<BusDetailResponse>) {
-        return result.data;
-      }
+      result.fold(
+        (failure) {
+          setError(failure.message);
+          dPrint("Failed to fetch bus details: ${failure.message}");
+          throw Exception("Failed to fetch bus details");
+        },
+        (data) {
+          return data;
+        },
+      );
+
+      // if (result is ApiSuccess<BusDetailResponse>) {
+      //   return result.data;
+      // }
     } catch (e) {
       dPrint(e);
     }

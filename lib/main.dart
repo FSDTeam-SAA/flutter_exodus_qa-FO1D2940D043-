@@ -11,29 +11,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/init/app_initializer.dart';
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await AppInitializer.initializeApp();
 
-  // Initialize Hive
-  await Hive.initFlutter();
+  // WidgetsFlutterBinding.ensureInitialized();
 
-  // Register Hive adapter (you'll need to generate this)
-  Hive.registerAdapter(HiveCacheModelAdapter());
+  // // Initialize Hive
+  // await Hive.initFlutter();
 
-  setupServiceLocator();
+  // // Register Hive adapter (you'll need to generate this)
+  // Hive.registerAdapter(HiveCacheModelAdapter());
 
-  // Open Hive boxes with the correct type
-  await Hive.openBox<HiveCacheModel>(ApiCacheConstants.userCacheKey);
+  // setupServiceLocator();
 
-  // Initialize Stripe
-  Stripe.publishableKey = StripeKey.key;
-  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  // // Open Hive boxes with the correct type
+  // await Hive.openBox<HiveCacheModel>(ApiCacheConstants.userCacheKey);
 
-  try {
-    await Stripe.instance.applySettings();
-  } catch (e) {
-    dPrint(e);
-  }
+  // // Initialize Stripe
+  // Stripe.publishableKey = StripeKey.key;
+  // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+
+  // try {
+  //   await Stripe.instance.applySettings();
+  // } catch (e) {
+  //   dPrint(e);
+  // }
 
   runApp(const MyApp());
 }

@@ -22,14 +22,22 @@ class HomeController extends BaseController {
     try {
       final result = await _getHomeDataUsecase.call();
 
-      if (result is ApiSuccess<UserData>) {
-        final data = result.data;
-        userDataNotifier.value = result.data;
-        _appStateService.setUser(result.data);
+      result.fold((failure) {}, (data) {
+        userDataNotifier.value = data;
+        _appStateService.setUser(data);
         dPrint("User Data Print -> ${data.user.email}");
 
         return data;
-      }
+      });
+
+      // if (result is ApiSuccess<UserData>) {
+      // final data = result.data;
+      // userDataNotifier.value = result.data;
+      // _appStateService.setUser(result.data);
+      // dPrint("User Data Print -> ${data.user.email}");
+
+      // return data;
+      // }
     } finally {
       setLoading(false);
     }

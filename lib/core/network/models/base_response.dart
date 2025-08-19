@@ -18,7 +18,7 @@ class BaseResponse<T> {
     T Function(dynamic) fromJsonT,
   ) {
     return BaseResponse<T>(
-      success: json['success'] ?? false,
+      success: json['success'] ?? json['status'] ?? false, // Handle both 'success' and 'status'
       message: json['message'] ?? '',
       data: json['data'] != null ? fromJsonT(json['data']) : null,
       errorSources: json['errorSources'] != null

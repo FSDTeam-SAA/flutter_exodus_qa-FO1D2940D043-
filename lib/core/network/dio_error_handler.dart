@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:exodus/core/utils/debug_logger.dart';
-
+import 'package:flutx_core/flutx_core.dart';
 
 String dioErrorToUserMessage(DioException error) {
   // First try to get message from response body
@@ -13,7 +12,7 @@ String dioErrorToUserMessage(DioException error) {
         }
       }
     } catch (e) {
-      dPrint("Error parsing error response: $e");
+      DPrint.error("Error parsing error response: $e");
     }
 
     // // Fall back to status code messages

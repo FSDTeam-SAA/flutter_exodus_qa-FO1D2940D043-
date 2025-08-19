@@ -1,5 +1,6 @@
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
@@ -25,22 +26,41 @@ class RegisterController extends BaseController {
       final result = await registerUseCase.call(request);
       dPrint("Register Result: $result");
 
-      if (result is ApiSuccess<User>) {
-        dPrint("Registration successful: ${result.data}");
-        // Handle successful registration, e.g., navigate to login or home screen
-        NavigationService().freshStartTo(
-          AppRoutes.codeVerify,
-          arguments: {
-            'email': request.email,
-            'fromLogin': true,
-          },
-        );
-      } else {
-        final message = (result as ApiError).message;
-        setError(message);
-        dPrint(" Controller login message print $message");
-        notifyListeners();
-      }
+      result.handle(
+        onSuccess: (data) {
+          dPrint("Registration successful: ${data.toJson()}");
+          // Handle successful registration, e.g., navigate to login or home screen
+          NavigationService().freshStartTo(
+            AppRoutes.codeVerify,
+            arguments: {
+              'email': request.email,
+              'fromLogin': true,
+            },
+          );
+        },
+        onFailure: (failure) {
+          setError(failure.message);
+          dPrint("Controller register error: ${failure.message}");
+          notifyListeners();
+        },
+      );
+
+      // if (result is ApiSuccess<User>) {
+      //   dPrint("Registration successful: ${result.data}");
+      //   // Handle successful registration, e.g., navigate to login or home screen
+      //   NavigationService().freshStartTo(
+      //     AppRoutes.codeVerify,
+      //     arguments: {
+      //       'email': request.email,
+      //       'fromLogin': true,
+      //     },
+      //   );
+      // } else {
+      //   final message = (result as ApiError).message;
+      //   setError(message);
+      //   dPrint(" Controller login message print $message");
+      //   notifyListeners();
+      // }
 
       setLoading(false);
     } catch (e) {

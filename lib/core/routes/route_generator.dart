@@ -1,5 +1,3 @@
-import 'package:exodus/core/routes/transitions/fade_route.dart';
-import 'package:exodus/core/routes/transitions/slide_left.dart';
 import 'package:exodus/presentation/map/map_screen.dart';
 import 'package:exodus/presentation/screens/app/about_app.dart';
 import 'package:exodus/presentation/screens/app/privacy_policy.dart';
@@ -25,6 +23,7 @@ import 'package:exodus/presentation/screens/profile/screens/user_profile_screen.
 import 'package:exodus/presentation/screens/splash/screens/splash_screen.dart';
 import 'package:exodus/presentation/screens/subscriptions/screens/subscriptions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutx_core/flutx_core.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {

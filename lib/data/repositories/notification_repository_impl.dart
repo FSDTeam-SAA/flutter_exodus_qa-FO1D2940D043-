@@ -3,7 +3,7 @@ import 'package:exodus/domain/repositories/notification_repository.dart';
 
 import '../../core/constants/api/api_constants_endpoints.dart';
 import '../../core/network/api_client.dart';
-import '../../core/network/api_result.dart';
+import '../../core/network/network_result.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
   final ApiClient _apiClient;
@@ -12,7 +12,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
     : _apiClient = apiClient;
 
   @override
-  Future<ApiResult<List<NotificationModel>>> getAllNotifications() async {
+  NetworkResult<List<NotificationModel>> getAllNotifications() async {
     return _apiClient.get<List<NotificationModel>>(
       ApiEndpoints.getAllNotification,
       fromJsonT:
@@ -24,7 +24,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
-  Future<ApiResult<NotificationModel>> markAsRead() async {
+  NetworkResult<NotificationModel> markAsRead() async {
     return _apiClient.get<NotificationModel>(
       ApiEndpoints.makeAsAllRead,
       fromJsonT: (json) => NotificationModel.fromJson(json),

@@ -88,13 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     TitleTextWidget(title: "Your Next Ride"),
 
                     Gap.h16,
-                    _buildNextRideCard(snapshot.data!.ticket),
+                    _buildNextRideCard(snapshot.data?.ticket ?? List.empty()),
 
                     Gap.h22,
                     TitleTextWidget(title: "Your All Ride"),
 
                     Gap.h16,
-                    _buildRideList(snapshot.data!.ticket),
+                    _buildRideList(snapshot.data?.ticket ?? List.empty()),
 
                     Gap.bottomAppBarGap,
                   ],

@@ -6,6 +6,7 @@ import 'package:exodus/domain/repositories/user_profile_update_repository.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/network/api_result.dart';
+import '../../core/network/network_result.dart';
 import '../models/auth/profile_update_repository.dart';
 
 import 'package:mime/mime.dart';
@@ -17,7 +18,7 @@ class UserProfileUpdateRepositoryImpl implements UserProfileUpdateRepository {
   UserProfileUpdateRepositoryImpl(this._apiClient);
 
   @override
-  Future<ApiResult<ProfileUpdateRepository>> updateDriver({
+  NetworkResult<ProfileUpdateRepository> updateDriver({
     required String id,
     // String? name,
     // String? email,

@@ -20,19 +20,33 @@ class RideHistoryController extends BaseController {
 
   Future<List<TicketModel>> getAllRideHistory() async {
     final result = await _rideHistoryUsecase.call();
-    if (result is ApiSuccess<List<TicketModel>>) {
-      final rideHistoryData = result.data;
-      // _getAllRideHistoryController.add(rideHistoryData);
-      AppDataStore().updateRideHistory(rideHistoryData);
 
-      // dPrint("Ride History -> ${rideHistoryData.first.busNumber}");
-      return rideHistoryData;
-    } else {
-      final message = (result as ApiError).message;
-      AppDataStore().updateRideHistory([]);
-      dPrint("Ride History -> $message");
-      return [];
-    }
+    return result.fold(
+      (failure) {
+        // final message = (result as ApiError).message;
+        AppDataStore().updateRideHistory([]);
+        dPrint("Ride History -> ${failure.message}");
+        return [];
+      },
+      (data) {
+        AppDataStore().updateRideHistory(data);
+        return data;
+      },
+    );
+
+    // if (result is ApiSuccess<List<TicketModel>>) {
+    //   final rideHistoryData = result.data;
+    //   // _getAllRideHistoryController.add(rideHistoryData);
+    //   AppDataStore().updateRideHistory(rideHistoryData);
+
+    //   // dPrint("Ride History -> ${rideHistoryData.first.busNumber}");
+    //   return rideHistoryData;
+    // } else {
+    //   final message = (result as ApiError).message;
+    //   AppDataStore().updateRideHistory([]);
+    //   dPrint("Ride History -> $message");
+    //   return [];
+    // }
   }
 
   // @override

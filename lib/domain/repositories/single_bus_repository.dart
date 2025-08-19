@@ -1,8 +1,10 @@
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/data/models/bus/single_bus_response.dart';
 
+import '../../core/network/network_result.dart';
+
 abstract class GetSingleBusRepository {
-  Future<ApiResult<BusDetailResponse>> getSingleBus(
+  NetworkResult<BusDetailResponse> getSingleBus(
     String busId,
     String sourse,
     String destinatino,
@@ -10,5 +12,5 @@ abstract class GetSingleBusRepository {
     String time,
   );
 
-  Future<ApiResult<void>> cancelRide(String busId);
+  NetworkResult<void> cancelRide(String busId);
 }

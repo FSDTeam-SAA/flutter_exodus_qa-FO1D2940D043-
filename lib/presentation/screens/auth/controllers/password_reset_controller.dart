@@ -1,4 +1,5 @@
 import 'package:exodus/core/controller/base_controller.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
@@ -61,13 +62,24 @@ class PasswordResetController extends BaseController {
       newPassword,
     );
 
-    if (result is ApiSuccess<void>) {
-      NavigationService().freshStartTo(AppRoutes.bottomNavbar);
-    } else if (result is ApiError) {
-      setError(result.message);
-      notifyListeners();
-      return;
-    }
+    result.handle(
+      onSuccess: (data) {
+        // Navigate to the bottom navigation bar or any other screen
+        NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+      },
+      onFailure: (failure) {
+        setError(failure.message);
+        notifyListeners();
+      },
+    );
+
+    // if (result is ApiSuccess<void>) {
+    //   NavigationService().freshStartTo(AppRoutes.bottomNavbar);
+    // } else if (result is ApiError) {
+    //   setError(result.message);
+    //   notifyListeners();
+    //   return;
+    // }
 
     dPrint("Change Password Result: $result");
     setLoading(false);

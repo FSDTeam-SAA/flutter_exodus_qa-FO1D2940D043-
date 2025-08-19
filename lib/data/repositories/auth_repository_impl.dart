@@ -1,6 +1,5 @@
 import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
 import 'package:exodus/core/network/api_client.dart';
-import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
 import 'package:exodus/data/models/auth/user_response.dart';
@@ -8,13 +7,18 @@ import 'package:exodus/data/models/auth/user_data_response.dart';
 import 'package:exodus/domain/repositories/auth_repository.dart';
 import 'package:exodus/presentation/screens/auth/model/register_request.dart';
 
+import '../../core/network/network_result.dart';
+
 class AuthRepositoryImpl implements AuthRepository {
   final ApiClient _apiClient;
 
   AuthRepositoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
 
   @override
-  Future<ApiResult<LoginResponse>> login(String email, String password) {
+  NetworkResult<LoginResponse> login(
+    String email,
+    String password,
+  ) {
     dPrint("email : $email");
     return _apiClient.post<LoginResponse>(
       ApiEndpoints.login,
@@ -24,7 +28,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<User>> register(RegisterRequest register) {
+  NetworkResult<User> register(RegisterRequest register) {
     return _apiClient.post(
       ApiEndpoints.register,
       data: {
@@ -38,7 +42,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<void>> verifyOTP(String email, String otp) {
+  NetworkResult<void> verifyOTP(String email, String otp) {
     dPrint(email);
     return _apiClient.post(
       ApiEndpoints.verifyOtp,
@@ -48,7 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<UserData>> getUserData() async {
+  NetworkResult<UserData> getUserData() async {
     return _apiClient.get<UserData>(
       ApiEndpoints.getUserData,
       fromJsonT: (json) => UserData.fromJson(json),
@@ -56,7 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<void>> forgatePassword(String email) {
+  NetworkResult<void> forgatePassword(String email) {
     return _apiClient.post(
       ApiEndpoints.forgetPassword,
       data: {"email": email},
@@ -65,7 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<void>> resetPassword(
+  NetworkResult<void> resetPassword(
     String email,
     String otp,
     String newPassword,
@@ -78,7 +82,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResult<void>> changePassword(
+  NetworkResult<void> changePassword(
     String email,
     String oldPassword,
     String newPassword,

@@ -2,7 +2,7 @@ import 'package:exodus/core/network/api_client.dart';
 import 'package:exodus/domain/repositories/create_ticket_repository.dart';
 
 import '../../core/constants/api/api_constants_endpoints.dart';
-import '../../core/network/api_result.dart';
+import '../../core/network/network_result.dart';
 import '../models/ticket/ticket_model.dart';
 
 class CreateTicketRepositoryImpl implements CreateTicketRepository {
@@ -12,7 +12,7 @@ class CreateTicketRepositoryImpl implements CreateTicketRepository {
     : _apiClient = apiClient;
 
   @override
-  Future<ApiResult<TicketModel>> generateTicket(
+  NetworkResult<TicketModel> generateTicket(
     String seatNumber,
     String busNumber,
     String source,

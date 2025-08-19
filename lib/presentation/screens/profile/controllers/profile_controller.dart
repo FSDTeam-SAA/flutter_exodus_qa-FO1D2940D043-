@@ -1,5 +1,6 @@
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
+import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
@@ -49,16 +50,31 @@ class ProfileController extends BaseController {
     XFile? avatarFile,
   }) async {
     try {
+      setLoading(true);
+
       if (avatarFile != null) {
         final response = await _userProfileUpdateUsecase.call(
           model.id,
           avatarFile,
         );
-        if (response is ApiSuccess<Map<String, dynamic>>) {
-          dPrint("Profile updated successfully");
-          // Update local user data with the response
-          // await _appStateService.setUser(response.data.entries);
-        }
+
+        response.handle(
+          onSuccess: (data) async {
+            dPrint("Profile updated successfully");
+            await getUserData();
+            NavigationService().backtrack();
+          },
+
+          onFailure: (failure) {
+            dPrint("Error updating profile: ${failure.message}");
+          },
+        );
+
+        // if (response is ApiSuccess<Map<String, dynamic>>) {
+        //   dPrint("Profile updated successfully");
+        //   // Update local user data with the response
+        //   // await _appStateService.setUser(response.data.entries);
+        // }
         // else if (response is ApiFailure) {
         //   dPrint("Error updating profile: ${response.error}");
         // }
@@ -70,6 +86,8 @@ class ProfileController extends BaseController {
     } catch (e) {
       dPrint("Exception in updateUserProfile: $e");
       // Handle error appropriately
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -79,14 +97,23 @@ class ProfileController extends BaseController {
     try {
       final result = await _getHomeDataUsecase.call();
 
-      if (result is ApiSuccess<UserData>) {
-        final data = result.data;
-        userDataNotifier.value = result.data;
-        _appStateService.setUser(result.data);
+      result.fold((failure) {}, (data) {
+        // final data = result.data;
+        userDataNotifier.value = data;
+        _appStateService.setUser(data);
         dPrint("User Data Print -> ${data.user.email}");
 
         return data;
-      }
+      });
+
+      // if (result is ApiSuccess<UserData>) {
+      //   final data = result.data;
+      //   userDataNotifier.value = result.data;
+      //   _appStateService.setUser(result.data);
+      //   dPrint("User Data Print -> ${data.user.email}");
+
+      //   return data;
+      // }
     } finally {
       setLoading(false);
     }

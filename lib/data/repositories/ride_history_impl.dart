@@ -4,13 +4,15 @@ import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/domain/repositories/ride_history_repository.dart';
 
+import '../../core/network/network_result.dart';
+
 class RideHistoryImpl implements RideHistoryRepository {
   final ApiClient _apiClient;
 
   RideHistoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
 
   @override
-  Future<ApiResult<List<TicketModel>>> getAllRideHistory() async {
+  NetworkResult<List<TicketModel>> getAllRideHistory() async {
     return _apiClient.get<List<TicketModel>>(
       ApiEndpoints.getRideHistory,
       fromJsonT:
