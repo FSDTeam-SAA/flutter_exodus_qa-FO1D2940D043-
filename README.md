@@ -2,15 +2,30 @@
 
 A new Flutter project.
 
-## Getting Started
+## Setup Instructions
 
-This project is a starting point for a Flutter application.
+### 1. Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) installed
+- [Git](https://git-scm.com/downloads) installed
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 2. Clone the Repository
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+git clone https://github.com/FSDTeam-SAA/flutter_exodus_qa-FO1D2940D043-.git
+cd flutter_exodus_qa-FO1D2940D043-
+```
+
+### 3. Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 4. Run the Project
+
+```bash
+flutter run
+```
+
+For more details, see the
