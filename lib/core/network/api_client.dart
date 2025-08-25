@@ -3,10 +3,11 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutx_core/flutx_core.dart';
 
+import '../constants/api/api_constants_endpoints.dart';
 import 'constants/api_constants.dart';
 import 'constants/key_constants.dart';
 import 'dio_error_handler.dart';
@@ -15,6 +16,8 @@ import 'models/base_response.dart';
 import 'models/network_failure.dart';
 import 'services/connectivity_service.dart';
 import 'services/secure_store_services.dart';
+
+import '/core/network/models/network_success.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -131,7 +134,7 @@ class ApiClient {
   }
 
   /// Main request method using Either
-  Future<Either<NetworkFailure, T>> _request<T>({
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> _request<T>({
     required String method,
     required String endpoint,
     required T Function(dynamic) fromJsonT,
@@ -144,10 +147,40 @@ class ApiClient {
   }) async {
     final connectivityCheck = await _checkConnectivity();
     if (connectivityCheck.isLeft()) {
+      if (method.toUpperCase() == 'GET') {
+        final cacheKey = _cacheInterceptor.generateCacheKey(
+          RequestOptions(
+            path: endpoint,
+            queryParameters: queryParameters,
+            headers: options?.headers ?? {},
+          ),
+        );
+        final cachedData = _cacheInterceptor.getCachedData(cacheKey);
+        if (cachedData != null) {
+          if (kDebugMode) {
+            DPrint.info(
+              "🎯 Serving cached data for $endpoint due to no internet",
+            );
+          }
+          return Right(
+            NetworkSuccess<T>(
+              data: fromJsonT(cachedData['data']),
+              message: 'Served from cache due to no internet connection',
+              statusCode:
+                  _cacheInterceptor.getCachedStatusCode(cacheKey) ?? 200,
+            ),
+          );
+        }
+      }
       return connectivityCheck.fold(
         (failure) => Left(failure),
         (_) => const Left(UnknownFailure(message: 'Connectivity check failed')),
       );
+
+      // return connectivityCheck.fold(
+      //   (failure) => Left(failure),
+      //   (_) => const Left(UnknownFailure(message: 'Connectivity check failed')),
+      // );
     }
 
     try {
@@ -186,7 +219,19 @@ class ApiClient {
         );
       }
 
-      return Right(baseResponse.data as T);
+      // final data = (baseResponse.data as T);
+
+      // Ensure message and statusCode are non-null
+      final message = baseResponse.message;
+      final statusCode = response.statusCode ?? 0;
+
+      return Right(
+        NetworkSuccess<T>(
+          data: baseResponse.data as T,
+          message: message,
+          statusCode: statusCode,
+        ),
+      );
     } on DioException catch (error) {
       if (error.response?.statusCode == 401 && !_isRefreshing) {
         _isRefreshing = true;
@@ -222,7 +267,7 @@ class ApiClient {
   }
 
   /// HTTP Methods using Either
-  Future<Either<NetworkFailure, T>> get<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> get<T>(
     String endpoint, {
     Map<String, dynamic>? queryParameters,
     required T Function(dynamic) fromJsonT,
@@ -239,7 +284,7 @@ class ApiClient {
     onReceiveProgress: onReceiveProgress,
   );
 
-  Future<Either<NetworkFailure, T>> post<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> post<T>(
     String endpoint, {
     dynamic data,
     required T Function(dynamic) fromJsonT,
@@ -256,7 +301,7 @@ class ApiClient {
     onSendProgress: onSendProgress,
   );
 
-  Future<Either<NetworkFailure, T>> patch<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> patch<T>(
     String endpoint, {
     dynamic data,
     required T Function(dynamic) fromJsonT,
@@ -271,7 +316,7 @@ class ApiClient {
     cancelToken: cancelToken,
   );
 
-  Future<Either<NetworkFailure, T>> put<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> put<T>(
     String endpoint, {
     dynamic data,
     required T Function(dynamic) fromJsonT,
@@ -286,7 +331,7 @@ class ApiClient {
     cancelToken: cancelToken,
   );
 
-  Future<Either<NetworkFailure, T>> delete<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> delete<T>(
     String endpoint, {
     dynamic data,
     required T Function(dynamic) fromJsonT,
@@ -301,7 +346,7 @@ class ApiClient {
     cancelToken: cancelToken,
   );
 
-  Future<Either<NetworkFailure, T>> postFormData<T>(
+  Future<Either<NetworkFailure, NetworkSuccess<T>>> postFormData<T>(
     String endpoint, {
     required FormData formData,
     required T Function(dynamic) fromJsonT,

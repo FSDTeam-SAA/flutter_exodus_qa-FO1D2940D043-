@@ -23,9 +23,9 @@ class HomeController extends BaseController {
       final result = await _getHomeDataUsecase.call();
 
       result.fold((failure) {}, (data) {
-        userDataNotifier.value = data;
-        _appStateService.setUser(data);
-        dPrint("User Data Print -> ${data.user.email}");
+        userDataNotifier.value = data.data;
+        _appStateService.setUser(data.data);
+        dPrint("User Data Print -> ${data.data.user.email}");
 
         return data;
       });

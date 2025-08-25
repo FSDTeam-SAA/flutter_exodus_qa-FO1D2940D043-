@@ -6,11 +6,12 @@ import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/presentation/core/services/app_data_store.dart';
 
 // import '../network/interceptor/token_refresh_interceptor.dart';
+import '../network/services/auth_storage_service.dart';
 import '../services/app_state_service.dart';
-import '../services/payment_service.dart';
 
 void setupCore() {
   sl.registerLazySingleton(() => ApiClient());
+  sl.registerLazySingleton(() => AuthStorageService());
   sl.registerLazySingleton(() => NavigationService());
   sl.registerFactory(() => SecureStoreServices());
 

@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:exodus/core/di/service_locator.dart';
+import 'package:exodus/core/network/services/auth_storage_service.dart';
 import 'package:exodus/core/services/app_state_service.dart';
 import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
@@ -27,11 +27,13 @@ import 'package:exodus/presentation/screens/notification/controllers/notificatio
 import 'package:exodus/presentation/screens/profile/controllers/profile_controller.dart';
 import 'package:exodus/presentation/screens/profile/controllers/ride_history_controller.dart';
 
-import '../services/payment_service.dart';
-
 void setupController() {
   sl.registerFactory(
-    () => LoginController(sl<LoginUsecase>(), sl<SecureStoreServices>()),
+    () => LoginController(
+      sl<LoginUsecase>(),
+      sl<AuthStorageService>(),
+      sl<SecureStoreServices>(),
+    ),
   );
 
   sl.registerFactory(() => RegisterController(sl<RegisterUsecase>()));
@@ -52,7 +54,7 @@ void setupController() {
 
   sl.registerFactory(
     () => ProfileController(
-      sl<SecureStoreServices>(),
+      sl<AuthStorageService>(),
       sl<UserProfileUpdateUsecase>(),
       sl<GetHomeDataUsecase>(),
       sl<AppStateService>(),

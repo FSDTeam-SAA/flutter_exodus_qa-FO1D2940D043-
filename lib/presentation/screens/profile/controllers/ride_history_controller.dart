@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:exodus/core/controller/base_controller.dart';
-import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/ticket/ticket_model.dart';
 import 'package:exodus/domain/usecases/userProfile/ride_history_usecase.dart';
@@ -29,8 +28,8 @@ class RideHistoryController extends BaseController {
         return [];
       },
       (data) {
-        AppDataStore().updateRideHistory(data);
-        return data;
+        AppDataStore().updateRideHistory(data.data);
+        return data.data;
       },
     );
 

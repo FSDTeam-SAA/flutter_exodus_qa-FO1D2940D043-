@@ -33,7 +33,7 @@ class ListOfRoutsController extends BaseController {
       onSuccess: (data) {
         dPrint("List of Routes: $data");
 
-        AppDataStore().routesList = data;
+        AppDataStore().routesList = data.data;
 
         // return the data
         notifyListeners();
@@ -84,7 +84,7 @@ class ListOfRoutsController extends BaseController {
         notifyListeners();
       },
       (data) {
-        availableShuttlesList = data;
+        availableShuttlesList = data.data;
 
         // return the data
         notifyListeners();

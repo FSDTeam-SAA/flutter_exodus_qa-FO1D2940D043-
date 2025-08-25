@@ -9,11 +9,18 @@ import 'package:exodus/domain/usecases/auth/login_usecase.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/auth/login_response.dart';
 
+import '../../../../core/network/services/auth_storage_service.dart';
+
 class LoginController extends BaseController {
   final LoginUsecase _loginUsecase;
   final SecureStoreServices _secureStoreServices;
+  final AuthStorageService _authStorageService;
 
-  LoginController(this._loginUsecase, this._secureStoreServices);
+  LoginController(
+    this._loginUsecase,
+    this._authStorageService,
+    this._secureStoreServices,
+  );
 
   Future<void> login(String email, String password) async {
     setLoading(true);
@@ -27,24 +34,27 @@ class LoginController extends BaseController {
           dPrint("Success}");
           // final data = result.data;
 
-          await _secureStoreServices.storeData(
-            KeyConstants.accessToken,
-            data.accessToken,
-          );
-          await _secureStoreServices.storeData(
-            KeyConstants.refreshToken,
-            data.refreshToken,
-          );
+          _authStorageService.storeAccessToken(data.data.accessToken);
+          _authStorageService.storeRefreshToken(data.data.refreshToken);
+
+          // await _secureStoreServices.storeData(
+          //   KeyConstants.accessToken,
+          //   data.accessToken,
+          // );
+          // await _secureStoreServices.storeData(
+          //   KeyConstants.refreshToken,
+          //   data.refreshToken,
+          // );
           await _secureStoreServices.storeData(KeyConstants.email, email);
-          await _secureStoreServices.storeData(KeyConstants.role, data.role);
-          if (data.isUser) {
+          await _secureStoreServices.storeData(KeyConstants.role, data.data.role);
+          if (data.data.isUser) {
             NavigationService().freshStartTo(AppRoutes.bottomNavbar);
           }
           // if (data.isDriver) {
           //   NavigationService().freshStartTo(AppRoutes.driverHome);
           // }
 
-          dPrint("User role: ${data.role}");
+          dPrint("User role: ${data.data.role}");
           // Navigator.pushNamedAndRemoveUntil(context, newRouteName, predicate)
           dPrint("Navigation complete");
         },

@@ -3,6 +3,7 @@ import 'package:exodus/core/constants/api/api_constants_endpoints.dart';
 import 'package:exodus/core/constants/app/app_colors.dart';
 import 'package:exodus/core/network/api_client.dart';
 import 'package:exodus/core/network/models/network_failure.dart';
+import 'package:exodus/core/network/models/network_success.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
 import 'package:exodus/data/models/payment/payment_response.dart';
 import 'package:exodus/domain/repositories/payment_repository.dart';
@@ -72,7 +73,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         clientSecret,
       );
 
-      return Right(paymentIntent);
+      return Right(RetrievedSuccess(data: paymentIntent, message: 'Success'));
     } on StripeException catch (e) {
       dPrint('Stripe error: ${e.error.localizedMessage}');
       return Left(

@@ -41,7 +41,7 @@ class NotificationController extends BaseController {
 
       result.handle(
         onSuccess: (data) {
-          _currentNotifications = data;
+          _currentNotifications = data.data;
           AppDataStore().updateNotifications(_currentNotifications);
           // this.notifications = notifications;
           dPrint("Notification -> ${_currentNotifications.length}");

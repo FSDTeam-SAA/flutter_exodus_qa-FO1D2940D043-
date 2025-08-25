@@ -1,9 +1,8 @@
 import 'package:exodus/core/controller/base_controller.dart';
-import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/network/extensions/either_extensions.dart';
+import 'package:exodus/core/network/services/auth_storage_service.dart';
 import 'package:exodus/core/routes/app_routes.dart';
 import 'package:exodus/core/services/navigation_service.dart';
-import 'package:exodus/core/services/secure_store_services.dart';
 import 'package:exodus/domain/usecases/home/get_home_data.dart';
 import 'package:exodus/domain/usecases/userProfile/user_profile_update_usecase.dart';
 import 'package:exodus/presentation/screens/profile/model/user_profile_update_model.dart';
@@ -19,13 +18,14 @@ import '../../../../core/utils/debug_logger.dart';
 import '../../../../data/models/auth/user_data_response.dart';
 
 class ProfileController extends BaseController {
-  final SecureStoreServices _secureStoreServices;
+  // final SecureStoreServices _secureStoreServices;
+  final AuthStorageService _authStoreServices;
   final UserProfileUpdateUsecase _userProfileUpdateUsecase;
   final GetHomeDataUsecase _getHomeDataUsecase;
   final AppStateService _appStateService;
 
   ProfileController(
-    this._secureStoreServices,
+    this._authStoreServices,
     this._userProfileUpdateUsecase,
     this._getHomeDataUsecase,
     this._appStateService,
@@ -34,7 +34,7 @@ class ProfileController extends BaseController {
   final ValueNotifier<UserData?> userDataNotifier = ValueNotifier(null);
 
   Future<void> logout() async {
-    await _secureStoreServices.deleteAllData();
+    await _authStoreServices.clearAuthData();
 
     // Clear Hive cache box explicitly
     final cacheBox = Hive.box<HiveCacheModel>(ApiCacheConstants.userCacheKey);
@@ -99,9 +99,9 @@ class ProfileController extends BaseController {
 
       result.fold((failure) {}, (data) {
         // final data = result.data;
-        userDataNotifier.value = data;
-        _appStateService.setUser(data);
-        dPrint("User Data Print -> ${data.user.email}");
+        userDataNotifier.value = data.data;
+        _appStateService.setUser(data.data);
+        dPrint("User Data Print -> ${data.data.user.email}");
 
         return data;
       });

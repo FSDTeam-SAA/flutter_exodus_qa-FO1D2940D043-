@@ -28,7 +28,7 @@ class RegisterController extends BaseController {
 
       result.handle(
         onSuccess: (data) {
-          dPrint("Registration successful: ${data.toJson()}");
+          dPrint("Registration successful: ${data.data.toJson()}");
           // Handle successful registration, e.g., navigate to login or home screen
           NavigationService().freshStartTo(
             AppRoutes.codeVerify,

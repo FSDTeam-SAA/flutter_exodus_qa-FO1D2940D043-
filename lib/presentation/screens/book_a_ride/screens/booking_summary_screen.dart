@@ -348,7 +348,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           setState(() => _isLoading = false);
 
           final paymentResult = await _paymentController.processPayment(
-            clientSecret: clientSecret.transactionId,
+            clientSecret: clientSecret.data.transactionId,
           );
           dPrint("Payment resutl -> $paymentResult");
 
@@ -360,7 +360,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
             (data) async {
               // final paymentIntent = data;
               final confirmResult = await _paymentController.confirmPayment(
-                data.id,
+                data.data.id,
               );
               setState(() => _isLoading = false);
 

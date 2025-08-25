@@ -1,3 +1,5 @@
+// lib/core/network/interceptor/custom_cache_interceptor.dart
+
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutx_core/flutx_core.dart';
@@ -23,6 +25,22 @@ class CustomCacheInterceptor extends Interceptor {
     List<String>? excludedPaths,
   }) : _excludedPaths = Set.from(excludedPaths ?? []),
        _cacheBox = Hive.box<HiveCacheModel>(ApiCacheConstants.enhancedCacheKey);
+
+  Box<HiveCacheModel> get cacheBox => _cacheBox;
+
+  String generateCacheKey(RequestOptions options) {
+    return _generateCacheKey(options);
+  }
+
+  dynamic getCachedData(String key) {
+    final cached = _cacheBox.get(key);
+    if (cached == null) return null;
+    return _deserializeData(cached.responseBody, cached.dataType);
+  }
+
+  int? getCachedStatusCode(String key) {
+    return _cacheBox.get(key)?.statusCode;
+  }
 
   @override
   Future<void> onRequest(
