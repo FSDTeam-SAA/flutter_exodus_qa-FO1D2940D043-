@@ -145,16 +145,21 @@ class ListOfRoutsController extends BaseController {
         time,
       );
 
-      result.fold(
+      dPrint("list_of_routes -> ${result}");
+
+      final busDetails = result.fold(
         (failure) {
           setError(failure.message);
           dPrint("Failed to fetch bus details: ${failure.message}");
           throw Exception("Failed to fetch bus details");
         },
         (data) {
-          return data;
+          dPrint("single bus result -> ${data.data.bus.busNumber}");
+          return data.data;
         },
       );
+
+      return busDetails;
 
       // if (result is ApiSuccess<BusDetailResponse>) {
       //   return result.data;

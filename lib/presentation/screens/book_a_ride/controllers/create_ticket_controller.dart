@@ -30,7 +30,7 @@ class CreateTicketController extends BaseController {
         date,
       );
 
-      result.fold(
+      final ticketResult = result.fold(
         (failure) {
           setError(failure.message);
           dPrint("Ticket creation error: ${failure.message}");
@@ -38,9 +38,11 @@ class CreateTicketController extends BaseController {
         },
         (data) {
           dPrint("Create Ticket data result -> ${data}");
-          return data;
+          return data.data;
         },
       );
+
+      return ticketResult;
 
       // if (result is ApiSuccess<TicketModel>) {
       //   dPrint("Ticket Is create -> ${result}");

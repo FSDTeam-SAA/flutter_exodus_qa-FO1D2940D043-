@@ -293,43 +293,47 @@ class _SeatsScreenState extends State<SeatsScreen> {
   }
 
   Widget _cancellationPolicy(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.containerPolicyColor,
-        borderRadius: AppSizes.borderRadiusMedium,
-      ),
-      child: Padding(
-        padding: AppSizes.paddingAllMedium,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// [Title]
-            Text("Standing", style: AppText.bodyMedium),
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.containerPolicyColor,
+          borderRadius: AppSizes.borderRadiusMedium,
+        ),
+        child: Padding(
+          padding: AppSizes.paddingAllMedium,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// [Title]
+              Text("Standing", style: AppText.bodyMedium),
 
-            Gap.h8,
-            Text(
-              "Note: When all seats are full, a limited number of users can request standing tickets. The bus driver will be notified, and upon approval, the user will be granted access for standing travel.",
-            ),
-
-            Gap.h16,
-            context.secondaryButton(
-              onPressed: () {},
-              widget: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ShaderMask(
-                    shaderCallback:
-                        (bounds) =>
-                            AppColors.primaryGradient.createShader(bounds),
-                    child: Text(
-                      "Apply for standing",
-                      style: AppText.smallMedium.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ],
+              Gap.h8,
+              Text(
+                "Note: When all seats are full, a limited number of users can request standing tickets. The bus driver will be notified, and upon approval, the user will be granted access for standing travel.",
               ),
-            ),
-          ],
+
+              Gap.h16,
+              context.secondaryButton(
+                onPressed: () {},
+                widget: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ShaderMask(
+                      shaderCallback:
+                          (bounds) =>
+                              AppColors.primaryGradient.createShader(bounds),
+                      child: Text(
+                        "Apply for standing",
+                        style: AppText.smallMedium.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

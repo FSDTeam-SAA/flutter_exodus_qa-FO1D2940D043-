@@ -1,4 +1,5 @@
 import 'package:exodus/data/models/bus/available_bus_response.dart';
+import 'package:flutx_core/flutx_core.dart';
 
 class BusDetailResponse {
   final Bus bus;
@@ -12,6 +13,7 @@ class BusDetailResponse {
   });
 
   factory BusDetailResponse.fromJson(Map<String, dynamic> json) {
+    DPrint.log("Single bus -> $json");
     return BusDetailResponse(
       bus: Bus.fromJson(json['bus']),
       availableSeats: List<String>.from(json['avaiableSeat']),

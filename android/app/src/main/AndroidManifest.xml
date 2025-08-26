@@ -12,7 +12,14 @@
     <application
         android:label="exodus"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:theme="@style/NormalTheme">
+
+        <!-- Stripe Google Pay configuration -->
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"

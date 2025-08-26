@@ -250,7 +250,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
                 final isSelected = index == selectedDateIndex;
 
                 return GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
                       selectedDateIndex = index;
                       final dateString =
@@ -261,7 +261,7 @@ class _BookARideScreenState extends State<BookARideScreen> {
                       selectedDate = DateTime.parse(dateString);
                       dPrint("Parsed DateTime: $selectedDate");
                     });
-                    _getAvailableShuttles();
+                    await _getAvailableShuttles();
                   },
 
                   child: Container(
@@ -419,25 +419,29 @@ class _BookARideScreenState extends State<BookARideScreen> {
 
                     return GestureDetector(
                       onTap: () async {
-                        final data = await controller.getSingleBusDetails(
-                          ride.bus.id,
-                          firstStop,
-                          lastStop,
-                          date,
-                          departureTime,
-                        );
+                        try {
+                          final data = await controller.getSingleBusDetails(
+                            ride.bus.id,
+                            firstStop,
+                            lastStop,
+                            date,
+                            departureTime,
+                          );
 
-                        NavigationService().sailTo(
-                          AppRoutes.busSeats,
-                          arguments: {
-                            'Seates': data,
-                            'source': toSelect,
-                            'destination': fromSelect,
-                            'date': selectedDate,
-                            'departureTime' : departureTime,
-                            'arrivalTime' : arrivalTime
-                          },
-                        );
+                          NavigationService().sailTo(
+                            AppRoutes.busSeats,
+                            arguments: {
+                              'Seates': data,
+                              'source': toSelect,
+                              'destination': fromSelect,
+                              'date': selectedDate,
+                              'departureTime': departureTime,
+                              'arrivalTime': arrivalTime,
+                            },
+                          );
+                        } catch (e) {
+                          dPrint("book a ride screen navite -> $e");
+                        }
                       },
                       child: Column(
                         children: [

@@ -6,7 +6,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 class StripeInitializer {
   static Future<void> intiStripe() async {
     Stripe.publishableKey = StripeKey.key;
-    Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+    // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
 
     try {
       await Stripe.instance.applySettings();

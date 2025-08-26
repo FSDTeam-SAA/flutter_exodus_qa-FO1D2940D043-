@@ -84,7 +84,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                 _buildPaymentOptions(),
                 Gap.h32,
                 _buildContinueButton(),
-                Gap.h24,
+                Gap.bottomAppBarGap,
               ],
             ),
           ),
@@ -338,10 +338,10 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
         reserveBusId: widget.reserveBusId,
         amount: widget.total,
       );
-      dPrint("Result in payment -> $result");
 
       result.handle(
         onSuccess: (data) async {
+          dPrint("Result in payment -> ${data.data}");
           final clientSecret = data;
 
           dPrint("clientSecret -> ${clientSecret}");
@@ -382,8 +382,6 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           return;
         },
       );
-
-
 
       // if (result is ApiError) {
       //   _showSnackbar((result as ApiError).message);

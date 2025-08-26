@@ -51,39 +51,41 @@ class _BottomNavbarState extends State<BottomNavbar>
           children: _screens,
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: AppColors.secondary, // Use a contrasting color
-              width: 0.2, // Thickness of the line
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: AppColors.secondary, // Use a contrasting color
+                width: 0.2, // Thickness of the line
+              ),
             ),
           ),
-        ),
-        child: Material(
-          // color: AppColors.secondary,
-          elevation: 8,
-          child: TabBar(
-            controller: _tabController,
-            onTap: (index) {
-              setState(() {
-                _tabController.index = index;
-              });
-            },
-            indicator: const TopIndicator(),
-            indicatorSize: TabBarIndicatorSize.tab,
+          child: Material(
+            // color: AppColors.secondary,
+            elevation: 8,
+            child: TabBar(
+              controller: _tabController,
+              onTap: (index) {
+                setState(() {
+                  _tabController.index = index;
+                });
+              },
+              indicator: const TopIndicator(),
+              indicatorSize: TabBarIndicatorSize.tab,
 
-            labelColor: AppColors.secondary,
-            unselectedLabelColor: AppColors.secondary,
-            tabs: const [
-              Tab(icon: Icon(Icons.home_outlined), text: 'Home'),
-              Tab(icon: Icon(Icons.directions_bus_outlined), text: 'Ride'),
-              Tab(
-                icon: Icon(Icons.subscriptions_outlined),
-                text: 'Subscription',
-              ),
-              Tab(icon: Icon(Icons.person_outlined), text: 'My Profile'),
-            ],
+              labelColor: AppColors.secondary,
+              unselectedLabelColor: AppColors.secondary,
+              tabs: const [
+                Tab(icon: Icon(Icons.home_outlined), text: 'Home'),
+                Tab(icon: Icon(Icons.directions_bus_outlined), text: 'Ride'),
+                Tab(
+                  icon: Icon(Icons.subscriptions_outlined),
+                  text: 'Subscription',
+                ),
+                Tab(icon: Icon(Icons.person_outlined), text: 'My Profile'),
+              ],
+            ),
           ),
         ),
       ),

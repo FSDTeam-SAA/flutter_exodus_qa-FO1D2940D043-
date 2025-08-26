@@ -2,14 +2,16 @@ import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/api_result.dart';
 import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
+import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/verify_otp_usecase.dart';
 
 class VerifyCodeController extends BaseController {
   final VerfifyOTPUseCase _verifyOTPUseCase;
+  // final ResetPasswordUseCase _resetPasswordUseCase;
 
-  VerifyCodeController(this._verifyOTPUseCase);
+  VerifyCodeController(this._verifyOTPUseCase,);
 
-  Future<bool> verifyCode(String email, String code) async {
+  Future<bool> verifyCode(String email, String code, bool fromLogin) async {
     try {
       setLoading(true);
       clearError();

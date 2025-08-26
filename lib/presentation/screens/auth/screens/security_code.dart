@@ -52,9 +52,14 @@ class _SecurityCodeScreenState extends State<SecurityCodeScreen> {
         dPrint("Code Print $code");
         dPrint("Email in Code Print ${widget.email}");
 
+        if(widget.fromLogin) {
+
+        }
+
         final result = await _verifyCodeController.verifyCode(
           widget.email!,
           code,
+          widget.fromLogin
         );
 
         if (result) {

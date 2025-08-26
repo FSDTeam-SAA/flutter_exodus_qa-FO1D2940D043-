@@ -1,6 +1,6 @@
 class ApiEndpoints {
   // BaseURL
-  // static const String baseDomain = 'http://10.10.5.95:5000';
+  // static const String baseDomain = 'http://10.10.5.33:5001';
 
   static const String baseDomain = 'https://api.exodusqa.com';
   static const String baseUrl = '$baseDomain/api/v1';
@@ -11,7 +11,7 @@ class ApiEndpoints {
     // Content-Type will be set automatically for multipart
   };
 
-  static const String refreshToken = '$baseUrl/auth/refresh-token';
+  static const String refreshToken = '$baseUrl/user/refresh-token';
   // Auth
   static const String login = '$baseUrl/auth/login';
   static const String register = '$baseUrl/auth/register';
