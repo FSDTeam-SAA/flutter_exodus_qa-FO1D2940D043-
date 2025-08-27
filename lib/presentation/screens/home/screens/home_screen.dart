@@ -149,46 +149,48 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ValueListenableBuilder<UserData?>(
         valueListenable: _controller.userDataNotifier,
         builder: (context, userData, _) {
-          return AppBar(
-            leadingWidth: 60.0,
-            leading: Row(
-              children: [
-                SizedBox(width: 18.0),
-                SizedBox(
-                  child: CustomCachedImage.avatarSmall(
-                    userData?.user.avatar.url ?? '',
+          return _controller.isLoading
+              ? AppBar()
+              : AppBar(
+                leadingWidth: 60.0,
+                leading: Row(
+                  children: [
+                    SizedBox(width: 18.0),
+                    SizedBox(
+                      child: CustomCachedImage.avatarSmall(
+                        userData?.user.avatar.url ?? '',
+                      ),
+                    ),
+                  ],
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userData?.user.name.capitalizeFirstOfEach ?? 'User Name',
+                      style: AppText.bodySemiBold.copyWith(
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                    Text(
+                      userData?.user.username.startsWithAt ?? "@username",
+                      style: AppText.smallRegular,
+                    ),
+                  ],
+                ),
+                actions: [
+                  InkWell(
+                    child: Icon(
+                      Icons.notifications_none_outlined,
+                      color: AppColors.secondary,
+                    ),
+                    onTap: () {
+                      NavigationService().sailTo(AppRoutes.notification);
+                    },
                   ),
-                ),
-              ],
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  userData?.user.name.capitalizeFirstOfEach ?? 'User Name',
-                  style: AppText.bodySemiBold.copyWith(
-                    color: AppColors.secondary,
-                  ),
-                ),
-                Text(
-                  userData?.user.username.startsWithAt ?? "@username",
-                  style: AppText.smallRegular,
-                ),
-              ],
-            ),
-            actions: [
-              InkWell(
-                child: Icon(
-                  Icons.notifications_none_outlined,
-                  color: AppColors.secondary,
-                ),
-                onTap: () {
-                  NavigationService().sailTo(AppRoutes.notification);
-                },
-              ),
-              SizedBox(width: 18.0),
-            ],
-          );
+                  SizedBox(width: 18.0),
+                ],
+              );
         },
       ),
     );

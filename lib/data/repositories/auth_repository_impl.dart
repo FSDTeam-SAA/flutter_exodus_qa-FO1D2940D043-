@@ -15,10 +15,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
 
   @override
-  NetworkResult<LoginResponse> login(
-    String email,
-    String password,
-  ) {
+  NetworkResult<LoginResponse> login(String email, String password) {
     dPrint("email : $email");
     return _apiClient.post<LoginResponse>(
       ApiEndpoints.login,
@@ -52,6 +49,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  NetworkResult<void> verifyResetOTP(String email, String otp) {
+    dPrint(email);
+    return _apiClient.post(
+      ApiEndpoints.verifyResetOtp,
+      data: {"email": email, "otp": otp},
+      fromJsonT: (json) => {},
+    );
+  }
+
+  @override
   NetworkResult<UserData> getUserData() async {
     return _apiClient.get<UserData>(
       ApiEndpoints.getUserData,
@@ -76,7 +83,7 @@ class AuthRepositoryImpl implements AuthRepository {
   ) {
     return _apiClient.post(
       ApiEndpoints.resetPassword,
-      data: {"email": email, "otp": otp, "newPassword": newPassword},
+      data: {"email": email, "otp": otp, "password": newPassword},
       fromJsonT: (json) => {},
     );
   }

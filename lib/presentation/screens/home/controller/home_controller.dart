@@ -18,6 +18,7 @@ class HomeController extends BaseController {
 
   Future<UserData?> getUserData() async {
     setLoading(true);
+    notifyListeners();
 
     try {
       final result = await _getHomeDataUsecase.call();
@@ -29,6 +30,7 @@ class HomeController extends BaseController {
 
         return data;
       });
+      notifyListeners();
 
       // if (result is ApiSuccess<UserData>) {
       // final data = result.data;
@@ -40,6 +42,7 @@ class HomeController extends BaseController {
       // }
     } finally {
       setLoading(false);
+      notifyListeners();
     }
     return null;
   }

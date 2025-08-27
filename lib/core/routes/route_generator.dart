@@ -49,7 +49,10 @@ class RouteGenerator {
           ),
         );
       case AppRoutes.createNewPassword:
-        return SlideLeftTransition(page: CreateNewPasswordScreen(), );
+        final args = settings.arguments as Map<String, dynamic>?;
+        return SlideLeftTransition(
+          page: CreateNewPasswordScreen(otp: args?['otp_code']),
+        );
 
       /// [App Bottom Navbar]
       case AppRoutes.bottomNavbar:

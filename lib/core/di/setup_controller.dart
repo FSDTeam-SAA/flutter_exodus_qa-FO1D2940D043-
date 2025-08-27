@@ -37,7 +37,12 @@ void setupController() {
   );
 
   sl.registerFactory(() => RegisterController(sl<RegisterUsecase>()));
-  sl.registerFactory(() => VerifyCodeController(sl<VerfifyOTPUseCase>()));
+  sl.registerFactory(
+    () => VerifyCodeController(
+      sl<VerfifyResetOTPUseCase>(),
+      sl<VerfifyResetOTPUseCase>(),
+    ),
+  );
 
   // Password Controllers
   sl.registerFactory(

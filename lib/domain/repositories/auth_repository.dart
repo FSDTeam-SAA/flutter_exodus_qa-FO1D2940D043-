@@ -11,8 +11,16 @@ abstract class AuthRepository {
   NetworkResult<UserData> getUserData();
   NetworkResult<User> register(RegisterRequest params);
   NetworkResult<void> verifyOTP(String email, String otp);
+  NetworkResult<void> verifyResetOTP(String email, String otp);
   NetworkResult<void> forgatePassword(String email);
-  NetworkResult<void> resetPassword(String email, String otp, String newPassword);
-  NetworkResult<void> changePassword(String email, String oldPassword, String newPassword);
-
+  NetworkResult<void> resetPassword(
+    String email,
+    String otp,
+    String newPassword,
+  );
+  NetworkResult<void> changePassword(
+    String email,
+    String oldPassword,
+    String newPassword,
+  );
 }

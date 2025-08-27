@@ -15,11 +15,13 @@ import 'package:exodus/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../controllers/login_controller.dart';
 import '../controllers/password_reset_controller.dart';
 
 class CreateNewPasswordScreen extends StatefulWidget {
-  const CreateNewPasswordScreen({super.key});
+  final String otp;
+  const CreateNewPasswordScreen({super.key, required this.otp});
 
   @override
   State<CreateNewPasswordScreen> createState() =>
@@ -46,11 +48,16 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
     if (_formKey.currentState!.validate()) {
       final email = await _secureStorage.retrieveData(KeyConstants.email);
 
-      _controller.changePassword(
+      final result = await _controller.resetPassword(
         email!,
-        _newPasswordController.text,
+        widget.otp,
         _repeatNewPasswordController.text,
       );
+
+      if (result && mounted) {
+        SnackbarUtils.showSnackbar(context, message: _controller.errorMessage);
+        NavigationService().freshStartTo(AppRoutes.login);
+      }
 
       // Navigator.pushNamed(context, AppRoutes.home);
     }
@@ -157,9 +164,15 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                         ),
 
                         Gap.h22,
-                        context.primaryButton(
-                          onPressed: _submit,
-                          text: "Continue",
+                        AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return context.primaryButton(
+                              onPressed: _submit,
+                              text: "Continue",
+                              isLoading: _controller.isLoading,
+                            );
+                          },
                         ),
                       ],
                     ),

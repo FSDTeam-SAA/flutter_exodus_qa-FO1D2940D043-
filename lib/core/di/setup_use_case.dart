@@ -21,7 +21,7 @@ void setupUseCase() {
   sl.registerLazySingleton(() => CheckAuthStatusUsecase(sl()));
   sl.registerLazySingleton(() => LoginUsecase(sl()));
   sl.registerLazySingleton(() => RegisterUsecase(sl()));
-  sl.registerLazySingleton(() => VerfifyOTPUseCase(sl()));
+  sl.registerLazySingleton(() => VerfifyResetOTPUseCase(sl()));
   sl.registerLazySingleton(() => GetHomeDataUsecase(sl()));
   sl.registerLazySingleton(() => NotificationDataUsecase(sl()));
 

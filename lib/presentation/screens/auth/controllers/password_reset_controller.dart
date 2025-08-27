@@ -1,6 +1,7 @@
 import 'package:exodus/core/controller/base_controller.dart';
 import 'package:exodus/core/network/extensions/either_extensions.dart';
 import 'package:exodus/core/utils/debug_logger.dart';
+import 'package:exodus/core/utils/snackbar_utils.dart';
 import 'package:exodus/domain/usecases/auth/change_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/forgate_password_usecases.dart';
 import 'package:exodus/domain/usecases/auth/reset_password_usecases.dart';
@@ -33,18 +34,32 @@ class PasswordResetController extends BaseController {
   }
 
   // Reset Password
-  Future<void> resetPassword(
+  Future<bool> resetPassword(
     String email,
     String code,
     String newPassword,
   ) async {
     setLoading(true);
+    setError("");
     notifyListeners();
+
+    dPrint("reset password : $email $code $newPassword");
 
     final result = await resetPasswordUseCase.call(email, code, newPassword);
 
-    dPrint("Reset Password Result: $result");
+    final returnResutl = result.fold(
+      (fail) {
+        return false;
+      },
+      (success) {
+        dPrint("Reset Password Result: ${success.message}");
+        setError(success.message);
+        return true;
+      },
+    );
+
     setLoading(false);
+    return returnResutl;
   }
 
   // Change Password
